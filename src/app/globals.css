@@ -1,26 +1,57 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --compost: #214e34;
+  --leaf: #83b925;
+  --charcoal: #111827;
+  --stone: #f6f4ef;
+  --white: #ffffff;
+  --air-blue: #00a8f3;
+  --eco-mist: #ecf6ed;
+  --kraft: #d7c7a3;
+  --forest: #014a05;
+  --aqua: #79def0;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-compost: var(--compost);
+  --color-leaf: var(--leaf);
+  --color-charcoal: var(--charcoal);
+  --color-stone: var(--stone);
+  --color-air: var(--air-blue);
+  --color-mist: var(--eco-mist);
+  --color-kraft: var(--kraft);
+  --color-forest: var(--forest);
+  --color-aqua: var(--aqua);
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--stone);
+  color: var(--charcoal);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+/* Homepage — climate-tech premium (scoped; see GlobalHome wrapper) */
+.zp-home-climate :is(h1, h2, h3).font-heading,
+.zp-home-climate .font-heading {
+  font-family: var(--font-jakarta), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.025em;
+}
+
+/* Funnel landing page (scoped to dedicated route) */
+.zp-funnel-page :is(h1, h2, h3).font-heading,
+.zp-funnel-page .font-heading {
+  font-family: var(--font-jakarta), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.03em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--air-blue);
+  outline-offset: 2px;
 }

@@ -55,3 +55,40 @@ body {
   outline: 2px solid var(--air-blue);
   outline-offset: 2px;
 }
+
+/* Homepage motion (respect reduced motion) */
+.zp-reveal {
+  opacity: 0;
+  transform: translate3d(0, 14px, 0);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+  will-change: opacity, transform;
+}
+
+.zp-reveal-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zp-reveal,
+  .zp-reveal-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    will-change: auto;
+  }
+}
+
+.zp-hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.zp-hover-lift:hover {
+  transform: translate3d(0, -3px, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zp-hover-lift:hover {
+    transform: none;
+  }
+}

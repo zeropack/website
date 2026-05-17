@@ -78,10 +78,10 @@ export function RegionalHome({ region }: { region: RegionCode }) {
           <div className="grid gap-10 lg:grid-cols-2">
             <div>
               <h2 className="font-heading text-2xl font-semibold text-charcoal sm:text-3xl">
-                {globalHome.problem.heading}
+                {globalHome.packagingContext.heading}
               </h2>
               <div className="mt-6 space-y-4 text-charcoal/75">
-                {globalHome.problem.body.map((p) => (
+                {globalHome.packagingContext.body.map((p) => (
                   <p key={p}>{p}</p>
                 ))}
               </div>

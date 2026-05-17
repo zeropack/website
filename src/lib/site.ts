@@ -2,7 +2,7 @@ export const SITE_NAME = "Zero Pack";
 
 export function getSiteUrl(): string {
   const base = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
-  return base && base.length > 0 ? base : "https://www.zeropack.com";
+  return base && base.length > 0 ? base : "https://zeropack.co";
 }
 
 export function absoluteUrl(path: string): string {

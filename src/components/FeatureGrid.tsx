@@ -24,8 +24,8 @@ export function FeatureGrid({
               key={f.title}
               className={
                 isClimate
-                  ? "rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-300/25"
-                  : "rounded-2xl border border-black/5 bg-stone p-6"
+                  ? "zp-hover-lift rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-300/25 hover:shadow-md"
+                  : "zp-hover-lift rounded-2xl border border-black/5 bg-stone p-6 hover:shadow-md"
               }
             >
               <h3 className="font-heading text-lg font-semibold text-compost">{f.title}</h3>

@@ -35,19 +35,19 @@ export function LeadMagnetBlock({
               how to decide whether custom compostable mailers are right for your brand.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <CTAButton href="/packaging-guide/" variant="primary">
-                Get the Free Guide
-              </CTAButton>
-              <CTAButton href={quoteHref} variant="secondary">
+              <CTAButton href={quoteHref} variant="primary">
                 Get a Custom Quote
+              </CTAButton>
+              <CTAButton href="/packaging-guide/" variant="secondary">
+                Download the packaging guide
               </CTAButton>
             </div>
           </div>
           <div
             className={
               isClimate
-                ? "rounded-2xl border border-slate-200/50 bg-gradient-to-br from-stone/80 to-white p-6 shadow-sm"
-                : "rounded-2xl bg-stone p-6 ring-1 ring-black/5"
+                ? "zp-hover-lift rounded-2xl border border-slate-200/50 bg-gradient-to-br from-stone/80 to-white p-6 shadow-sm hover:shadow-md"
+                : "zp-hover-lift rounded-2xl bg-stone p-6 ring-1 ring-black/5 hover:shadow-md"
             }
           >
             <p className="text-sm font-semibold text-compost">What’s inside</p>

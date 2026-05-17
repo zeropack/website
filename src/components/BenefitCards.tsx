@@ -29,8 +29,8 @@ export function BenefitCards({ variant = "default" }: { variant?: "default" | "c
               key={p.title}
               className={
                 isClimate
-                  ? "rounded-2xl border border-white/10 bg-white/10 p-6 shadow-lg shadow-black/20 backdrop-blur-sm"
-                  : "rounded-2xl bg-white/5 p-6 ring-1 ring-white/10"
+                  ? "zp-hover-lift rounded-2xl border border-white/10 bg-white/10 p-6 shadow-lg shadow-black/20 backdrop-blur-sm hover:border-white/20"
+                  : "zp-hover-lift rounded-2xl bg-white/5 p-6 ring-1 ring-white/10 hover:ring-white/20"
               }
             >
               <h3 className="font-heading text-lg font-semibold text-leaf">{p.title}</h3>

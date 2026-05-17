@@ -21,8 +21,8 @@ export function ProcessSteps({
               key={s.title}
               className={
                 isClimate
-                  ? "rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-300/20"
-                  : "rounded-2xl border border-black/5 bg-white p-6"
+                  ? "zp-hover-lift rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-300/20 hover:shadow-md"
+                  : "zp-hover-lift rounded-2xl border border-black/5 bg-white p-6 hover:shadow-md"
               }
             >
               <p

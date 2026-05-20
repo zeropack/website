@@ -6,9 +6,9 @@ export const brand = {
 export const globalHome = {
   hero: {
     labelPill: "Made to order · B2B · Ships worldwide",
-    headline: "Custom Compostable Mailers for Brands That Want Better Than Plastic",
+    headline: "Custom Compostable Mailers for Brands That Want A Better Planet",
     subheading:
-      "Zero Pack is a custom packaging partner for ecommerce brands: made-to-order compostable mailers with credible certification guidance, sizing support and print that matches how you ship.",
+      "Zero Pack is your custom packaging partner for ecommerce: made-to-order compostable mailers with globally recognised certification, free design support and print that matches your brand.",
     primaryCta: "Get a Custom Quote",
     secondaryCta: "Download the packaging guide",
     softCta: "Prefer to read first? Start with what to ask before ordering custom packaging.",
@@ -24,34 +24,36 @@ export const globalHome = {
   ],
   whoWeAre: {
     heading: "Who we are",
+    /** Set to a YouTube video ID to replace the placeholder (e.g. from watch?v=VIDEO_ID). */
+    youtubeVideoId: "",
     body: [
       "Zero Pack helps brands replace generic plastic shipping mailers with custom compostable mailers that look considered, perform in transit and align with modern customer expectations.",
-      "We work globally with ecommerce-led brands that ship regularly. Production is made to order (not off-the-shelf stock), and pricing is quote-based so specification, print and freight stay transparent.",
+      "We work globally with ecommerce-focused brands. Production is made to order (not off-the-shelf stock), and pricing is quote-based so specification, print and freight stay transparent.",
     ],
   },
   packagingContext: {
     heading: "Why packaging is a strategic touchpoint",
     body: [
       "Before a customer sees your product, they see the packaging. It signals quality, care and credibility — especially when sustainability claims are under more scrutiny than ever.",
-      "Our role is practical: help you choose a compostable specification that matches your shipping risk profile, then produce consistent branded mailers at a sensible MOQ for growing brands.",
+      "Our role is practical: we transform your current packaging into a compostable alternative and support you through the transition. Providing you and your customers with the same or better quality your accustomed to.",
     ],
   },
   whatWeDo: {
     heading: "What we do",
     intro:
-      "Our core offer is made-to-order custom compostable mailers. We also support related compostable formats for brands building a cohesive system — still produced through the same quote-led workflow.",
+      "Our core offer is made-to-order custom compostable mailers. We also provide other compostable packaging needs to ensure that your brand can provide a unified stance against plastic packaging.",
     bullets: [
       {
         title: "Core product",
         text: "Custom compostable mailers for ecommerce fulfilment — sizing, print and specification aligned to how you ship.",
       },
       {
-        title: "Broader formats (via quote)",
-        text: "Shopping bags, garment bags and campaign-led packaging can be explored when your programme needs more than mailers alone.",
+        title: "Broader formats",
+        text: "Shopping bags, garment bags and campaign-led packaging can be explored when your business needs more than mailers alone.",
       },
       {
-        title: "How buying works",
-        text: "No generic stock model: you confirm specification, then we produce to order. MOQs typically start from around 2,000 units depending on size and print.",
+        title: "How it works",
+        text: "No generic stock model: you confirm specification, then we produce to order. MOQs typically start from around 2,000 units depending on packaging, size and print.",
       },
     ],
     primaryCtaLabel: "Get a Custom Quote",

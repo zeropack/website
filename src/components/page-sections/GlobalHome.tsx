@@ -16,6 +16,8 @@ import { getRegionConfig } from "@/lib/regions";
 import { JsonLd } from "@/components/JsonLd";
 import { absoluteUrl } from "@/lib/site";
 import { Reveal } from "@/components/Reveal";
+import { PrimasoyPackagingShowcase } from "@/components/PrimasoyPackagingShowcase";
+import { YoutubeVideoPlaceholder } from "@/components/YoutubeVideoPlaceholder";
 
 const showcaseStudies = [...getRegionConfig("au").caseStudies, ...getRegionConfig("uk").caseStudies].slice(0, 4);
 
@@ -60,12 +62,18 @@ export function GlobalHome() {
 
         <Reveal>
           <section className="border-b border-slate-200/40 bg-white py-14 sm:py-20">
-            <div className="mx-auto max-w-6xl px-4 sm:px-6">
-              <h2 className="font-heading text-2xl font-semibold text-charcoal sm:text-3xl">{globalHome.whoWeAre.heading}</h2>
-              <div className="mt-6 max-w-3xl space-y-4 text-lg text-charcoal/75">
-                {globalHome.whoWeAre.body.map((p) => (
-                  <p key={p}>{p}</p>
-                ))}
+            <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-12">
+              <YoutubeVideoPlaceholder
+                videoId={globalHome.whoWeAre.youtubeVideoId || undefined}
+                title="About Zero Pack"
+              />
+              <div>
+                <h2 className="font-heading text-2xl font-semibold text-charcoal sm:text-3xl">{globalHome.whoWeAre.heading}</h2>
+                <div className="mt-6 space-y-4 text-lg text-charcoal/75">
+                  {globalHome.whoWeAre.body.map((p) => (
+                    <p key={p}>{p}</p>
+                  ))}
+                </div>
               </div>
             </div>
           </section>
@@ -77,13 +85,16 @@ export function GlobalHome() {
               className="pointer-events-none absolute -right-16 top-0 h-56 w-56 rounded-full bg-[radial-gradient(closest-side,rgba(0,168,243,0.12),transparent_72%)]"
               aria-hidden
             />
-            <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
-              <h2 className="font-heading text-2xl font-semibold text-charcoal sm:text-3xl">{globalHome.packagingContext.heading}</h2>
-              <div className="mt-6 max-w-3xl space-y-4 text-lg text-charcoal/75">
-                {globalHome.packagingContext.body.map((p) => (
-                  <p key={p}>{p}</p>
-                ))}
+            <div className="relative mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-12">
+              <div>
+                <h2 className="font-heading text-2xl font-semibold text-charcoal sm:text-3xl">{globalHome.packagingContext.heading}</h2>
+                <div className="mt-6 space-y-4 text-lg text-charcoal/75">
+                  {globalHome.packagingContext.body.map((p) => (
+                    <p key={p}>{p}</p>
+                  ))}
+                </div>
               </div>
+              <PrimasoyPackagingShowcase />
             </div>
           </section>
         </Reveal>

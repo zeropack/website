@@ -46,7 +46,7 @@ const badges: Badge[] = [
   {
     icon: AwardIcon,
     text: "AS5810 certified",
-    description: "Home compostable certification standard",
+    description: "The Gold Standard for Home Compostable Certification",
   },
   {
     icon: PackageIcon,
@@ -61,7 +61,7 @@ const badges: Badge[] = [
   {
     icon: CheckIcon,
     text: "Quote response in 48 hours",
-    description: "Fast, clear guidance before production",
+    description: "Fast, clear guidance and free design support",
   },
 ];
 

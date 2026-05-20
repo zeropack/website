@@ -1,5 +1,7 @@
 import { CTAButton } from "./CTAButton";
+import { CustomMailerCarousel } from "./CustomMailerCarousel";
 import { ProductMockupGallery } from "./ProductMockupGallery";
+import { customMailerCarouselSlides } from "@/content/customMailerCarouselSlides";
 
 export function HeroSection({
   variant = "default",
@@ -104,7 +106,11 @@ export function HeroSection({
             </p>
           ) : null}
         </div>
-        <ProductMockupGallery tone={isClimate ? "climate" : "default"} />
+        {isClimate ? (
+          <CustomMailerCarousel slides={customMailerCarouselSlides} variant="climate" />
+        ) : (
+          <ProductMockupGallery tone="default" />
+        )}
       </div>
     </section>
   );

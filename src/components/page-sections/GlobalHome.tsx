@@ -5,33 +5,16 @@ import { HeroSection } from "@/components/HeroSection";
 import { TrustBadges } from "@/components/TrustBadges";
 import { FeatureGrid } from "@/components/FeatureGrid";
 import { BenefitCards } from "@/components/BenefitCards";
-import { CertificationExplainer } from "@/components/CertificationExplainer";
-import { ProcessSteps } from "@/components/ProcessSteps";
-import { CustomerShowcaseGrid } from "@/components/CustomerShowcaseGrid";
+import { PackagingPathSteps } from "@/components/PackagingPathSteps";
 import { LeadMagnetBlock } from "@/components/LeadMagnetBlock";
-import { CTASection } from "@/components/CTASection";
 import { FAQAccordion } from "@/components/FAQAccordion";
 import { FAQSchema } from "@/components/FAQSchema";
-import { getRegionConfig } from "@/lib/regions";
 import { JsonLd } from "@/components/JsonLd";
 import { absoluteUrl } from "@/lib/site";
 import { Reveal } from "@/components/Reveal";
 import { PrimasoyPackagingShowcase } from "@/components/PrimasoyPackagingShowcase";
 import { YoutubeVideoPlaceholder } from "@/components/YoutubeVideoPlaceholder";
-
-const showcaseStudies = [...getRegionConfig("au").caseStudies, ...getRegionConfig("uk").caseStudies].slice(0, 4);
-
-const standApartShell: Record<(typeof globalHome.standsApart.items)[number]["accent"], string> = {
-  sage: "zp-hover-lift rounded-2xl border border-leaf/25 bg-gradient-to-br from-mist/95 to-white p-6 shadow-sm shadow-slate-200/30",
-  air: "zp-hover-lift rounded-2xl border border-air/30 bg-gradient-to-br from-[#eef8ff] to-white p-6 shadow-sm shadow-slate-200/30",
-  mist: "zp-hover-lift rounded-2xl border border-slate-200/80 bg-gradient-to-br from-stone/90 to-white p-6 shadow-sm shadow-slate-200/30",
-};
-
-const standApartDot: Record<(typeof globalHome.standsApart.items)[number]["accent"], string> = {
-  sage: "bg-leaf",
-  air: "bg-air",
-  mist: "bg-compost/70",
-};
+import { HomeCompostableProblemSolution } from "@/components/HomeCompostableProblemSolution";
 
 export function GlobalHome() {
   const serviceJsonLd = {
@@ -152,45 +135,7 @@ export function GlobalHome() {
         </Reveal>
 
         <Reveal delayMs={40}>
-          <section className="border-y border-slate-200/35 bg-white py-14 sm:py-20">
-            <div className="mx-auto max-w-6xl px-4 sm:px-6">
-              <h2 className="font-heading text-2xl font-semibold text-charcoal sm:text-3xl">{globalHome.whyMailers.heading}</h2>
-              <p className="mt-4 max-w-3xl text-charcoal/75">{globalHome.whyMailers.intro}</p>
-              <div className="mt-10 grid gap-6 md:grid-cols-3">
-                {globalHome.whyMailers.cards.map((x) => (
-                  <div
-                    key={x.title}
-                    className="zp-hover-lift rounded-2xl border border-slate-100 bg-gradient-to-br from-mist/90 to-white p-6 shadow-sm shadow-slate-200/30"
-                  >
-                    <h3 className="font-heading text-lg font-semibold text-compost">{x.title}</h3>
-                    <p className="mt-2 text-sm text-charcoal/75">{x.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        </Reveal>
-
-        <Reveal>
-          <section className="border-y border-slate-200/40 bg-gradient-to-b from-white via-[#f7faf9] to-white py-14 sm:py-20">
-            <div className="mx-auto max-w-6xl px-4 sm:px-6">
-              <h2 className="font-heading text-2xl font-semibold text-charcoal sm:text-3xl">{globalHome.standsApart.heading}</h2>
-              <p className="mt-3 max-w-2xl text-charcoal/70">
-                Practical differentiation for brands that need packaging to be both credible and repeatable at scale.
-              </p>
-              <div className="mt-10 grid gap-6 md:grid-cols-3">
-                {globalHome.standsApart.items.map((item) => (
-                  <div key={item.title} className={standApartShell[item.accent]}>
-                    <div className="flex items-center gap-3">
-                      <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${standApartDot[item.accent]}`} aria-hidden />
-                      <h3 className="font-heading text-lg font-semibold text-charcoal">{item.title}</h3>
-                    </div>
-                    <p className="mt-3 text-sm text-charcoal/75">{item.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
+          <HomeCompostableProblemSolution />
         </Reveal>
 
         <Reveal delayMs={40}>
@@ -206,23 +151,23 @@ export function GlobalHome() {
             features={[
               {
                 title: "Waterproof and durable",
-                description: "Designed for practical ecommerce shipping — specification matched to your risk profile.",
+                description: "Designed to protect your products during transit.",
               },
               {
                 title: "Strong adhesive closure",
-                description: "Reduces in-transit failures when applied consistently in fulfilment.",
+                description: "Available in single or double adhesive options.",
               },
               {
                 title: "Custom printed",
-                description: "Logo-only through to fuller artwork — print affects lead time and pricing in predictable ways.",
+                description: "Logo-only through to fuller more complex artwork.",
               },
               {
                 title: "Made to order",
-                description: "No generic stock model — production aligns to your brand specification.",
+                description: "No generic stock model — production aligns to your brand requirements.",
               },
               {
                 title: "Practical MOQ options",
-                description: "Typically from around 2,000 units — sized for growing ecommerce brands shipping regularly.",
+                description: "From as low as 2,000 units — sized for growing ecommerce brands shipping regularly.",
               },
               {
                 title: "Quote-based pricing",
@@ -232,73 +177,8 @@ export function GlobalHome() {
           />
         </Reveal>
 
-        <Reveal delayMs={40}>
-          <CertificationExplainer
-            variant="climate"
-            paragraphs={[
-              "Compostable and biodegradable mean different things. Certification ties claims to test conditions and intended disposal routes — your quote should match the specification you actually buy.",
-              "We explain compostable vs biodegradable vs oxo-degradable in plain language, and what your customers can reasonably be told about disposal in your markets.",
-            ]}
-            bullets={[
-              "Request documentation before you repeat supplier claims in your own packaging or marketing.",
-              "If you reference home or industrial composting, align wording to the certification and local collection reality.",
-            ]}
-          />
-        </Reveal>
-
         <Reveal>
-          <ProcessSteps
-            variant="climate"
-            title="How the process works"
-            steps={[
-              { title: "Tell us what you need", body: "Share sizes, volumes, print intent and timeline — estimates are fine." },
-              { title: "Get a custom quote", body: "We respond with guidance, questions and pricing drivers." },
-              { title: "Confirm specification", body: "Size, print and artwork are aligned to production requirements." },
-              { title: "Approve production details", body: "Nothing starts without written confirmation of the spec." },
-              { title: "Production and shipping", body: "Timelines depend on region, quantity and print — confirmed up front." },
-              { title: "Reorder when ready", body: "Most brands run on a rhythm — we support repeat production planning." },
-            ]}
-            footerNote="Production and delivery timelines depend on region, order quantity, print specification and freight method. Zero Pack confirms expected timing before production begins."
-          />
-        </Reveal>
-
-        <Reveal delayMs={40}>
-          <section className="border-y border-slate-200/35 bg-[#fafcfd] py-14 sm:py-20">
-            <div className="mx-auto max-w-6xl px-4 sm:px-6">
-              <div className="flex flex-wrap items-end justify-between gap-4">
-                <div>
-                  <h2 className="font-heading text-2xl font-semibold text-charcoal sm:text-3xl">Customer showcase</h2>
-                  <p className="mt-2 max-w-2xl text-charcoal/70">
-                    Examples of custom compostable mailers and related packaging for ecommerce-led brands.
-                  </p>
-                </div>
-                <Link className="text-sm font-semibold text-air hover:underline" href="/customer-showcase/">
-                  View showcase
-                </Link>
-              </div>
-              <div className="mt-10">
-                <CustomerShowcaseGrid studies={showcaseStudies} />
-              </div>
-            </div>
-          </section>
-        </Reveal>
-
-        <Reveal>
-          <LeadMagnetBlock variant="climate" />
-        </Reveal>
-
-        <Reveal delayMs={40}>
-          <section className="bg-white py-14 sm:py-20">
-            <div className="mx-auto max-w-6xl px-4 sm:px-6">
-              <CTASection
-                variant="climate"
-                title={globalHome.midCta.title}
-                description={globalHome.midCta.description}
-                primary={{ label: "Get a Custom Quote", href: "/quote/" }}
-                secondary={{ label: "Download the packaging guide", href: "/packaging-guide/" }}
-              />
-            </div>
-          </section>
+          <PackagingPathSteps variant="dark" standalone />
         </Reveal>
 
         <Reveal>
@@ -314,17 +194,7 @@ export function GlobalHome() {
         </Reveal>
 
         <Reveal delayMs={40}>
-          <section className="bg-white py-14 sm:pb-24 sm:pt-16">
-            <div className="mx-auto max-w-6xl px-4 sm:px-6">
-              <CTASection
-                variant="climate"
-                title={globalHome.finalCta.title}
-                description={globalHome.finalCta.description}
-                primary={{ label: "Get a Custom Quote", href: "/quote/" }}
-                secondary={{ label: "Download the packaging guide", href: "/packaging-guide/" }}
-              />
-            </div>
-          </section>
+          <LeadMagnetBlock variant="climate" />
         </Reveal>
       </div>
     </>

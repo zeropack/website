@@ -6,7 +6,7 @@ export const regionConfig: RegionConfig = {
   locale: "en-US",
   currency: "USD",
   defaultCTA: "Get a Custom Quote",
-  quoteEmail: process.env.NEXT_PUBLIC_QUOTE_EMAIL_US ?? "quotes@zeropack.com",
+  quoteEmail: process.env.NEXT_PUBLIC_QUOTE_EMAIL_US ?? "quotes@zeropack.co",
   certificationNotes: [
     "US-specific certification and labelling guidance will be added as the US route launches.",
   ],

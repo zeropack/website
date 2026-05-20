@@ -11,10 +11,10 @@ export const pillars = [
   {
     title: "Compostable Alternative to Plastic",
     points: [
-      "Compostable material options",
+      "Certified Home Compostable",
       "Better aligned with customer expectations",
       "Helps reduce reliance on plastic",
-      "Supports waste-reduction goals",
+      "Supports a Circular Economy",
     ],
   },
   {
@@ -36,16 +36,6 @@ export const pillars = [
       "Suitable for ecommerce shipping",
       "Designed to protect products in transit",
       "Premium look and feel",
-    ],
-  },
-  {
-    title: "Trust and Certification",
-    points: [
-      "Certification matters",
-      "Avoid vague biodegradable claims",
-      "Explain compostable vs biodegradable vs oxo-degradable",
-      "Guidance to keep marketing claims accurate and supportable",
-      "Use certification claims only where supportable",
     ],
   },
 ] as const;

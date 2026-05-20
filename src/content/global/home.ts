@@ -61,59 +61,28 @@ export const globalHome = {
     tertiaryLinkLabel: "Explore broader packaging",
     tertiaryHref: "/custom-compostable-packaging/",
   },
-  whyMailers: {
-    heading: "Why compostable mailers",
+  compostableTruth: {
+    heading: 'Most "Compostable" Packaging Isn\'t Actually Home Compostable',
     intro:
-      "Mailers are one of the highest-volume packaging touchpoints in ecommerce. When specified correctly, compostable mailers can reduce reliance on conventional plastic while keeping a workflow fulfilment teams already understand.",
-    cards: [
-      {
-        title: "Customer expectations",
-        description:
-          "Shoppers notice packaging. Clear claims and disposal guidance build trust faster than vague eco language.",
-      },
-      {
-        title: "Operational practicality",
-        description:
-          "Mailers are quick to pack, easy to store and predictable in fulfilment — when sizing is disciplined and closures are applied consistently.",
-      },
-      {
-        title: "Brand presentation",
-        description: "Custom print turns a functional object into a consistent brand touchpoint on every doorstep.",
-      },
-    ],
-  },
-  standsApart: {
-    heading: "Why Zero Pack stands apart",
-    items: [
-      {
-        title: "Genuinely home compostable options",
-        description:
-          "We focus on credible certification pathways and plain-language guidance so your claims match the specification you actually buy.",
-        accent: "sage" as const,
-      },
-      {
-        title: "Practical MOQs for growing brands",
-        description:
-          "Made-to-order production is sized for brands shipping regularly — typically from around 2,000 units depending on size, print and specification.",
-        accent: "air" as const,
-      },
-      {
-        title: "Your brand, consistently executed",
-        description:
-          "From logo-only mailers through to fuller artwork, we help you translate brand intent into production-ready print.",
-        accent: "mist" as const,
-      },
-    ],
-  },
-  midCta: {
-    title: "Built for brands that ship regularly",
-    description:
-      "If you want credible materials guidance, disciplined sizing support and custom print — start with a quote. If you are still comparing options, the free guide is the fastest way to get oriented.",
-  },
-  finalCta: {
-    title: "Ready when you are",
-    description:
-      "Tell us what you know about sizes, volumes and print intent. We will help with the rest — including artwork requirements and what to verify before you repeat claims in your own marketing.",
+      "Brands face a critical problem: most packaging labelled as \"compostable\" only meets industrial standards (such as EN13432). That often means it will not break down in a customer's backyard compost bin — and where industrial composting infrastructure is limited, it can still end up in landfill.",
+    problem: {
+      title: "The Problem",
+      items: [
+        "EN13432 requires industrial composting facilities",
+        "Limited industrial composting infrastructure in many markets",
+        "Packaging ends up in landfill despite a \"compostable\" label",
+        "High MOQ requirements (10k–50k units) exclude growing brands",
+      ],
+    },
+    solution: {
+      title: "The Zero Pack Solution",
+      items: [
+        "ABAP AS5810 breaks down in backyard compost",
+        "No industrial facility needed — genuine home composting",
+        "Low MOQ from 2,000 units — accessible to growing brands",
+        "Full custom branding — your design, elevated",
+      ],
+    },
   },
   positioningLine: brand.tagline,
 };

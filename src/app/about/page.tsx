@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/metadata";
 import { CTAButton } from "@/components/CTAButton";
+import { QUOTE_FORM_HREF } from "@/lib/site";
 
 export const metadata: Metadata = buildMetadata({
   title: "About Zero Pack",
@@ -27,14 +28,14 @@ export default function Page() {
           quotes, not retail checkout.
         </p>
         <p className="mt-4 text-charcoal/75">
-          Operations and sales can be run from Australia, with production made to order through manufacturing partners
-          and regional routes designed to scale (AU and UK live; US and EU structurally supported).
+          Operations and sales support ecommerce brands globally, with production made to order through manufacturing
+          partners and freight confirmed during quoting.
         </p>
         <p className="mt-4 font-heading text-lg font-semibold text-compost">
           Custom compostable packaging, made for brands that care what they send out.
         </p>
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-          <CTAButton href="/quote/" variant="primary">
+          <CTAButton href={QUOTE_FORM_HREF} variant="primary">
             Get a Custom Quote
           </CTAButton>
           <CTAButton href="/how-it-works/" variant="secondary">

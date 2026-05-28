@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { buildMetadata } from "@/lib/metadata";
-import { GuideLeadForm } from "@/components/GuideLeadForm";
 import { CTAButton } from "@/components/CTAButton";
+import { HubSpotFormEmbed } from "@/components/HubSpotFormEmbed";
+import { QUOTE_FORM_HREF } from "@/lib/site";
+
+const PACKAGING_GUIDE_HUBSPOT_FORM_ID = "fbbf0c51-3c65-4c5f-868d-5a2d8e9bcc5a";
 
 export const metadata: Metadata = buildMetadata({
   title: "The Brand’s Guide to Switching to Compostable Packaging | Zero Pack",
@@ -28,9 +30,10 @@ export default function Page() {
             <li>What to verify before you change materials</li>
             <li>Which claims deserve scrutiny</li>
             <li>How to prepare for a custom packaging quote</li>
+            <li>And much, much more</li>
           </ul>
           <div className="mt-8">
-            <CTAButton href="/quote/" variant="secondary">
+            <CTAButton href={QUOTE_FORM_HREF} variant="secondary">
               Ready to price your packaging? Request a custom quote
             </CTAButton>
           </div>
@@ -38,9 +41,7 @@ export default function Page() {
         <div className="rounded-2xl border border-black/5 bg-stone p-8">
           <h2 className="font-heading text-xl font-semibold text-charcoal">Get the Free Guide</h2>
           <div className="mt-6">
-            <Suspense fallback={<p className="text-sm text-charcoal/60">Loading…</p>}>
-              <GuideLeadForm />
-            </Suspense>
+            <HubSpotFormEmbed formId={PACKAGING_GUIDE_HUBSPOT_FORM_ID} />
           </div>
         </div>
       </div>

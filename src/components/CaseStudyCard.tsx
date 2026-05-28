@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CaseStudyCard as CaseStudy } from "@/lib/types";
+import { QUOTE_FORM_HREF } from "@/lib/site";
 
 export function CaseStudyCard({ study }: { study: CaseStudy }) {
   return (
@@ -28,7 +29,7 @@ export function CaseStudyCard({ study }: { study: CaseStudy }) {
       <div className="mt-6">
         <Link
           className="text-sm font-semibold text-compost underline-offset-4 hover:underline"
-          href="/quote/"
+          href={QUOTE_FORM_HREF}
         >
           Request Similar Packaging
         </Link>

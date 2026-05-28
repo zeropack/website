@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
+import { SiteImage } from "@/components/SiteImage";
 import { buildMetadata } from "@/lib/metadata";
+import { TypeformFormEmbed } from "@/components/TypeformFormEmbed";
 import { FAQAccordion } from "@/components/FAQAccordion";
 import { FAQSchema } from "@/components/FAQSchema";
 import { CustomMailerCarousel } from "@/components/CustomMailerCarousel";
 import { PackagingPathSteps } from "@/components/PackagingPathSteps";
+import { globalHomeFaqs } from "@/content/global/faqs";
 import { customMailerCarouselSlides } from "@/content/customMailerCarouselSlides";
-import type { FaqItem } from "@/lib/types";
 import brandDimple from "@/content/images/brands/dimple_logo.png";
 import brandLahana from "@/content/images/brands/lahana.png";
 import brandInfectious from "@/content/images/brands/infectious_clothing.webp";
@@ -72,59 +72,6 @@ const reviews = [
   },
 ];
 
-const landingFaqs: FaqItem[] = [
-  {
-    question: "What is the minimum order quantity for custom compostable mailers?",
-    answer:
-      "Our custom mailers are made to order, so the best starting point is usually around 2,000 units, depending on size, print, and specification.",
-  },
-  {
-    question: "Are compostable mailers strong enough for ecommerce shipping?",
-    answer:
-      "Yes, when correctly specified. Our mailers are designed to be durable, waterproof, and finished with strong adhesive for ecommerce dispatch.",
-  },
-  {
-    question: "What is the difference between compostable and biodegradable packaging?",
-    answer:
-      "Compostable packaging is designed to break down under defined composting conditions and must be backed by certification. Biodegradable is a broader term and can be vague unless backed by clear standards and evidence.",
-  },
-  {
-    question: "Can I add my logo and brand colours?",
-    answer:
-      "Yes. Custom mailers can be printed with your logo, colours, artwork, message, or campaign design.",
-  },
-  {
-    question: "How long does production take?",
-    answer:
-      "Custom packaging is made to order, so lead times depend on artwork, quantity, production schedule, and shipping method.",
-  },
-  {
-    question: "Is custom packaging worth it for a small business?",
-    answer:
-      "If you are still testing demand, plain packaging with branded stickers may be enough. If you are shipping consistent volume, custom mailers can improve presentation and make your brand feel more professional.",
-  },
-  {
-    question: "Can compostable mailers go in recycling?",
-    answer:
-      "Usually, compostable packaging should not be placed in recycling unless local guidance specifically allows it. Clear disposal instructions are important.",
-  },
-  {
-    question: "How do I know the compostable claim is credible?",
-    answer:
-      "Ask for certification, material information, and clear details about whether the product is home compostable or industrial compostable.",
-  },
-  {
-    question: "What products are compostable mailers best suited for?",
-    answer:
-      "They are well suited to apparel, accessories, beauty, wellness, books, gifts, and other non-fragile ecommerce products.",
-  },
-  {
-    question: "What details do you need for a quote?",
-    answer:
-      "We usually need your preferred size, quantity, delivery country, artwork, print requirements, and what product you are shipping.",
-  },
-];
-
 const customerBrands = [
   { name: "Dimple", logo: brandDimple },
   { name: "Lahana", logo: brandLahana },
@@ -143,7 +90,7 @@ export default function TrendPackagingFunnelPage() {
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_26%_52%,rgba(0,168,243,0.28),transparent_46%),radial-gradient(circle_at_78%_50%,rgba(131,185,37,0.22),transparent_44%),linear-gradient(160deg,#04070d_0%,#08111d_26%,#102a21_58%,#0a1713_100%)]"
         aria-hidden
       />
-      <FAQSchema items={landingFaqs} />
+      <FAQSchema items={globalHomeFaqs} />
       <section className="relative overflow-hidden border-b border-white/10">
         <div className="relative mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
           <h1 className="mt-4 max-w-5xl font-heading text-4xl font-semibold leading-[1.02] tracking-tight text-white sm:text-5xl lg:text-7xl">
@@ -164,14 +111,6 @@ export default function TrendPackagingFunnelPage() {
                 <p className="mt-1 text-sm text-slate-200/80">{item.label}</p>
               </div>
             ))}
-          </div>
-          <div className="mt-8 flex justify-center">
-            <Link
-              href="/quote/?src=trend-packaging-funnel-hero"
-              className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-air to-aqua px-6 py-3 text-sm font-bold uppercase tracking-[0.08em] text-[#04121b] shadow-[0_12px_30px_rgba(0,168,243,0.35)] transition hover:scale-[1.02]"
-            >
-              Get Your Custom Mailer Quote
-            </Link>
           </div>
         </div>
       </section>
@@ -206,14 +145,6 @@ export default function TrendPackagingFunnelPage() {
               Custom compostable mailers let you deliver a stronger unboxing experience while signalling your brand is
               part of the next wave, not behind it.
             </p>
-            <div className="mt-8 flex justify-center">
-              <Link
-                href="/quote/?src=trend-packaging-funnel-mid"
-                className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-air to-aqua px-6 py-3 text-sm font-bold uppercase tracking-[0.08em] text-[#04121b] shadow-[0_12px_30px_rgba(0,168,243,0.35)] transition hover:scale-[1.02]"
-              >
-                Get Your Custom Mailer Quote
-              </Link>
-            </div>
           </div>
           <CustomMailerCarousel slides={customMailerCarouselSlides} />
         </div>
@@ -231,14 +162,6 @@ export default function TrendPackagingFunnelPage() {
                 </li>
               ))}
             </ul>
-            <div className="mt-6 flex justify-center">
-              <Link
-                href="/quote/?src=trend-packaging-funnel-stack"
-                className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-air to-aqua px-5 py-3 text-sm font-bold uppercase tracking-[0.08em] text-[#04121b] transition hover:opacity-90"
-              >
-                Get Your Custom Mailer Quote
-              </Link>
-            </div>
           </div>
         </div>
       </section>
@@ -255,9 +178,12 @@ export default function TrendPackagingFunnelPage() {
                 key={brand.name}
                 className="flex min-h-24 items-center justify-center rounded-2xl border border-white/15 bg-white px-4 py-5 text-center"
               >
-                <Image
+                <SiteImage
                   src={brand.logo}
                   alt={`${brand.name} logo`}
+                  width={brand.logo.width}
+                  height={brand.logo.height}
+                  sizes="160px"
                   className="h-9 w-auto object-contain sm:h-10"
                 />
               </div>
@@ -282,9 +208,12 @@ export default function TrendPackagingFunnelPage() {
                   <p className="mt-5 text-lg tracking-[0.18em] text-[#f4c430]">★★★★★</p>
                 </div>
                 <figcaption className="mt-4 flex items-center gap-3">
-                  <Image
+                  <SiteImage
                     src={review.avatar}
                     alt={review.name}
+                    width={review.avatar.width}
+                    height={review.avatar.height}
+                    sizes="56px"
                     className="h-14 w-14 rounded-full border-2 border-white object-cover"
                   />
                   <span className="font-heading text-3xl font-semibold text-white">{review.name}</span>
@@ -298,7 +227,7 @@ export default function TrendPackagingFunnelPage() {
       <PackagingPathSteps variant="dark" />
 
       <section className="relative border-b border-white/10 bg-transparent py-16 sm:py-24">
-        <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
+        <div id="quoteform" className="mx-auto max-w-4xl px-4 text-center sm:px-6">
           <h2 className="font-heading text-4xl font-semibold leading-tight text-white sm:text-6xl">
             Ready to move to custom compostable mailers?
           </h2>
@@ -306,14 +235,7 @@ export default function TrendPackagingFunnelPage() {
             Join the brands creating premium unboxing experiences while showing customers they take the environment
             seriously.
           </p>
-          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link
-              href="/quote/?src=trend-packaging-funnel-final"
-              className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-air to-aqua px-7 py-3 text-sm font-bold uppercase tracking-[0.08em] text-[#04121b] shadow-[0_12px_30px_rgba(0,168,243,0.35)] transition hover:scale-[1.02]"
-            >
-              Get Your Custom Mailer Quote
-            </Link>
-          </div>
+          <TypeformFormEmbed className="mx-auto mt-10 max-w-xl rounded-2xl border border-white/15 bg-white/5 p-6 backdrop-blur-sm sm:p-8" />
         </div>
       </section>
 
@@ -323,8 +245,8 @@ export default function TrendPackagingFunnelPage() {
           <p className="mt-3 max-w-2xl text-slate-300/80">
             The most common questions from brands switching from generic packaging to custom compostable mailers.
           </p>
-          <div className="mt-8 max-w-4xl">
-            <FAQAccordion items={landingFaqs} />
+          <div className="mt-8">
+            <FAQAccordion items={globalHomeFaqs} />
           </div>
         </div>
       </section>

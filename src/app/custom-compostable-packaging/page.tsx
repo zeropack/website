@@ -1,96 +1,122 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/metadata";
 import { CTAButton } from "@/components/CTAButton";
-import { ProcessSteps } from "@/components/ProcessSteps";
+import { CustomMailerCarousel } from "@/components/CustomMailerCarousel";
+import { SiteImage } from "@/components/SiteImage";
+import { QUOTE_FORM_HREF } from "@/lib/site";
+import { PackagingPathSteps } from "@/components/PackagingPathSteps";
 import { LeadMagnetBlock } from "@/components/LeadMagnetBlock";
 import { FAQAccordion } from "@/components/FAQAccordion";
 import { FAQSchema } from "@/components/FAQSchema";
 import { globalHomeFaqs } from "@/content/global/faqs";
+import { packagingSlidesForCarousel } from "@/content/packagingCarouselSlides";
+import imgShoppingBags from "@/content/images/custom/packaging/zero_pack_custom_compostable_packaging (15).png";
+import imgGroceryBags from "@/content/images/custom/packaging/zero_pack_custom_compostable_packaging (13).png";
+import imgGarmentBags from "@/content/images/custom/packaging/zero_pack_custom_compostable_packaging (17).png";
+import imgStandupPouches from "@/content/images/custom/packaging/zero_pack_custom_compostable_packaging (12).png";
+
+const morePackagingOptions = [
+  {
+    t: "Shopping bags",
+    d: "Retail-facing formats for brands that want consistency with their shipping packaging story.",
+    image: imgShoppingBags,
+  },
+  {
+    t: "Garment bags",
+    d: "Apparel workflows often need both mailers and internal garment protection — specified together.",
+    image: imgGarmentBags,
+  },
+  {
+    t: "Grocery bags",
+    d: "Perfect for grocery stores and supermarkets. Tougher and more durable than paper bags.",
+    image: imgGroceryBags,
+  },
+  {
+    t: "Stand up pouches",
+    d: "Perfect for food and coffee products. Resealable, they are a great alternative to plastic pouches.",
+    image: imgStandupPouches,
+  },
+];
 
 export const metadata: Metadata = buildMetadata({
   title: "Custom Compostable Packaging | Zero Pack",
   description:
-    "Broader custom compostable packaging beyond mailers: shopping bags, garment bags and campaign packaging — always quoted to order, with mailers as the main range.",
+    "Broader custom compostable packaging beyond mailers: shopping bags, garment bags and campaign packaging — always quoted to order.",
   path: "/custom-compostable-packaging/",
 });
-
-const faqs = globalHomeFaqs.slice(0, 6);
 
 export default function Page() {
   return (
     <>
-      <FAQSchema items={faqs} />
+      <FAQSchema items={globalHomeFaqs} />
       <section className="bg-white py-14 sm:py-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <p className="text-sm font-semibold uppercase tracking-wide text-compost">Custom compostable packaging</p>
-          <h1 className="mt-2 font-heading text-3xl font-semibold text-charcoal sm:text-4xl">
-            A wider range — without competing with mailers
-          </h1>
-          <p className="mt-5 max-w-3xl text-lg text-charcoal/75">
-            Zero Pack is built around{" "}
-            <a className="font-semibold text-air hover:underline" href="/custom-compostable-mailers/">
-              custom compostable mailers
-            </a>{" "}
-            for ecommerce shipping. Secondary formats exist for brands that want a cohesive system as they scale.
-          </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <CTAButton href="/quote/" variant="primary">
-              Get a Custom Quote
-            </CTAButton>
-            <CTAButton href="/custom-compostable-mailers/" variant="secondary">
-              View mailers (hero product)
-            </CTAButton>
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:items-start lg:gap-12">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wide text-compost">Custom compostable packaging</p>
+            <h1 className="mt-2 font-heading text-3xl font-semibold text-charcoal sm:text-4xl">
+              Need more than custom compostable mailers?
+            </h1>
+            <p className="mt-5 text-lg text-charcoal/75">
+              Whilst{" "}
+              <a className="font-semibold text-air hover:underline" href="/custom-compostable-mailers/">
+                custom mailers
+              </a>{" "}
+              are the primary product for ecommerce shipping, we offer a wider range of custom compostable packaging to
+              meet your needs.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <CTAButton href={QUOTE_FORM_HREF} variant="primary">
+                Get a Custom Quote
+              </CTAButton>
+              <CTAButton href="/customer-showcase/" variant="secondary">
+                View Customer Showcase
+              </CTAButton>
+            </div>
           </div>
+          <CustomMailerCarousel
+            slides={packagingSlidesForCarousel()}
+            variant="climate"
+            permanentCaption
+          />
         </div>
       </section>
-
       <section className="bg-stone py-14 sm:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <h2 className="font-heading text-2xl font-semibold text-charcoal sm:text-3xl">Secondary offers</h2>
+          <h2 className="font-heading text-2xl font-semibold text-charcoal sm:text-3xl">More Custom Compostable Options</h2>
           <div className="mt-8 grid gap-6 md:grid-cols-2">
-            {[
-              {
-                t: "Custom compostable shopping bags",
-                d: "Retail-facing formats for brands that want consistency with their shipping packaging story.",
-              },
-              {
-                t: "Custom compostable garment bags",
-                d: "Apparel workflows often need both mailers and internal garment protection — specified together.",
-              },
-              {
-                t: "Custom compostable campaign packaging",
-                d: "Limited runs and launches — feasibility depends on specification, print and timeline.",
-              },
-              {
-                t: "Mailers remain the core",
-                d: "If you are new to Zero Pack, start with mailers. Everything else should support the same brand standard.",
-              },
-            ].map((x) => (
+            {morePackagingOptions.map((x) => (
               <div key={x.t} className="rounded-2xl border border-black/5 bg-white p-6">
-                <h3 className="font-heading text-lg font-semibold text-compost">{x.t}</h3>
-                <p className="mt-2 text-sm text-charcoal/75">{x.d}</p>
+                <div className="flex items-start gap-4">
+                  <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-full border border-slate-200/70 bg-mist shadow-sm">
+                    <SiteImage
+                      src={x.image}
+                      alt={x.t}
+                      width={x.image.width}
+                      height={x.image.height}
+                      sizes="112px"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="font-heading text-lg font-semibold text-compost">{x.t}</h3>
+                    <p className="mt-2 text-sm text-charcoal/75">{x.d}</p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <ProcessSteps
-        title="Same quoting process"
-        steps={[
-          { title: "Tell us formats", body: "Mailers first, then secondary formats if needed." },
-          { title: "Align specification", body: "Each format has its own MOQ and print constraints." },
-          { title: "Quote and approve", body: "Nothing starts without written confirmation." },
-        ]}
-      />
+      <PackagingPathSteps variant="dark" standalone />
 
       <LeadMagnetBlock />
 
       <section className="bg-white py-14 sm:py-20">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <h2 className="font-heading text-2xl font-semibold text-charcoal">FAQ</h2>
           <div className="mt-6">
-            <FAQAccordion items={faqs} />
+            <FAQAccordion items={globalHomeFaqs} />
           </div>
         </div>
       </section>

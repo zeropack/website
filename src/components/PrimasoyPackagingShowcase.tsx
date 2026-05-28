@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
-import Image, { type StaticImageData } from "next/image";
+import { SiteImage } from "./SiteImage";
+import { type StaticImageData } from "next/image";
 import primasoyFrontThumb from "@/content/images/custom/primasoy closup front - 1024 x 1024.png";
 import primasoyBackThumb from "@/content/images/custom/primasoy closup back - 1024 x 1024.png";
 import primasoyFrontFull from "@/content/images/custom/primasoy closup front.png";
@@ -19,16 +20,6 @@ function preloadFullImages() {
   });
 }
 
-function schedulePreload() {
-  if (typeof window === "undefined") return;
-  const run = () => preloadFullImages();
-  if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(run, { timeout: 4000 });
-  } else {
-    setTimeout(run, 1500);
-  }
-}
-
 export function PrimasoyPackagingShowcase() {
   const [hovering, setHovering] = useState(false);
   const [open, setOpen] = useState(false);
@@ -37,9 +28,6 @@ export function PrimasoyPackagingShowcase() {
 
   useEffect(() => {
     setMounted(true);
-    if (document.readyState === "complete") schedulePreload();
-    else window.addEventListener("load", schedulePreload, { once: true });
-    return () => window.removeEventListener("load", schedulePreload);
   }, []);
 
   const close = useCallback(() => {
@@ -98,14 +86,13 @@ export function PrimasoyPackagingShowcase() {
 
           <div className="relative min-h-[min(50vh,480px)] w-full flex-1 overflow-hidden bg-gradient-to-br from-[#f4f7fb] via-white to-[#e8f3f8]">
             <div className="relative mx-auto aspect-square h-full min-h-[min(50vh,480px)] w-full max-w-2xl">
-              <Image
+              <SiteImage
                 key={showBack ? "back" : "front"}
                 src={modalImage}
                 alt={showBack ? "Primasoy packaging — back" : "Primasoy packaging — front"}
                 fill
                 sizes="(max-width: 768px) 100vw, 48rem"
                 className="object-contain p-4 sm:p-6"
-                priority
                 draggable={false}
               />
             </div>
@@ -153,14 +140,14 @@ export function PrimasoyPackagingShowcase() {
         className="group zp-hover-lift relative mx-auto aspect-square w-full max-w-md overflow-hidden rounded-2xl border border-slate-200/70 bg-gradient-to-br from-[#f4f7fb] via-white to-[#e8f3f8] shadow-lg shadow-slate-300/25 ring-1 ring-slate-200/60 transition hover:ring-air/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-air focus-visible:ring-offset-2"
         aria-label="View Primasoy packaging close-up"
       >
-        <Image
+        <SiteImage
           src={primasoyFrontThumb}
           alt="Primasoy custom compostable packaging — front"
           fill
           sizes="(max-width: 1024px) 100vw, 28rem"
           className={`object-contain p-3 transition-opacity duration-300 ${hovering ? "opacity-0" : "opacity-100"}`}
         />
-        <Image
+        <SiteImage
           src={primasoyBackThumb}
           alt=""
           fill

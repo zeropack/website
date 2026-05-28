@@ -13,12 +13,10 @@ export const metadata: Metadata = buildMetadata({
   path: "/quote/",
 });
 
-const faqs = globalHomeFaqs.slice(0, 8);
-
 export default function Page() {
   return (
     <>
-      <FAQSchema items={faqs} />
+      <FAQSchema items={globalHomeFaqs} />
       <section className="bg-stone py-14 sm:py-20">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-2">
           <div>
@@ -40,7 +38,7 @@ export default function Page() {
           <div>
             <h2 className="font-heading text-xl font-semibold text-charcoal">FAQ</h2>
             <div className="mt-4">
-              <FAQAccordion items={faqs} />
+              <FAQAccordion items={globalHomeFaqs} />
             </div>
           </div>
         </div>

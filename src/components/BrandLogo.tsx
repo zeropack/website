@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { SiteImage } from "./SiteImage";
 import type { StaticImageData } from "next/image";
 import logoPrimary from "@/content/images/logo/zero-pack-logo-deep_compost_green-transparent.png";
 import logoWhite from "@/content/images/logo/zero-pack-logo-white-transparent.png";
@@ -30,7 +30,7 @@ export function BrandLogo({
   const src = byVariant[variant];
   return (
     <span className={`inline-block max-w-full ${className}`}>
-      <Image
+      <SiteImage
         src={src}
         alt="Zero Pack"
         width={src.width}

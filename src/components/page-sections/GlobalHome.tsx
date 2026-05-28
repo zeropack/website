@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { SiteImage } from "@/components/SiteImage";
+import { Fragment } from "react";
 import { globalHome } from "@/content/global/home";
 import { globalHomeFaqs } from "@/content/global/faqs";
 import { HeroSection } from "@/components/HeroSection";
@@ -10,11 +12,16 @@ import { LeadMagnetBlock } from "@/components/LeadMagnetBlock";
 import { FAQAccordion } from "@/components/FAQAccordion";
 import { FAQSchema } from "@/components/FAQSchema";
 import { JsonLd } from "@/components/JsonLd";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, QUOTE_FORM_HREF } from "@/lib/site";
 import { Reveal } from "@/components/Reveal";
 import { PrimasoyPackagingShowcase } from "@/components/PrimasoyPackagingShowcase";
 import { YoutubeVideoPlaceholder } from "@/components/YoutubeVideoPlaceholder";
 import { HomeCompostableProblemSolution } from "@/components/HomeCompostableProblemSolution";
+import { HubSpotFormEmbed } from "@/components/HubSpotFormEmbed";
+import cartridgesDirectCloseup from "@/content/images/zero_pack_cartridges_direct_blob_closeup.png";
+
+const WHAT_WE_DO_HUBSPOT_FORM_ID = "750eab93-2236-4bb9-a2b3-f2016dcd916f";
+
 
 export function GlobalHome() {
   const serviceJsonLd = {
@@ -37,7 +44,7 @@ export function GlobalHome() {
           labelPill={globalHome.hero.labelPill}
           title={globalHome.hero.headline}
           subtitle={globalHome.hero.subheading}
-          primaryCta={{ label: globalHome.hero.primaryCta, href: "/quote/" }}
+          primaryCta={{ label: globalHome.hero.primaryCta, href: QUOTE_FORM_HREF }}
           secondaryCta={{ label: globalHome.hero.secondaryCta, href: "/packaging-guide/" }}
           softCta={{ label: globalHome.hero.softCta, href: globalHome.hero.softCtaHref }}
         />
@@ -89,16 +96,31 @@ export function GlobalHome() {
                 <h2 className="font-heading text-2xl font-semibold text-charcoal sm:text-3xl">{globalHome.whatWeDo.heading}</h2>
                 <p className="mt-4 text-charcoal/75">{globalHome.whatWeDo.intro}</p>
                 <ul className="mt-6 space-y-4 text-sm text-charcoal/75">
-                  {globalHome.whatWeDo.bullets.map((b) => (
-                    <li key={b.title} className="zp-hover-lift rounded-xl border border-slate-200/70 bg-white p-4 shadow-sm">
-                      <span className="font-semibold text-charcoal">{b.title}:</span> {b.text}
-                    </li>
+                  {globalHome.whatWeDo.bullets.map((b, i) => (
+                    <Fragment key={b.title}>
+                      <li className="zp-hover-lift rounded-xl border border-slate-200/70 bg-white p-4 shadow-sm">
+                        <span className="font-semibold text-charcoal">{b.title}:</span> {b.text}
+                      </li>
+                      {i === 0 ? (
+                        <li className="zp-hover-lift overflow-hidden rounded-xl border border-slate-200/70 bg-white p-4 shadow-sm">
+                          <p className="font-bold text-charcoal">High Quality Printing</p>
+                          <SiteImage
+                            src={cartridgesDirectCloseup}
+                            alt="Cartridges Direct custom compostable mailer close-up"
+                            width={cartridgesDirectCloseup.width}
+                            height={cartridgesDirectCloseup.height}
+                            className="mx-auto mt-4 h-auto w-full max-w-sm object-contain"
+                            sizes="(max-width: 1024px) 100vw, 24rem"
+                          />
+                        </li>
+                      ) : null}
+                    </Fragment>
                   ))}
                 </ul>
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                   <Link
-                    className="inline-flex items-center justify-center rounded-lg bg-leaf px-5 py-3 text-sm font-semibold text-charcoal transition hover:bg-[#6fa01f]"
-                    href="/quote/"
+                    className="inline-flex items-center justify-center rounded-lg bg-air px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0096d6]"
+                    href={QUOTE_FORM_HREF}
                   >
                     {globalHome.whatWeDo.primaryCtaLabel}
                   </Link>
@@ -123,12 +145,16 @@ export function GlobalHome() {
                   </Link>
                 </p>
               </div>
-              <div className="zp-hover-lift rounded-2xl border border-slate-200/70 bg-white p-8 shadow-sm shadow-slate-300/20">
-                <p className="text-sm font-semibold uppercase tracking-wide text-compost">Positioning</p>
-                <p className="mt-3 font-heading text-xl font-semibold text-charcoal">{globalHome.positioningLine}</p>
-                <p className="mt-4 text-sm text-charcoal/70">
-                  We are not a generic stock shop: specification, print and freight are confirmed before production starts.
-                </p>
+              <div className="space-y-8">
+                <div className="zp-hover-lift rounded-2xl border border-slate-200/70 bg-white p-8 shadow-sm shadow-slate-300/20">
+                  <p className="mt-3 font-heading text-xl font-semibold text-charcoal">{globalHome.positioningLine}</p>
+                  <p className="mt-4 text-sm text-charcoal/70">
+                    We are not a generic stock shop: specification, print and freight are confirmed before production starts.
+                  </p>
+                </div>
+                <div className="zp-hover-lift rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-300/20 sm:p-8">
+                  <HubSpotFormEmbed formId={WHAT_WE_DO_HUBSPOT_FORM_ID} />
+                </div>
               </div>
             </div>
           </section>
@@ -186,7 +212,7 @@ export function GlobalHome() {
             <div className="mx-auto max-w-6xl px-4 sm:px-6">
               <h2 className="font-heading text-2xl font-semibold text-charcoal sm:text-3xl">FAQ</h2>
               <p className="mt-2 text-charcoal/70">Answers to common questions about mailers, MOQs, timelines and quotes.</p>
-              <div className="mt-8 max-w-3xl">
+              <div className="mt-8">
                 <FAQAccordion items={globalHomeFaqs} />
               </div>
             </div>

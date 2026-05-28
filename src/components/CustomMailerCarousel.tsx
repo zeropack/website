@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image, { type StaticImageData } from "next/image";
+import { SiteImage } from "./SiteImage";
+import { type StaticImageData } from "next/image";
 
 type Slide = {
   image: StaticImageData;
-  heading: string;
+  heading?: string;
   subheading: string;
   alt: string;
 };
@@ -13,13 +14,20 @@ type Slide = {
 export function CustomMailerCarousel({
   slides,
   variant = "dark",
+  priorityFirstSlide = false,
+  permanentCaption = false,
 }: {
   slides: Slide[];
   variant?: "dark" | "climate";
+  /** Eager-load only the first slide (e.g. homepage hero LCP). */
+  priorityFirstSlide?: boolean;
+  /** Keep caption overlay visible instead of revealing on hover. */
+  permanentCaption?: boolean;
 }) {
   const isClimate = variant === "climate";
   const [index, setIndex] = useState(0);
   const [isInView, setIsInView] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
 
   const prev = () => setIndex((current) => (current - 1 + slides.length) % slides.length);
@@ -38,12 +46,12 @@ export function CustomMailerCarousel({
   }, []);
 
   useEffect(() => {
-    if (!isInView || slides.length <= 1) return;
+    if (!isInView || isHovered || slides.length <= 1) return;
     const timer = window.setInterval(() => {
       setIndex((current) => (current + 1) % slides.length);
     }, 3500);
-    return () => window.clearTimeout(timer);
-  }, [isInView, slides.length]);
+    return () => window.clearInterval(timer);
+  }, [isInView, isHovered, slides.length]);
 
   if (slides.length === 0) return null;
 
@@ -61,9 +69,13 @@ export function CustomMailerCarousel({
     ? "h-[min(380px,52vh)] w-full object-contain sm:h-[min(440px,58vh)]"
     : "h-[420px] w-full bg-[#081018] object-contain sm:h-[520px]";
 
-  const captionClass = isClimate
-    ? "absolute bottom-0 left-0 right-0 border-t border-slate-200/40 bg-white/70 p-4 sm:p-5"
-    : "absolute bottom-0 left-0 right-0 bg-charcoal/65 p-5 sm:p-6";
+  const captionClass = permanentCaption
+    ? isClimate
+      ? "absolute bottom-0 left-0 right-0 border-t border-slate-200/40 bg-white/50 p-4 text-center backdrop-blur-sm sm:p-5"
+      : "absolute bottom-0 left-0 right-0 bg-charcoal/50 p-5 text-center backdrop-blur-sm sm:p-6"
+    : isClimate
+      ? "absolute bottom-0 left-0 right-0 border-t border-slate-200/40 bg-white/85 p-4 backdrop-blur-sm transition-transform duration-300 ease-out will-change-transform motion-reduce:translate-y-0 sm:p-5 [@media(hover:hover)]:translate-y-full [@media(hover:hover)]:group-hover:translate-y-0"
+      : "absolute bottom-0 left-0 right-0 bg-charcoal/75 p-5 backdrop-blur-sm transition-transform duration-300 ease-out will-change-transform motion-reduce:translate-y-0 sm:p-6 [@media(hover:hover)]:translate-y-full [@media(hover:hover)]:group-hover:translate-y-0";
 
   const headingClass = isClimate
     ? "font-heading text-xl font-semibold text-charcoal sm:text-2xl"
@@ -81,11 +93,31 @@ export function CustomMailerCarousel({
 
   return (
     <div ref={rootRef} className={shellClass}>
-      <div className={imageWrapClass}>
-        <Image src={current.image} alt={current.alt} className={imageClass} priority />
+      <div
+        className={`group ${imageWrapClass}`}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <SiteImage
+          src={current.image}
+          alt={current.alt}
+          width={current.image.width}
+          height={current.image.height}
+          sizes="(max-width: 1024px) 100vw, 50vw"
+          className={imageClass}
+          priority={priorityFirstSlide && index === 0}
+        />
         <div className={captionClass}>
-          <p className={headingClass}>{current.heading}</p>
-          <p className={subheadingClass}>{current.subheading}</p>
+          {current.heading ? <p className={`${headingClass} text-center`}>{current.heading}</p> : null}
+          <p
+            className={
+              current.heading
+                ? `${subheadingClass} mx-auto text-center`
+                : `${headingClass} text-center ${isClimate ? "text-charcoal/80" : "text-white/90"}`
+            }
+          >
+            {current.subheading}
+          </p>
         </div>
       </div>
       <div className="mt-4 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 sm:gap-3">
@@ -95,7 +127,7 @@ export function CustomMailerCarousel({
         <div className="mx-auto flex max-w-[240px] flex-wrap items-center justify-center gap-2 sm:max-w-[360px]">
           {slides.map((slide, dotIndex) => (
             <button
-              key={`${slide.heading}-${dotIndex}`}
+              key={`${slide.alt}-${dotIndex}`}
               type="button"
               onClick={() => setIndex(dotIndex)}
               aria-label={`Go to slide ${dotIndex + 1}`}

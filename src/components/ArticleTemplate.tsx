@@ -4,7 +4,8 @@ import { CTAButton } from "./CTAButton";
 import { FAQAccordion } from "./FAQAccordion";
 import { FAQSchema } from "./FAQSchema";
 import { JsonLd } from "./JsonLd";
-import { absoluteUrl } from "@/lib/site";
+import { globalHomeFaqs } from "@/content/global/faqs";
+import { absoluteUrl, QUOTE_FORM_HREF } from "@/lib/site";
 import type { RegionCode } from "@/lib/types";
 
 export function ArticleTemplate({
@@ -14,8 +15,8 @@ export function ArticleTemplate({
   article: Article;
   region?: RegionCode;
 }) {
-  const quoteHref = region ? `/quote/?region=${region}` : "/quote/";
-  const mailersHref = region ? `/${region}/custom-compostable-mailers/` : "/custom-compostable-mailers/";
+  const quoteHref = QUOTE_FORM_HREF;
+  const mailersHref = "/customer-showcase/";
 
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -30,7 +31,7 @@ export function ArticleTemplate({
   return (
     <article className="bg-stone pb-16 pt-8 sm:pb-24">
       <JsonLd data={articleJsonLd} />
-      <FAQSchema items={article.faqs} />
+      <FAQSchema items={globalHomeFaqs} />
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
         <p className="text-xs font-semibold uppercase tracking-wide text-leaf">{article.category}</p>
         <h1 className="mt-2 font-heading text-3xl font-semibold leading-tight text-charcoal sm:text-4xl">
@@ -56,7 +57,7 @@ export function ArticleTemplate({
 
         <div className="mt-12 max-w-none">
           {article.sections.map((s) => (
-            <section key={s.id} id={s.id} className="mb-12 scroll-mt-28">
+            <section key={s.id} id={s.id} className="mb-12">
               <h2 className="font-heading text-2xl font-semibold text-compost">{s.heading}</h2>
               <div className="mt-4 space-y-4 text-charcoal/75">
                 {s.paragraphs.map((p, i) => (
@@ -96,7 +97,7 @@ export function ArticleTemplate({
         <div className="mt-14">
           <h2 className="font-heading text-xl font-semibold text-charcoal">FAQ</h2>
           <div className="mt-4">
-            <FAQAccordion items={article.faqs} />
+            <FAQAccordion items={globalHomeFaqs} />
           </div>
         </div>
 

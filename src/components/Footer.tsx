@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { BrandLogo } from "./BrandLogo";
+import { TREND_PACKAGING_FUNNEL_HREF } from "@/lib/site";
 
 const groups = [
   {
     title: "Products",
     links: [
-      { href: "/custom-compostable-mailers/", label: "Custom compostable mailers" },
+      { href: TREND_PACKAGING_FUNNEL_HREF, label: "Custom compostable mailers" },
       { href: "/custom-compostable-packaging/", label: "Custom compostable packaging" },
     ],
   },
@@ -16,15 +17,6 @@ const groups = [
       { href: "/how-it-works/", label: "How it works" },
       { href: "/customer-showcase/", label: "Customer showcase" },
       { href: "/contact/", label: "Contact" },
-    ],
-  },
-  {
-    title: "Regions",
-    links: [
-      { href: "/au/", label: "Australia" },
-      { href: "/uk/", label: "United Kingdom" },
-      { href: "/us/", label: "United States (coming soon)" },
-      { href: "/eu/", label: "European Union (coming soon)" },
     ],
   },
 ];

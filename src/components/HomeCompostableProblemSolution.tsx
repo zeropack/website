@@ -21,12 +21,12 @@ export function HomeCompostableProblemSolution() {
       </div>
 
       <div className="mx-auto mt-12 grid max-w-5xl gap-8 px-4 sm:px-6 md:grid-cols-2">
-        <div className="zp-hover-lift rounded-2xl border-2 border-slate-200/80 bg-white p-6 shadow-sm shadow-slate-200/25 sm:p-8">
+        <div className="zp-hover-lift rounded-2xl border-2 border-red-300/80 bg-gradient-to-br from-red-50/95 to-white p-6 shadow-sm shadow-red-100/30 sm:p-8">
           <h3 className="font-heading text-xl font-semibold text-charcoal sm:text-2xl">{compostableTruth.problem.title}</h3>
           <ul className="mt-5 space-y-3 text-charcoal/75">
             {compostableTruth.problem.items.map((item) => (
               <li key={item} className="flex items-start gap-2">
-                <span className="mt-0.5 shrink-0 font-semibold text-compost" aria-hidden>
+                <span className="mt-0.5 shrink-0 font-semibold text-red-600" aria-hidden>
                   ✗
                 </span>
                 <span>{item}</span>

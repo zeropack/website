@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { buildMetadata } from "@/lib/metadata";
 import { CTAButton } from "@/components/CTAButton";
+import { QUOTE_FORM_HREF } from "@/lib/site";
 
 export const metadata: Metadata = buildMetadata({
   title: "Thank You | Compostable Packaging Guide",
@@ -24,7 +25,7 @@ export default function Page() {
           when you want help deciding what detail you need.
         </p>
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-          <CTAButton href="/quote/" variant="primary">
+          <CTAButton href={QUOTE_FORM_HREF} variant="primary">
             Request a custom quote
           </CTAButton>
           <Link className="text-sm font-semibold text-air hover:underline" href="/articles/">

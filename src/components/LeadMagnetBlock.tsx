@@ -1,7 +1,8 @@
 import { CTAButton } from "./CTAButton";
+import { QUOTE_FORM_HREF } from "@/lib/site";
 
 export function LeadMagnetBlock({
-  quoteHref = "/quote/",
+  quoteHref = QUOTE_FORM_HREF,
   variant = "default",
 }: {
   quoteHref?: string;
@@ -52,7 +53,7 @@ export function LeadMagnetBlock({
           >
             <p className="text-sm font-semibold text-compost">What’s inside</p>
             <p className="mt-2 font-heading text-xl font-semibold text-charcoal">
-              The Brand’s Guide to Switching to Compostable Packaging
+              The Brand’s Guide to Custom Compostable Packaging
             </p>
             <p className="mt-2 text-sm text-charcoal/70">
               Includes mailer-specific checklists for ecommerce brands.
@@ -61,6 +62,7 @@ export function LeadMagnetBlock({
               <li>What to verify before you change materials</li>
               <li>How to avoid vague “biodegradable” messaging</li>
               <li>What to prepare before requesting a quote</li>
+              <li>And much, much more</li>
             </ul>
           </div>
         </div>

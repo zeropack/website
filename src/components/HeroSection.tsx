@@ -107,7 +107,7 @@ export function HeroSection({
           ) : null}
         </div>
         {isClimate ? (
-          <CustomMailerCarousel slides={customMailerCarouselSlides} variant="climate" />
+          <CustomMailerCarousel slides={customMailerCarouselSlides} variant="climate" priorityFirstSlide />
         ) : (
           <ProductMockupGallery tone="default" />
         )}

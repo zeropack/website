@@ -8,15 +8,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const staticPaths = [
     "/",
-    "/au/",
-    "/uk/",
-    "/us/",
-    "/eu/",
+    "/trend-packaging-funnel/",
     "/custom-compostable-mailers/",
-    "/au/custom-compostable-mailers/",
-    "/uk/custom-compostable-mailers/",
-    "/us/custom-compostable-mailers/",
-    "/eu/custom-compostable-mailers/",
     "/custom-compostable-packaging/",
     "/how-it-works/",
     "/customer-showcase/",

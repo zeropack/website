@@ -25,7 +25,7 @@ export function CTAButton({
   const base =
     "inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00A8F3]";
   const styles: Record<Variant, string> = {
-    primary: "bg-leaf text-charcoal hover:bg-[#6fa01f]",
+    primary: "bg-air text-white hover:bg-[#0096d6]",
     secondary:
       "border border-compost/30 bg-white text-compost hover:border-compost hover:bg-mist",
     ghost: "text-compost hover:bg-mist underline-offset-4 hover:underline",

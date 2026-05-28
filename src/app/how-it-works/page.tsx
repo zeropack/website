@@ -1,48 +1,43 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/metadata";
-import { ProcessSteps } from "@/components/ProcessSteps";
-import { CTAButton } from "@/components/CTAButton";
+import { LeadMagnetBlock } from "@/components/LeadMagnetBlock";
+import { PackagingPathFlowchart } from "@/components/PackagingPathFlowchart";
 
 export const metadata: Metadata = buildMetadata({
   title: "How It Works | Zero Pack",
   description:
-    "Tell us what you need, get a custom quote, confirm artwork and specification, approve production, then receive your made-to-order packaging.",
+    "Eight clear steps from your first custom packaging quote to shipping branded compostable mailers with every order.",
   path: "/how-it-works/",
 });
 
 export default function Page() {
   return (
-    <div className="bg-white pb-16 pt-14 sm:pb-24 sm:pt-20">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <h1 className="font-heading text-3xl font-semibold text-charcoal sm:text-4xl">How it works</h1>
-        <p className="mt-4 max-w-3xl text-lg text-charcoal/75">
-          Production and delivery timelines depend on region, order quantity, print specification and freight method.
-          Zero Pack confirms expected timing before production begins.
-        </p>
-      </div>
-      <ProcessSteps
-        title="Seven clear steps"
-        steps={[
-          { title: "Tell us what you need", body: "Volumes, sizes, print intent, timeline — estimates are fine." },
-          { title: "Get a custom quote", body: "We clarify missing details and explain pricing drivers." },
-          { title: "Confirm size, print and artwork", body: "Specification is aligned to production requirements." },
-          { title: "Approve production details", body: "Written confirmation before anything starts." },
-          { title: "Production begins", body: "Manufacturing partners produce to the agreed specification." },
-          { title: "Your packaging is shipped", body: "Freight method and region affect delivery dates." },
-          { title: "Reorder when ready", body: "Most brands run on a rhythm — we support repeat planning." },
-        ]}
-        footerNote="We do not overpromise speed. Dates are confirmed for your specific job once specification and freight are known."
-      />
-      <div className="mx-auto mt-10 max-w-6xl px-4 sm:px-6">
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <CTAButton href="/quote/" variant="primary">
-            Get a Custom Quote
-          </CTAButton>
-          <CTAButton href="/packaging-guide/" variant="secondary">
-            Get the Compostable Packaging Guide
-          </CTAButton>
+    <>
+      <section className="relative overflow-hidden border-b border-slate-200/40 bg-gradient-to-br from-[#f4f7fb] via-white to-[#eef6f3] pb-12 pt-14 sm:pb-16 sm:pt-20">
+        <div
+          className="pointer-events-none absolute -right-32 top-0 h-96 w-96 rounded-full bg-[radial-gradient(closest-side,rgba(0,168,243,0.12),transparent_70%)]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-[radial-gradient(closest-side,rgba(131,185,37,0.1),transparent_70%)]"
+          aria-hidden
+        />
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+          <p className="text-sm font-semibold uppercase tracking-wide text-compost">How it works</p>
+          <h1 className="mt-2 max-w-4xl font-heading text-3xl font-semibold text-charcoal sm:text-5xl">
+            From first quote to shipping with your brand on every parcel
+          </h1>
+          <p className="mt-5 max-w-3xl text-lg leading-relaxed text-charcoal/75">
+            Every custom compostable packaging order follows the same eight-stage path — with written confirmation at
+            each milestone. Sizes, packaging and design are confirmed before your final quote is issued; nothing goes to
+            production until that quote is accepted.
+          </p>
         </div>
-      </div>
-    </div>
+      </section>
+
+      <PackagingPathFlowchart />
+
+      <LeadMagnetBlock />
+    </>
   );
 }

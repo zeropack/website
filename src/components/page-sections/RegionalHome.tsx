@@ -7,8 +7,10 @@ import { ProcessSteps } from "@/components/ProcessSteps";
 import { LeadMagnetBlock } from "@/components/LeadMagnetBlock";
 import { FAQAccordion } from "@/components/FAQAccordion";
 import { FAQSchema } from "@/components/FAQSchema";
+import { globalHomeFaqs } from "@/content/global/faqs";
 import { CTASection } from "@/components/CTASection";
 import { globalHome } from "@/content/global/home";
+import { QUOTE_FORM_HREF } from "@/lib/site";
 
 const heroByRegion: Record<
   RegionCode,
@@ -56,11 +58,11 @@ export function RegionalHome({ region }: { region: RegionCode }) {
   const cfg = getRegionConfig(region);
   const hero = heroByRegion[region];
   const mailersHref = `/${region}/custom-compostable-mailers/`;
-  const quoteHref = `/quote/?region=${region}`;
+  const quoteHref = QUOTE_FORM_HREF;
 
   return (
     <>
-      <FAQSchema items={cfg.faqs.slice(0, 10)} />
+      <FAQSchema items={globalHomeFaqs} />
       <HeroSection
         title={hero.title}
         subtitle={hero.sub}
@@ -105,7 +107,7 @@ export function RegionalHome({ region }: { region: RegionCode }) {
               </ul>
               <div className="mt-8 flex flex-col gap-3">
                 <Link
-                  className="inline-flex items-center justify-center rounded-lg bg-leaf px-5 py-3 text-sm font-semibold text-charcoal hover:bg-[#6fa01f]"
+                  className="inline-flex items-center justify-center rounded-lg bg-air px-5 py-3 text-sm font-semibold text-white hover:bg-[#0096d6]"
                   href={mailersHref}
                 >
                   View regional mailers page
@@ -144,9 +146,9 @@ export function RegionalHome({ region }: { region: RegionCode }) {
 
       <section className="bg-stone py-14 sm:pb-24 sm:pt-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <h2 className="font-heading text-2xl font-semibold text-charcoal sm:text-3xl">Regional FAQ</h2>
-          <div className="mt-8 max-w-3xl">
-            <FAQAccordion items={cfg.faqs.slice(0, 10)} />
+          <h2 className="font-heading text-2xl font-semibold text-charcoal sm:text-3xl">FAQ</h2>
+          <div className="mt-8">
+            <FAQAccordion items={globalHomeFaqs} />
           </div>
         </div>
       </section>

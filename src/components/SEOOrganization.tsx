@@ -9,7 +9,7 @@ export function SEOOrganization() {
     url: absoluteUrl("/"),
     description:
       "Zero Pack supplies made-to-order custom compostable packaging for ecommerce brands, with a primary focus on custom compostable mailers.",
-    areaServed: ["AU", "GB", "US", "EU"],
+    areaServed: "Worldwide",
   };
   return <JsonLd data={data} />;
 }

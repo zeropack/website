@@ -11,6 +11,8 @@
   --kraft: #d7c7a3;
   --forest: #014a05;
   --aqua: #79def0;
+  /* Logo (h-14 / sm:h-[4.5rem]) + header py-3 */
+  --site-header-height: 5rem;
 }
 
 @theme inline {
@@ -27,8 +29,15 @@
   --font-heading: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
 }
 
+@media (min-width: 640px) {
+  :root {
+    --site-header-height: 6rem;
+  }
+}
+
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: var(--site-header-height);
 }
 
 body {

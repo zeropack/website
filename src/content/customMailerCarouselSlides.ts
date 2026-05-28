@@ -23,6 +23,8 @@ import bagCartridges from "@/content/images/custom/Zero_Pack_custom_compostable_
 import bagYakeen from "@/content/images/custom/Zero Pack custom compostable packaging eco-friendly shipping bags and mailers yakeen safety brown.webp";
 import bagKingfisher from "@/content/images/custom/Zero Pack custom compostable packaging eco-friendly shipping bags and mailers kingfisher purple.png";
 import bagFoodland from "@/content/images/custom/Zero Pack - Custom Compostable Packaging - Foodland-800x800.png";
+import bagSiboTest from "@/content/images/custom/Zero Pack custom compostable packaging eco-friendly shipping bags and mailers Sibo Test.png";
+import bagTransfusionMedicine from "@/content/images/custom/Zero Pack custom compostable packaging eco-friendly shipping bags and mailers Transfusion Medicine.png";
 
 export type CustomMailerCarouselSlide = {
   image: StaticImageData;
@@ -179,5 +181,19 @@ export const customMailerCarouselSlides: CustomMailerCarouselSlide[] = [
     heading: "Foodland",
     subheading: "The mighty South Aussie.",
     alt: "Foodland custom compostable mailer",
+  },
+  {
+    image: bagSiboTest,
+    heading: "SIBOtest",
+    subheading:
+      "SIBOtest specialises in diagnostic testing for functional digestive disorders. We are Australia's leader in SIBO breath testing.",
+    alt: "SIBOtest custom compostable mailer",
+  },
+  {
+    image: bagTransfusionMedicine,
+    heading: "Fiona Stanley Hospital",
+    subheading:
+      "Transfusion Medicine Unit, providing critical pathology services for blood typing, pre-transfusion testing, and patient blood management.",
+    alt: "Fiona Stanley Hospital Transfusion Medicine Unit custom compostable mailer",
   },
 ];

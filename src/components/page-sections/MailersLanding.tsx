@@ -17,24 +17,22 @@ import { FAQAccordion } from "@/components/FAQAccordion";
 import { FAQSchema } from "@/components/FAQSchema";
 import { CTASection } from "@/components/CTASection";
 import { globalHomeFaqs } from "@/content/global/faqs";
+import { QUOTE_FORM_HREF } from "@/lib/site";
 
-function quoteHref(region?: RegionCode) {
-  if (!region) return "/quote/";
-  return `/quote/?region=${region}`;
+function quoteHref(_region?: RegionCode) {
+  return QUOTE_FORM_HREF;
 }
 
 export function MailersLanding({ variant }: { variant: MailersVariant }) {
   const copy = mailersContent[variant];
   const region = variant === "global" ? undefined : variant;
   const cfg = region ? getRegionConfig(region) : null;
-  const faqs = cfg?.faqs?.length ? cfg.faqs.slice(0, 12) : globalHomeFaqs;
-
   const primaryHref = quoteHref(region);
   const guideHref = "/packaging-guide/";
 
   return (
     <>
-      <FAQSchema items={faqs} />
+      <FAQSchema items={globalHomeFaqs} />
       <HeroSection
         title={copy.heroTitle}
         subtitle={copy.heroSub}
@@ -241,7 +239,7 @@ export function MailersLanding({ variant }: { variant: MailersVariant }) {
             <div>
               <h2 className="font-heading text-2xl font-semibold text-charcoal sm:text-3xl">FAQ</h2>
               <div className="mt-6">
-                <FAQAccordion items={faqs} />
+                <FAQAccordion items={globalHomeFaqs} />
               </div>
               <div className="mt-10">
                 <CTASection

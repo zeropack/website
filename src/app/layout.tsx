@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    "Custom compostable packaging, made for brands that care what they send out. Made-to-order mailers for ecommerce brands — quotes, certification guidance, AU and UK supported.",
+    "Custom compostable packaging, made for brands that care what they send out. Made-to-order mailers for ecommerce brands worldwide — quotes, certification guidance, and practical MOQs.",
   robots: { index: true, follow: true },
 };
 

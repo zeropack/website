@@ -2,6 +2,8 @@ import Link from "next/link";
 import { SiteImage } from "@/components/SiteImage";
 import { Fragment } from "react";
 import { globalHome } from "@/content/global/home";
+import { aboutZeroPack } from "@/content/about/about";
+import { founderStory } from "@/content/about/founderStory";
 import { globalHomeFaqs } from "@/content/global/faqs";
 import { HeroSection } from "@/components/HeroSection";
 import { TrustBadges } from "@/components/TrustBadges";
@@ -52,18 +54,30 @@ export function GlobalHome() {
 
         <Reveal>
           <section className="border-b border-slate-200/40 bg-white py-14 sm:py-20">
-            <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-12">
-              <YoutubeVideoPlaceholder
-                videoId={globalHome.whoWeAre.youtubeVideoId || undefined}
-                title="About Zero Pack"
-              />
+            <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] lg:items-start lg:gap-12 xl:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] xl:gap-16">
+              <div className="mx-auto w-full max-w-xs sm:max-w-sm lg:mx-0 lg:max-w-none">
+                <YoutubeVideoPlaceholder
+                  videoId={founderStory.youtubeVideoId || undefined}
+                  title="About Zero Pack"
+                  aspectRatio="9:16"
+                  muted
+                />
+              </div>
               <div>
-                <h2 className="font-heading text-2xl font-semibold text-charcoal sm:text-3xl">{globalHome.whoWeAre.heading}</h2>
+                <h2 className="font-heading text-2xl font-semibold text-charcoal sm:text-3xl">
+                  {aboutZeroPack.whoWeAre.heading}
+                </h2>
                 <div className="mt-6 space-y-4 text-lg text-charcoal/75">
-                  {globalHome.whoWeAre.body.map((p) => (
+                  {aboutZeroPack.whoWeAre.body.map((p) => (
                     <p key={p}>{p}</p>
                   ))}
                 </div>
+                <p className="mt-6 font-heading text-lg font-semibold text-compost">{aboutZeroPack.tagline}</p>
+                <p className="mt-6">
+                  <Link className="font-semibold text-air hover:underline" href="/about/">
+                    {aboutZeroPack.whoWeAre.aboutLinkLabel} →
+                  </Link>
+                </p>
               </div>
             </div>
           </section>

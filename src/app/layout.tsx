@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Inter, Manrope, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Shell } from "@/components/Shell";
 import { SEOOrganization } from "@/components/SEOOrganization";
-import { SITE_NAME } from "@/lib/site";
+import { GA_MEASUREMENT_ID, SITE_NAME } from "@/lib/site";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -45,6 +46,9 @@ export default function RootLayout({
         <SEOOrganization />
         <Shell>{children}</Shell>
       </body>
+      {process.env.NODE_ENV === "production" && (
+        <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />
+      )}
     </html>
   );
 }

@@ -22,15 +22,6 @@ export const globalHome = {
     "Made to order",
     "Practical MOQ options",
   ],
-  whoWeAre: {
-    heading: "Who we are",
-    /** Set to a YouTube video ID to replace the placeholder (e.g. from watch?v=VIDEO_ID). */
-    youtubeVideoId: "",
-    body: [
-      "Zero Pack helps brands replace generic plastic shipping mailers with custom compostable mailers that look considered, perform in transit and align with modern customer expectations.",
-      "We work globally with ecommerce-focused brands. Production is made to order (not off-the-shelf stock), and pricing is quote-based so specification, print and freight stay transparent.",
-    ],
-  },
   packagingContext: {
     heading: "Why packaging is a strategic touchpoint",
     body: [

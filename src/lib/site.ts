@@ -1,5 +1,9 @@
 export const SITE_NAME = "Zero Pack";
 
+/** Google Analytics 4 measurement ID (gtag.js). */
+export const GA_MEASUREMENT_ID =
+  process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "G-KTC9QG7ZD5";
+
 export const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "enquiries@zeropack.co";
 
 /** Trend packaging funnel landing page. */

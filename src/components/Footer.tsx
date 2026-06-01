@@ -8,6 +8,7 @@ const groups = [
     links: [
       { href: TREND_PACKAGING_FUNNEL_HREF, label: "Custom compostable mailers" },
       { href: "/custom-compostable-packaging/", label: "Custom compostable packaging" },
+      { href: "/packaging-guide/", label: "Branded packaging guide" },
     ],
   },
   {
@@ -15,6 +16,7 @@ const groups = [
     links: [
       { href: "/about/", label: "About" },
       { href: "/how-it-works/", label: "How it works" },
+      { href: "/articles/", label: "Articles & guides" },
       { href: "/customer-showcase/", label: "Customer showcase" },
       { href: "/contact/", label: "Contact" },
     ],

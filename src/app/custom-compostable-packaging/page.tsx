@@ -58,7 +58,7 @@ export default function Page() {
             </h1>
             <p className="mt-5 text-lg text-charcoal/75">
               Whilst{" "}
-              <a className="font-semibold text-air hover:underline" href="/custom-compostable-mailers/">
+              <a className="font-semibold text-air hover:underline" href="/trend-packaging-funnel/">
                 custom mailers
               </a>{" "}
               are the primary product for ecommerce shipping, we offer a wider range of custom compostable packaging to

@@ -91,8 +91,8 @@ function SuccessInner() {
         </div>
 
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-          <CTAButton href="/packaging-guide/" variant="secondary">
-            Download the Compostable Packaging Guide
+          <CTAButton href="/packaging-guide/download/" variant="secondary">
+            Download the Guide
           </CTAButton>
           <Link className="text-sm font-semibold text-air hover:underline" href="/">
             Return home

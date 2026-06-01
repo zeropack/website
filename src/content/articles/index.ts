@@ -1,11 +1,20 @@
 import type { Article } from "./types";
 import { articlesPartA } from "./partA";
 import { articlesPartB } from "./partB";
+import { spokeGuides } from "./spokeGuides";
 
-const all: Article[] = [...articlesPartA, ...articlesPartB];
+const all: Article[] = [...articlesPartA, ...articlesPartB, ...spokeGuides];
 
 export function getAllArticles(): Article[] {
   return all;
+}
+
+export function getSpokeGuides(): Article[] {
+  return spokeGuides;
+}
+
+export function getSupportingArticles(): Article[] {
+  return [...articlesPartA, ...articlesPartB];
 }
 
 export function getArticleSlugs(): string[] {
@@ -17,6 +26,7 @@ export function getArticleBySlug(slug: string): Article | undefined {
 }
 
 export const articleCategories = [
+  "Packaging guides",
   "Compostable packaging education",
   "Custom mailer design",
   "Ecommerce packaging",

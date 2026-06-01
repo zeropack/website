@@ -28,7 +28,7 @@ export function MailersLanding({ variant }: { variant: MailersVariant }) {
   const region = variant === "global" ? undefined : variant;
   const cfg = region ? getRegionConfig(region) : null;
   const primaryHref = quoteHref(region);
-  const guideHref = "/packaging-guide/";
+  const guideHref = "/packaging-guide/download/";
 
   return (
     <>

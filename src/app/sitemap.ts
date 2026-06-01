@@ -15,13 +15,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/customer-showcase/",
     "/about/",
     "/quote/",
-    "/quote/success/",
     "/packaging-guide/",
-    "/packaging-guide/thank-you/",
     "/articles/",
     "/contact/",
     "/privacy/",
     "/terms/",
+    "/au/",
+    "/uk/",
+    "/us/",
+    "/eu/",
+    "/au/custom-compostable-mailers/",
+    "/uk/custom-compostable-mailers/",
+    "/us/custom-compostable-mailers/",
+    "/eu/custom-compostable-mailers/",
   ];
 
   const articles = getArticleSlugs().map((slug) => ({

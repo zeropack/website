@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { absoluteUrl, getSiteUrl } from "./site";
 import type { RegionCode } from "./types";
 
+const DEFAULT_OG_IMAGE = "/og/default.png";
+
 export type HreflangSpec = Partial<Record<string, string>>;
 
 export function buildMetadata(opts: {
@@ -10,9 +12,11 @@ export function buildMetadata(opts: {
   path: string;
   hreflang?: HreflangSpec;
   ogImagePath?: string;
+  openGraphType?: "website" | "article";
 }): Metadata {
   const url = absoluteUrl(opts.path);
-  const og = opts.ogImagePath ? absoluteUrl(opts.ogImagePath) : undefined;
+  const ogPath = opts.ogImagePath ?? DEFAULT_OG_IMAGE;
+  const og = absoluteUrl(ogPath);
   return {
     title: opts.title,
     description: opts.description,
@@ -27,14 +31,14 @@ export function buildMetadata(opts: {
       url,
       siteName: "Zero Pack",
       locale: "en",
-      type: "website",
-      images: og ? [{ url: og }] : undefined,
+      type: opts.openGraphType ?? "website",
+      images: [{ url: og }],
     },
     twitter: {
       card: "summary_large_image",
       title: opts.title,
       description: opts.description,
-      images: og ? [og] : undefined,
+      images: [og],
     },
   };
 }

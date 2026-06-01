@@ -39,8 +39,8 @@ export default function Page() {
               <CTAButton href={QUOTE_FORM_HREF} variant="primary">
                 Get a Custom Quote
               </CTAButton>
-              <CTAButton href="/packaging-guide/" variant="secondary">
-                Get the Guide
+              <CTAButton href="/packaging-guide/download/" variant="secondary">
+                Download the Guide
               </CTAButton>
             </div>
           </div>
@@ -122,8 +122,8 @@ export default function Page() {
                 to sustainability. Start with our guide while you compare options and plan your next move.
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <CTAButton href="/packaging-guide/" variant="secondary">
-                  Download the guide
+                <CTAButton href="/packaging-guide/download/" variant="secondary">
+                  Download the Guide
                 </CTAButton>
                 <CTAButton href="/custom-compostable-packaging/" variant="ghost">
                   Explore packaging formats

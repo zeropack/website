@@ -11,6 +11,13 @@ export type Article = {
   category: string;
   description: string;
   publishedAt: string;
+  dateModified?: string;
+  primaryKeyword?: string;
+  secondaryKeywords?: string[];
+  relatedSlugs?: string[];
+  pillarPath?: string;
+  keyTakeaways?: string[];
+  isSpokeGuide?: boolean;
   sections: ArticleSection[];
   faqs: { question: string; answer: string }[];
 };

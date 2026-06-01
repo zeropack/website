@@ -39,8 +39,8 @@ export function LeadMagnetBlock({
               <CTAButton href={quoteHref} variant="primary">
                 Get a Custom Quote
               </CTAButton>
-              <CTAButton href="/packaging-guide/" variant="secondary">
-                Download the packaging guide
+              <CTAButton href="/packaging-guide/download/" variant="secondary">
+                Download the Guide
               </CTAButton>
             </div>
           </div>
@@ -53,10 +53,11 @@ export function LeadMagnetBlock({
           >
             <p className="text-sm font-semibold text-compost">What’s inside</p>
             <p className="mt-2 font-heading text-xl font-semibold text-charcoal">
-              The Brand’s Guide to Custom Compostable Packaging
+              The 2026 Branded & Eco Friendly Packaging Guide
             </p>
             <p className="mt-2 text-sm text-charcoal/70">
-              Includes mailer-specific checklists for ecommerce brands.
+              Branded packaging, eco friendly options, and custom compostable mailers — with checklists for ecommerce
+              brands.
             </p>
             <ul className="mt-4 space-y-2 text-sm text-charcoal/75">
               <li>What to verify before you change materials</li>

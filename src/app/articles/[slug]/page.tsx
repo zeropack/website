@@ -19,6 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: article.title,
     description: article.description,
     path: `/articles/${article.slug}/`,
+    openGraphType: "article",
   });
 }
 

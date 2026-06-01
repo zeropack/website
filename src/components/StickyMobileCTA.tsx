@@ -10,8 +10,8 @@ export function StickyMobileCTA() {
         <CTAButton href={QUOTE_FORM_HREF} variant="primary" className="flex-1 py-3 text-sm">
           Get Quote
         </CTAButton>
-        <CTAButton href="/packaging-guide/" variant="secondary" className="flex-1 py-3 text-sm">
-          Get Guide
+        <CTAButton href="/packaging-guide/download/" variant="secondary" className="flex-1 py-3 text-sm">
+          Download the Guide
         </CTAButton>
       </div>
     </div>

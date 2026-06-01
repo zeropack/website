@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# internal source documents (web content is in src/content/guides/)
+*.docx
+tmp-brand-guide*

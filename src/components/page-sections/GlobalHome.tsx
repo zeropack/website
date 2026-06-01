@@ -47,7 +47,7 @@ export function GlobalHome() {
           title={globalHome.hero.headline}
           subtitle={globalHome.hero.subheading}
           primaryCta={{ label: globalHome.hero.primaryCta, href: QUOTE_FORM_HREF }}
-          secondaryCta={{ label: globalHome.hero.secondaryCta, href: "/packaging-guide/" }}
+          secondaryCta={{ label: globalHome.hero.secondaryCta, href: "/packaging-guide/download/" }}
           softCta={{ label: globalHome.hero.softCta, href: globalHome.hero.softCtaHref }}
         />
         <TrustBadges variant="climate" />
@@ -140,7 +140,7 @@ export function GlobalHome() {
                   </Link>
                   <Link
                     className="inline-flex items-center justify-center rounded-lg border border-compost/30 bg-white px-5 py-3 text-sm font-semibold text-compost transition hover:bg-mist"
-                    href="/packaging-guide/"
+                    href="/packaging-guide/download/"
                   >
                     {globalHome.whatWeDo.secondaryCtaLabel}
                   </Link>
@@ -150,7 +150,7 @@ export function GlobalHome() {
                     {globalHome.whatWeDo.tertiaryLinkLabel}
                   </Link>{" "}
                   ·{" "}
-                  <Link className="font-semibold text-air hover:underline" href="/custom-compostable-mailers/">
+                  <Link className="font-semibold text-air hover:underline" href="/trend-packaging-funnel/">
                     Custom compostable mailers
                   </Link>{" "}
                   ·{" "}

@@ -77,8 +77,8 @@ export function Header() {
           </nav>
         </div>
         <div className="hidden items-center gap-2 sm:flex">
-          <CTAButton href="/packaging-guide/" variant="secondary">
-            Get the Guide
+          <CTAButton href="/packaging-guide/download/" variant="secondary">
+            Download the Guide
           </CTAButton>
           <CTAButton href={QUOTE_FORM_HREF} variant="primary">
             Get a Custom Quote

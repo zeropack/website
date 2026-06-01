@@ -43,21 +43,35 @@ const heroByRegion: Record<
     ],
   },
   us: {
-    title: "Zero Pack US (coming soon)",
-    sub: "Tell us your US shipping needs and timeline — we will confirm feasibility as the US route opens.",
-    trust: ["Custom quotes", "Made to order", "Regional expansion"],
+    title: "Custom compostable mailers for ecommerce brands shipping across the US",
+    sub: "Made-to-order mailers for brands that want stronger presentation and a more considered alternative to conventional plastic — practical MOQs from around 2,000 units.",
+    trust: [
+      "Custom printed",
+      "Suitable for US ecommerce brands",
+      "Custom quote process",
+      "MOQ from around 2,000 units",
+      "Delivery timelines confirmed during quote",
+      "Certification and standards guidance",
+    ],
   },
   eu: {
-    title: "Zero Pack EU (coming soon)",
-    sub: "Tell us your primary EU shipping country and volumes — we will confirm next steps as the EU route expands.",
-    trust: ["Custom quotes", "Made to order", "Regional expansion"],
+    title: "Custom compostable mailers for ecommerce brands shipping across Europe",
+    sub: "Made-to-order mailers for brands that want stronger presentation and a more considered alternative to conventional plastic — practical MOQs from around 2,000 units.",
+    trust: [
+      "Custom printed",
+      "Suitable for EU ecommerce brands",
+      "Custom quote process",
+      "MOQ from around 2,000 units",
+      "Delivery timelines confirmed during quote",
+      "Certification and standards guidance",
+    ],
   },
 };
 
 export function RegionalHome({ region }: { region: RegionCode }) {
   const cfg = getRegionConfig(region);
   const hero = heroByRegion[region];
-  const mailersHref = `/${region}/custom-compostable-mailers/`;
+  const mailersHref = "/trend-packaging-funnel/";
   const quoteHref = QUOTE_FORM_HREF;
 
   return (
@@ -139,7 +153,7 @@ export function RegionalHome({ region }: { region: RegionCode }) {
             title="Request a quote for this region"
             description={cfg.legalDisclaimer}
             primary={{ label: cfg.defaultCTA, href: quoteHref }}
-            secondary={{ label: "Download the guide", href: "/packaging-guide/" }}
+            secondary={{ label: "Download the Guide", href: "/packaging-guide/download/" }}
           />
         </div>
       </section>

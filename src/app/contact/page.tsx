@@ -53,8 +53,8 @@ export default function Page() {
           <CTAButton href={QUOTE_FORM_HREF} variant="primary">
             Get a Custom Quote
           </CTAButton>
-          <CTAButton href="/packaging-guide/" variant="secondary">
-            Get the Guide
+          <CTAButton href="/packaging-guide/download/" variant="secondary">
+            Download the Guide
           </CTAButton>
         </div>
       </div>

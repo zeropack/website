@@ -4,7 +4,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import { Inter, Manrope, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Shell } from "@/components/Shell";
-import { SEOOrganization } from "@/components/SEOOrganization";
+import { SEOOrganization, SEOWebSite } from "@/components/SEOOrganization";
 import { GA_MEASUREMENT_ID, SITE_NAME } from "@/lib/site";
 
 const inter = Inter({
@@ -41,9 +41,10 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${manrope.variable} ${plusJakarta.variable} h-full`}>
+    <html lang="en" data-scroll-behavior="smooth" className={`${inter.variable} ${manrope.variable} ${plusJakarta.variable} h-full`}>
       <body className="min-h-full flex flex-col font-sans">
         <SEOOrganization />
+        <SEOWebSite />
         <Shell>{children}</Shell>
       </body>
       {process.env.NODE_ENV === "production" && (

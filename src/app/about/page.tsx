@@ -27,7 +27,7 @@ export default function Page() {
                 <>
                   Zero Pack is a specialist B2B supplier focused on made-to-order custom compostable packaging for
                   businesses that ship physical products — especially{" "}
-                  <a className="font-semibold text-air hover:underline" href="/custom-compostable-mailers/">
+                  <a className="font-semibold text-air hover:underline" href="/trend-packaging-funnel/">
                     custom compostable mailers
                   </a>{" "}
                   for ecommerce brands.

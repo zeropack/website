@@ -6,6 +6,7 @@ export type BrandGuide = {
   title: string;
   subtitle: string;
   tagline: string;
+  answerBox?: string;
   primaryKeyword: string;
   secondaryKeywords: readonly string[];
   pdfFilename: string;

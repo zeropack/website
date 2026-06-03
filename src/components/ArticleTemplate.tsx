@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { Article } from "@/content/articles/types";
+import type { Article, HowToStep } from "@/content/articles/types";
 import { getArticleBySlug } from "@/content/articles";
 import { CTAButton } from "./CTAButton";
 import { FAQAccordion } from "./FAQAccordion";
@@ -34,6 +34,21 @@ export function ArticleTemplate({ article }: { article: Article }) {
     .map((slug) => getArticleBySlug(slug))
     .filter(Boolean) as Article[];
 
+  const howToJsonLd = article.howToSteps && article.howToSteps.length > 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        name: article.title,
+        description: article.description,
+        step: article.howToSteps.map((s: HowToStep, i: number) => ({
+          "@type": "HowToStep",
+          position: i + 1,
+          name: s.name,
+          text: s.text,
+        })),
+      }
+    : null;
+
   const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -54,6 +69,7 @@ export function ArticleTemplate({ article }: { article: Article }) {
   return (
     <article className="bg-stone pb-16 pt-8 sm:pb-24">
       <JsonLd data={articleJsonLd} />
+      {howToJsonLd ? <JsonLd data={howToJsonLd} /> : null}
       {faqs.length > 0 ? <FAQSchema items={faqs} /> : null}
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <p className="text-xs font-semibold uppercase tracking-wide text-leaf">{article.category}</p>
@@ -67,6 +83,13 @@ export function ArticleTemplate({ article }: { article: Article }) {
             : null}
         </p>
         <p className="mt-6 text-lg text-charcoal/75">{article.description}</p>
+
+        {article.answerBox ? (
+          <div className="mt-6 rounded-xl border-l-4 border-leaf bg-white px-5 py-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-leaf">Quick answer</p>
+            <p className="mt-2 text-sm text-charcoal/80">{article.answerBox}</p>
+          </div>
+        ) : null}
 
         {!article.isSpokeGuide ? (
           <p className="mt-4 rounded-xl border border-slate-200/60 bg-white px-4 py-3 text-sm text-charcoal/75">
@@ -120,7 +143,7 @@ export function ArticleTemplate({ article }: { article: Article }) {
             <section key={s.id} id={s.id} className="mb-12">
               <h2 className="font-heading text-2xl font-semibold text-compost">{s.heading}</h2>
               <div className="mt-4 space-y-4 text-charcoal/75">
-                {s.paragraphs.map((p, i) => (
+                {s.paragraphs?.map((p, i) => (
                   <p key={i}>{renderParagraph(p)}</p>
                 ))}
               </div>
@@ -130,6 +153,50 @@ export function ArticleTemplate({ article }: { article: Article }) {
                     <li key={b}>{b}</li>
                   ))}
                 </ul>
+              ) : null}
+              {s.numberedList ? (
+                <ol className="mt-4 list-decimal space-y-3 pl-5 text-charcoal/75">
+                  {s.numberedList.map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ol>
+              ) : null}
+              {s.table ? (
+                <>
+                  <div className="mt-6 overflow-x-auto rounded-xl border border-black/8">
+                    <table className="w-full border-collapse text-sm">
+                      <thead>
+                        <tr>
+                          {s.table.headers.map((h) => (
+                            <th
+                              key={h}
+                              className="border-b border-black/8 bg-mist px-4 py-3 text-left font-semibold text-charcoal first:w-36"
+                            >
+                              {h}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {s.table.rows.map((row, ri) => (
+                          <tr key={ri} className={ri % 2 === 0 ? "bg-white" : "bg-stone/40"}>
+                            {row.map((cell, ci) => (
+                              <td
+                                key={ci}
+                                className={`border-b border-black/5 px-4 py-3 text-charcoal/80 last:border-b-0 ${ci === 0 ? "font-semibold text-charcoal" : ""}`}
+                              >
+                                {cell}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  {s.table.footnote ? (
+                    <p className="mt-2 text-right text-xs text-charcoal/50">{s.table.footnote}</p>
+                  ) : null}
+                </>
               ) : null}
             </section>
           ))}

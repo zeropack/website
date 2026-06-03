@@ -145,6 +145,14 @@ export default function TrendPackagingFunnelPage() {
               Custom compostable mailers let you deliver a stronger unboxing experience while signalling your brand is
               part of the next wave, not behind it.
             </p>
+            <div className="mt-8">
+              <a
+                href="#quoteform"
+                className="inline-flex items-center justify-center rounded-lg bg-air px-6 py-3 text-sm font-semibold text-white shadow-md hover:bg-air/90"
+              >
+                Create Packaging Like This
+              </a>
+            </div>
           </div>
           <CustomMailerCarousel slides={customMailerCarouselSlides} />
         </div>
@@ -189,6 +197,20 @@ export default function TrendPackagingFunnelPage() {
               </div>
             ))}
           </div>
+          <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <a
+              href="#quoteform"
+              className="inline-flex items-center justify-center rounded-lg bg-air px-6 py-3 text-sm font-semibold text-white shadow-md hover:bg-air/90"
+            >
+              Request Custom Mailer Pricing
+            </a>
+            <a
+              href="/packaging-guide/"
+              className="inline-flex items-center justify-center rounded-lg border border-white/25 bg-white/5 px-6 py-3 text-sm font-semibold text-slate-200 hover:bg-white/10"
+            >
+              Download the packaging guide
+            </a>
+          </div>
         </div>
       </section>
 
@@ -226,6 +248,37 @@ export default function TrendPackagingFunnelPage() {
 
       <PackagingPathSteps variant="dark" />
 
+      <section className="relative border-b border-white/10 bg-transparent py-14 sm:py-20">
+        <div className="mx-auto max-w-2xl px-4 sm:px-6">
+          <div className="rounded-2xl border border-white/15 bg-white/5 p-7 backdrop-blur-sm sm:p-9">
+            <p className="font-heading text-xl font-semibold text-white sm:text-2xl">Before you request a quote</p>
+            <p className="mt-3 text-sm text-slate-300/80">
+              To prepare accurate pricing, we will ask for a few details about your packaging, including:
+            </p>
+            <ul className="mt-4 grid gap-2 text-sm text-slate-200/85 sm:grid-cols-2">
+              {[
+                "Packaging type",
+                "Approximate size",
+                "Quantity",
+                "Print requirements",
+                "Delivery country",
+                "Artwork status",
+                "Preferred timeline",
+              ].map((item) => (
+                <li key={item} className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-air" aria-hidden />
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-5 text-sm text-slate-400/80">
+              Do not worry if you do not have everything ready. Send us what you know and we&apos;ll help you work
+              through the rest.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="relative border-b border-white/10 bg-transparent py-16 sm:py-24">
         <div id="quoteform" className="mx-auto max-w-4xl px-4 text-center sm:px-6">
           <h2 className="font-heading text-4xl font-semibold leading-tight text-white sm:text-6xl">
@@ -251,6 +304,67 @@ export default function TrendPackagingFunnelPage() {
         </div>
       </section>
 
+      <section className="relative border-b border-white/10 bg-transparent py-14 sm:py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="rounded-2xl border border-white/15 bg-white/5 p-7 backdrop-blur-sm sm:p-10">
+            <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
+              <div>
+                <h2 className="font-heading text-2xl font-semibold text-white sm:text-3xl">
+                  Still Researching Compostable Packaging?
+                </h2>
+                <p className="mt-4 text-slate-300/80">
+                  Switching packaging is a big decision. If you are comparing plastic, recycled plastic, paper and
+                  compostable mailers, start with the guide. It explains what to check, which claims to question and
+                  how to decide whether custom compostable mailers are right for your brand.
+                </p>
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <a
+                    href="#quoteform"
+                    className="inline-flex items-center justify-center rounded-lg bg-air px-6 py-3 text-sm font-semibold text-white shadow-md hover:bg-air/90"
+                  >
+                    Get a Custom Quote
+                  </a>
+                  <a
+                    href="/packaging-guide/download/"
+                    className="inline-flex items-center justify-center rounded-lg border border-white/25 bg-white/5 px-6 py-3 text-sm font-semibold text-slate-200 hover:bg-white/10"
+                  >
+                    Download the Guide
+                  </a>
+                </div>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+                <p className="text-sm font-semibold text-air">What&apos;s inside</p>
+                <p className="mt-2 font-heading text-xl font-semibold text-white">
+                  The 2026 Branded &amp; Eco Friendly Packaging Guide
+                </p>
+                <p className="mt-2 text-sm text-slate-300/70">
+                  Branded packaging, eco friendly options, and custom compostable mailers — with checklists for
+                  ecommerce brands.
+                </p>
+                <ul className="mt-4 space-y-2 text-sm text-slate-300/75">
+                  <li className="flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-air" aria-hidden />
+                    What to verify before you change materials
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-air" aria-hidden />
+                    How to avoid vague &ldquo;biodegradable&rdquo; messaging
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-air" aria-hidden />
+                    What to prepare before requesting a quote
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-air" aria-hidden />
+                    And much, much more
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="relative border-t border-white/10 bg-transparent py-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6 sm:p-8">
@@ -265,10 +379,10 @@ export default function TrendPackagingFunnelPage() {
             </p>
             <div className="mt-5">
               <a
-                href="mailto:enquiries@zeropack.co"
+                href="/custom-compostable-packaging/"
                 className="inline-flex items-center justify-center rounded-lg border border-air/35 bg-air/10 px-4 py-2 text-sm font-semibold text-air hover:bg-air/15"
               >
-                Email enquiries@zeropack.co
+                Explore compostable packaging options
               </a>
             </div>
           </div>

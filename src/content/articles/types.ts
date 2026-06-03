@@ -1,8 +1,36 @@
+export type SectionTable = {
+  headers: string[];
+  rows: string[][];
+  footnote?: string;
+  gated?: boolean;
+};
+
+export type GuideSubsection = {
+  heading: string;
+  paragraphs?: string[];
+  bullets?: string[];
+  numberedList?: string[];
+  table?: SectionTable;
+  table2?: SectionTable;
+  note?: string;
+};
+
 export type ArticleSection = {
   id: string;
   heading: string;
-  paragraphs: string[];
+  answerBox?: string;
+  paragraphs?: string[];
   bullets?: string[];
+  numberedList?: string[];
+  table?: SectionTable;
+  table2?: SectionTable;
+  note?: string;
+  subsections?: GuideSubsection[];
+};
+
+export type HowToStep = {
+  name: string;
+  text: string;
 };
 
 export type Article = {
@@ -17,6 +45,8 @@ export type Article = {
   relatedSlugs?: string[];
   pillarPath?: string;
   keyTakeaways?: string[];
+  answerBox?: string;
+  howToSteps?: HowToStep[];
   isSpokeGuide?: boolean;
   sections: ArticleSection[];
   faqs: { question: string; answer: string }[];

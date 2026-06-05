@@ -1,7 +1,7 @@
 export const founderStory = {
   title: "Zero Pack Founder Story",
-  /** YouTube video ID for the founder story (https://youtu.be/vSXJJRDJtgs). */
-  youtubeVideoId: "vSXJJRDJtgs",
+  /** YouTube video ID for the founder story (https://youtu.be/QTJov3s6BVc). */
+  youtubeVideoId: "QTJov3s6BVc",
   intro: "Hi, I'm Patrick, founder of Zero Pack.",
   paragraphs: [
     "Zero Pack started back in 2018, after I noticed something that didn't sit right with me.",

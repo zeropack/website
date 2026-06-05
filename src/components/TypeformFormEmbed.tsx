@@ -66,6 +66,8 @@ export function TypeformFormEmbed({ className }: { className?: string }) {
       host.replaceChildren();
       const target = document.createElement("div");
       target.setAttribute("data-tf-live", TYPEFORM_LIVE_ID);
+      // Keep the form inline on mobile instead of opening a fullscreen overlay modal
+      target.setAttribute("data-tf-inline-on-mobile", "");
       host.appendChild(target);
       window.tf?.load?.();
     };

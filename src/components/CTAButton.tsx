@@ -42,7 +42,7 @@ export function CTAButton({
       );
     }
     return (
-      <Link className={cls} href={href}>
+      <Link className={cls} href={href} onClick={onClick}>
         {children}
       </Link>
     );

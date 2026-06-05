@@ -243,6 +243,20 @@ export default function TrendPackagingFunnelPage() {
               </figure>
             ))}
           </div>
+          <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <a
+              href="#quoteform"
+              className="inline-flex items-center justify-center rounded-lg bg-air px-6 py-3 text-sm font-semibold text-white shadow-md hover:bg-air/90"
+            >
+              Request Custom Quote
+            </a>
+            <a
+              href="/packaging-guide/download/"
+              className="inline-flex items-center justify-center rounded-lg border border-white/25 bg-white/5 px-6 py-3 text-sm font-semibold text-slate-200 hover:bg-white/10"
+            >
+              Download the Packaging Guide
+            </a>
+          </div>
         </div>
       </section>
 

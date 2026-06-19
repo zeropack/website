@@ -42,6 +42,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-scroll-behavior="smooth" className={`${inter.variable} ${manrope.variable} ${plusJakarta.variable} h-full`}>
+      <head>
+        {/* Consentik cookie consent */}
+        <script src="https://cmp.consentik.com/sites/5a5eb279-8e4d-4daa-ad25-277fa627d7a4/b19585841572bc5a891525b33423d9f4/gcm.js" />
+        <script dangerouslySetInnerHTML={{ __html: `!function(e,t,n,s,i,c){const a=t.getElementsByTagName(n)[0],d=t.createElement(n);d.id="cst-package",d.async=!0,d.src="https://cmp.consentik.com/sites/5a5eb279-8e4d-4daa-ad25-277fa627d7a4/b19585841572bc5a891525b33423d9f4/index.js?v="+(new Date().getMinutes()),a.parentNode.insertBefore(d,a)}(window,document,"script");` }} />
+        {/* End Consentik cookie consent */}
+      </head>
       <body className="min-h-full flex flex-col font-sans">
         <SEOOrganization />
         <SEOWebSite />

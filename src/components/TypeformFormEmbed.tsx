@@ -106,6 +106,7 @@ export function TypeformFormEmbed({ className }: { className?: string }) {
       const target = document.createElement("div");
 
       target.setAttribute("data-tf-live", TYPEFORM_LIVE_ID);
+      target.setAttribute("data-tf-height", "750");
 
       // Keep the form inline on mobile instead of opening a fullscreen overlay modal.
       target.setAttribute("data-tf-inline-on-mobile", "");

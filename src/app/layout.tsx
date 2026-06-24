@@ -52,6 +52,9 @@ export default function RootLayout({
         {/* End Consentik cookie consent */}
       </head>
       <body className="min-h-full flex flex-col font-sans">
+        {/* Google Tag Manager (noscript) */}
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NSLBNXGR" height="0" width="0" style={{ display: "none", visibility: "hidden" }}></iframe></noscript>
+        {/* End Google Tag Manager (noscript) */}
         <SEOOrganization />
         <SEOWebSite />
         <Shell>{children}</Shell>

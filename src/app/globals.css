@@ -101,3 +101,8 @@ body {
     transform: none;
   }
 }
+
+/* Force Typeform embed height on all viewports including mobile */
+[data-tf-live] iframe {
+  min-height: 750px !important;
+}

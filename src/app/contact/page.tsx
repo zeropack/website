@@ -2,10 +2,7 @@ import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/metadata";
 import { TrackedOutbound } from "@/components/TrackedOutbound";
 import { CTAButton } from "@/components/CTAButton";
-import { HubSpotFormEmbed } from "@/components/HubSpotFormEmbed";
 import { CONTACT_EMAIL, QUOTE_FORM_HREF } from "@/lib/site";
-
-const CONTACT_HUBSPOT_FORM_ID = "c1ec3bc8-cf99-42b9-90a0-9b5d86fcd330";
 
 export const metadata: Metadata = buildMetadata({
   title: "Contact Zero Pack",
@@ -26,9 +23,12 @@ export default function Page() {
           . Use this page for direct questions or partnerships.
         </p>
 
-        <HubSpotFormEmbed
-          formId={CONTACT_HUBSPOT_FORM_ID}
-          className="mt-10 rounded-2xl border border-black/5 bg-stone p-6 sm:p-8"
+        <iframe
+          src="https://forms.monday.com/forms/embed/f1e66b3e59654992606729b712abfb30?r=apse2&utm_source=&utm_medium=&utm_campaign=&utm_content="
+          width="100%"
+          height="500"
+          className="mt-10"
+          style={{ border: 0, boxShadow: "5px 5px 56px 0px rgba(0,0,0,0.25)" }}
         />
 
         <div className="mt-8 rounded-2xl border border-black/5 bg-white p-6">

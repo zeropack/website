@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/metadata";
 import { TrackedOutbound } from "@/components/TrackedOutbound";
 import { CTAButton } from "@/components/CTAButton";
+import { MondayFormEmbed } from "@/components/MondayFormEmbed";
 import { CONTACT_EMAIL, QUOTE_FORM_HREF } from "@/lib/site";
+
+const MONDAY_FORM_SRC = "https://forms.monday.com/forms/embed/f1e66b3e59654992606729b712abfb30?r=apse2&utm_source=&utm_medium=&utm_campaign=&utm_content=";
 
 export const metadata: Metadata = buildMetadata({
   title: "Contact Zero Pack",
@@ -23,13 +26,7 @@ export default function Page() {
           . Use this page for direct questions or partnerships.
         </p>
 
-        <iframe
-          src="https://forms.monday.com/forms/embed/f1e66b3e59654992606729b712abfb30?r=apse2&utm_source=&utm_medium=&utm_campaign=&utm_content="
-          width="100%"
-          height="500"
-          className="mt-10"
-          style={{ border: 0, boxShadow: "5px 5px 56px 0px rgba(0,0,0,0.25)" }}
-        />
+        <MondayFormEmbed src={MONDAY_FORM_SRC} className="mt-10" />
 
         <div className="mt-8 rounded-2xl border border-black/5 bg-white p-6">
           <h2 className="font-heading text-lg font-semibold text-compost">Get in touch</h2>

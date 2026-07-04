@@ -3,6 +3,7 @@ import { buildMetadata } from "@/lib/metadata";
 import { TrackedOutbound } from "@/components/TrackedOutbound";
 import { CTAButton } from "@/components/CTAButton";
 import { MondayFormEmbed } from "@/components/MondayFormEmbed";
+import { CalendlyEmbed } from "@/components/CalendlyEmbed";
 import { CONTACT_EMAIL, QUOTE_FORM_HREF } from "@/lib/site";
 
 const MONDAY_FORM_SRC = "https://forms.monday.com/forms/embed/f1e66b3e59654992606729b712abfb30?r=apse2&utm_source=&utm_medium=&utm_campaign=&utm_content=";
@@ -27,6 +28,14 @@ export default function Page() {
         </p>
 
         <MondayFormEmbed src={MONDAY_FORM_SRC} className="mt-10" />
+
+        <div id="calendly" className="mt-12">
+          <h2 className="font-heading text-xl font-semibold text-charcoal">Book a call</h2>
+          <p className="mt-2 text-sm text-charcoal/75">
+            Pick a time that suits you and we will talk through your packaging requirements.
+          </p>
+          <CalendlyEmbed className="mt-6" />
+        </div>
 
         <div className="mt-8 rounded-2xl border border-black/5 bg-white p-6">
           <h2 className="font-heading text-lg font-semibold text-compost">Get in touch</h2>

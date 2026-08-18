@@ -9,7 +9,7 @@ export const compostablePackagingWaFogoGuidance: Article = {
   publishedAt: "2026-08-18",
   market: "AU",
   jurisdiction: ["WA"],
-  heroImage: "/images/articles/ZP-AU-2026-001-wa-fogo-guidance-hero.png",
+  heroImage: "/images/articles/ZP-AU-2026-001-wa-fogo-guidance-hero.webp",
   heroAlt: "Person holding a white flexible mailer beside a green-lidded wheelie bin in a bright home setting.",
   primaryKeyword: "compostable packaging FOGO WA",
   secondaryKeywords: [

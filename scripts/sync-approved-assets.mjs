@@ -1,4 +1,4 @@
-import { createHash, createSign } from "node:crypto";
+import { createHash } from "node:crypto";
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -6,17 +6,6 @@ import { get, head, put } from "@vercel/blob";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const REQUEST_DIR = path.join(ROOT, "asset-transfer-requests");
-const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
-const GOOGLE_DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.readonly";
-
-function base64Url(value) {
-  const buffer = Buffer.isBuffer(value) ? value : Buffer.from(value);
-  return buffer
-    .toString("base64")
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
-}
 
 function sha256(buffer) {
   return createHash("sha256").update(buffer).digest("hex");
@@ -28,56 +17,23 @@ function requireEnv(name) {
   return value;
 }
 
-async function getGoogleAccessToken() {
-  const clientEmail = requireEnv("GOOGLE_DRIVE_SERVICE_ACCOUNT_EMAIL");
-  const privateKey = requireEnv("GOOGLE_DRIVE_SERVICE_ACCOUNT_PRIVATE_KEY").replace(/\\n/g, "\n");
-  const now = Math.floor(Date.now() / 1000);
+async function fetchDriveFile(fileId) {
+  const url = new URL("https://drive.usercontent.google.com/download");
+  url.searchParams.set("id", fileId);
+  url.searchParams.set("export", "download");
+  url.searchParams.set("confirm", "t");
 
-  const header = base64Url(JSON.stringify({ alg: "RS256", typ: "JWT" }));
-  const payload = base64Url(
-    JSON.stringify({
-      iss: clientEmail,
-      scope: GOOGLE_DRIVE_SCOPE,
-      aud: GOOGLE_TOKEN_URL,
-      iat: now,
-      exp: now + 3600,
-    }),
-  );
-  const unsigned = `${header}.${payload}`;
-  const signer = createSign("RSA-SHA256");
-  signer.update(unsigned);
-  signer.end();
-  const assertion = `${unsigned}.${base64Url(signer.sign(privateKey))}`;
-
-  const response = await fetch(GOOGLE_TOKEN_URL, {
-    method: "POST",
-    headers: { "content-type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-      assertion,
-    }),
-  });
+  const response = await fetch(url, { redirect: "follow" });
 
   if (!response.ok) {
-    throw new Error(`Google OAuth failed (${response.status}): ${await response.text()}`);
+    throw new Error(`Public Google Drive download failed for ${fileId} (${response.status}): ${await response.text()}`);
   }
 
-  const token = await response.json();
-  if (!token.access_token) throw new Error("Google OAuth response did not contain access_token");
-  return token.access_token;
-}
-
-async function fetchDriveFile(fileId, accessToken) {
-  const url = new URL(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}`);
-  url.searchParams.set("alt", "media");
-  url.searchParams.set("supportsAllDrives", "true");
-
-  const response = await fetch(url, {
-    headers: { authorization: `Bearer ${accessToken}` },
-  });
-
-  if (!response.ok) {
-    throw new Error(`Google Drive download failed for ${fileId} (${response.status}): ${await response.text()}`);
+  const contentType = response.headers.get("content-type") || "";
+  if (contentType.includes("text/html")) {
+    throw new Error(
+      `Public Google Drive download for ${fileId} returned HTML instead of the approved asset; check link-sharing permissions`,
+    );
   }
 
   return Buffer.from(await response.arrayBuffer());
@@ -93,6 +49,9 @@ function validateManifest(manifest, filename) {
 
   if (!/^ZP-[A-Z]+-\d{4}-\d+$/.test(manifest.campaignId)) {
     throw new Error(`${filename}: invalid campaignId`);
+  }
+  if (!/^[A-Za-z0-9_-]+$/.test(manifest.driveFileId)) {
+    throw new Error(`${filename}: invalid driveFileId`);
   }
   if (!/^articles\/ZP-[A-Z]+-\d{4}-\d+\/[A-Za-z0-9._/-]+$/.test(manifest.blobPathname)) {
     throw new Error(`${filename}: blobPathname must be under articles/{Campaign ID}/`);
@@ -141,8 +100,8 @@ async function verifyExistingBlob(manifest, filename) {
   }
 }
 
-async function uploadManifest(manifest, filename, googleToken) {
-  const source = await fetchDriveFile(manifest.driveFileId, googleToken);
+async function uploadManifest(manifest, filename) {
+  const source = await fetchDriveFile(manifest.driveFileId);
   const sourceSize = source.byteLength;
   const sourceSha256 = sha256(source);
 
@@ -206,16 +165,13 @@ async function main() {
   }
 
   requireEnv("BLOB_READ_WRITE_TOKEN");
-  let googleToken = null;
 
   for (const filename of files) {
     const manifest = JSON.parse(await readFile(path.join(REQUEST_DIR, filename), "utf8"));
     validateManifest(manifest, filename);
 
     if (await verifyExistingBlob(manifest, filename)) continue;
-
-    if (!googleToken) googleToken = await getGoogleAccessToken();
-    await uploadManifest(manifest, filename, googleToken);
+    await uploadManifest(manifest, filename);
   }
 }
 

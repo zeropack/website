@@ -7,7 +7,7 @@ import { generatedArticles } from "./generated";
 const historical: Article[] = [...articlesPartA, ...articlesPartB, ...spokeGuides];
 const all: Article[] = [...historical, ...generatedArticles];
 
-function marketOf(article: Article): ArticleMarket {
+export function getArticleMarket(article: Article): ArticleMarket {
   return article.market ?? "GLOBAL";
 }
 
@@ -16,12 +16,12 @@ export function getAllArticles(): Article[] {
 }
 
 export function getGlobalArticles(): Article[] {
-  return all.filter((article) => marketOf(article) === "GLOBAL");
+  return all.filter((article) => getArticleMarket(article) === "GLOBAL");
 }
 
 export function getArticlesForMarket(market: Exclude<ArticleMarket, "GLOBAL">): Article[] {
   return all.filter((article) => {
-    const articleMarket = marketOf(article);
+    const articleMarket = getArticleMarket(article);
     return articleMarket === "GLOBAL" || articleMarket === market;
   });
 }
@@ -48,19 +48,23 @@ export function getArticleSlugs(): string[] {
   return all.map((a) => a.slug);
 }
 
+export function getGlobalArticleSlugs(): string[] {
+  return getGlobalArticles().map((article) => article.slug);
+}
+
 export function getArticleBySlug(slug: string): Article | undefined {
   return all.find((a) => a.slug === slug);
 }
 
 export function getArticlePath(article: Article): string {
-  const market = marketOf(article);
+  const market = getArticleMarket(article);
   if (market === "AU") return `/au/articles/${article.slug}/`;
   if (market === "UK") return `/uk/articles/${article.slug}/`;
   return `/articles/${article.slug}/`;
 }
 
 export function getMarketArticleSlugs(market: Exclude<ArticleMarket, "GLOBAL">): string[] {
-  return all.filter((article) => marketOf(article) === market).map((article) => article.slug);
+  return all.filter((article) => getArticleMarket(article) === market).map((article) => article.slug);
 }
 
 export const articleCategories = [

@@ -26,6 +26,10 @@ function renderParagraph(text: string): React.ReactNode {
   });
 }
 
+function displaySectionHeading(sectionId: string, heading: string): string {
+  return sectionId === "cta" ? "Next Actions" : heading;
+}
+
 export function ArticleTemplate({ article }: { article: Article }) {
   const quoteHref = QUOTE_FORM_HREF;
   const mailersHref = "/trend-packaging-funnel/";
@@ -105,7 +109,7 @@ export function ArticleTemplate({ article }: { article: Article }) {
 
         {article.answerBox ? (
           <div className="mt-6 rounded-xl border-l-4 border-leaf bg-white px-5 py-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-leaf">Quick answer</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-leaf">TL;DR</p>
             <p className="mt-2 text-sm text-charcoal/80">{article.answerBox}</p>
           </div>
         ) : null}
@@ -150,7 +154,7 @@ export function ArticleTemplate({ article }: { article: Article }) {
             {article.sections.map((s) => (
               <li key={s.id}>
                 <a className="text-air hover:underline" href={`#${s.id}`}>
-                  {s.heading}
+                  {displaySectionHeading(s.id, s.heading)}
                 </a>
               </li>
             ))}
@@ -160,7 +164,9 @@ export function ArticleTemplate({ article }: { article: Article }) {
         <div className="mt-12 max-w-none">
           {article.sections.map((s) => (
             <section key={s.id} id={s.id} className="mb-12">
-              <h2 className="font-heading text-2xl font-semibold text-compost">{s.heading}</h2>
+              <h2 className="font-heading text-2xl font-semibold text-compost">
+                {displaySectionHeading(s.id, s.heading)}
+              </h2>
               <div className="mt-4 space-y-4 text-charcoal/75">
                 {s.paragraphs?.map((p, i) => (
                   <p key={i}>{renderParagraph(p)}</p>

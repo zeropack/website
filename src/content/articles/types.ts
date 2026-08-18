@@ -33,6 +33,8 @@ export type HowToStep = {
   text: string;
 };
 
+export type ArticleMarket = "GLOBAL" | "AU" | "UK";
+
 export type Article = {
   slug: string;
   title: string;
@@ -40,6 +42,11 @@ export type Article = {
   description: string;
   publishedAt: string;
   dateModified?: string;
+  market?: ArticleMarket;
+  jurisdiction?: string[];
+  topics?: string[];
+  heroImage?: string;
+  heroAlt?: string;
   primaryKeyword?: string;
   secondaryKeywords?: string[];
   relatedSlugs?: string[];

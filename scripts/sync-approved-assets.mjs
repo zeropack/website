@@ -95,7 +95,14 @@ async function verifyExistingBlob(manifest, filename) {
     );
     return true;
   } catch (error) {
-    if (error?.name === "BlobNotFoundError" || /not found/i.test(String(error?.message))) return false;
+    const message = String(error?.message || error);
+    if (
+      error?.name === "BlobNotFoundError" ||
+      /not found/i.test(message) ||
+      /does not exist/i.test(message)
+    ) {
+      return false;
+    }
     throw error;
   }
 }

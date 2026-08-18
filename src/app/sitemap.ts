@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getArticleSlugs } from "@/content/articles";
+import { getAllArticles, getArticlePath } from "@/content/articles";
 import { getSiteUrl } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -24,14 +24,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/uk/",
     "/us/",
     "/eu/",
+    "/au/articles/",
+    "/uk/articles/",
     "/au/custom-compostable-mailers/",
     "/uk/custom-compostable-mailers/",
     "/us/custom-compostable-mailers/",
     "/eu/custom-compostable-mailers/",
   ];
 
-  const articles = getArticleSlugs().map((slug) => ({
-    url: `${base}/articles/${slug}/`,
+  const articles = getAllArticles().map((article) => ({
+    url: `${base}${getArticlePath(article)}`,
     lastModified,
   }));
 

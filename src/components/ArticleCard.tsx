@@ -1,10 +1,11 @@
 import Link from "next/link";
 import type { Article } from "@/content/articles/types";
+import { getArticlePath } from "@/content/articles";
 
 export function ArticleCard({ article }: { article: Article }) {
   return (
     <Link
-      href={`/articles/${article.slug}/`}
+      href={getArticlePath(article)}
       className="group flex flex-col rounded-2xl border border-black/5 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
     >
       <p className="text-xs font-semibold uppercase tracking-wide text-leaf">{article.category}</p>

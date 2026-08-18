@@ -18,6 +18,7 @@ export function getSiteUrl(): string {
 }
 
 export function absoluteUrl(path: string): string {
+  if (/^https?:\/\//i.test(path)) return path;
   const base = getSiteUrl();
   if (!path.startsWith("/")) return `${base}/${path}`;
   return `${base}${path}`;

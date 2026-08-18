@@ -2,15 +2,17 @@ import type { Article } from "../../types";
 
 export const compostablePackagingWaFogoGuidance: Article = {
   slug: "compostable-packaging-wa-fogo-guidance",
-  title: "Can compostable packaging go in WA FOGO bins? What the July 2026 guidance means for brands",
+  title: "WA’s July 2026 FOGO guidance: what changed for compostable packaging",
   category: "Packaging regulation & claims",
   description:
-    "Waste Authority WA’s July 2026 FOGO guidance is a useful reminder that compostability certification and kerbside collection acceptance are separate questions. This guide explains what the updated WA guidance says, why other compostable packaging may still be directed to general waste, and how brands can communicate disposal instructions more accurately.",
+    "Waste Authority WA updated its kerbside FOGO guidance on 10 July 2026. The guidance limits the accepted-list framing to food organics, garden organics and certified compostable caddy liners, while directing specified other compostable and non-recyclable packaging to general waste. This explainer covers what changed, why certification does not itself determine collection acceptance, the WA-only scope and what remains locally variable.",
   publishedAt: "2026-08-18",
   market: "AU",
   jurisdiction: ["WA"],
-  heroImage: "/images/articles/ZP-AU-2026-001-wa-fogo-guidance-hero.webp",
-  heroAlt: "Person holding a white flexible mailer beside a green-lidded wheelie bin in a bright home setting.",
+  heroImage:
+    "/images/articles/ZP-AU-2026-001-wa-fogo-guidance-hero-web.webp",
+  heroAlt:
+    "Person holding a white flexible mailer beside a green-lidded wheelie bin in a bright home setting.",
   primaryKeyword: "compostable packaging FOGO WA",
   secondaryKeywords: [
     "WA FOGO guidance",
@@ -21,147 +23,97 @@ export const compostablePackagingWaFogoGuidance: Article = {
     "Western Australia FOGO",
   ],
   answerBox:
-    "Waste Authority WA’s July 2026 guidance says kerbside FOGO is for food organics, garden organics and certified compostable caddy liners only. Other specified compostable and non-recyclable packaging is directed to general waste under that guidance. This is WA FOGO guidance, not a new statewide statutory ban, and local services can vary. Certification to AS 4736 or AS 5810 does not by itself guarantee acceptance by a council FOGO service or processor.",
+    "Waste Authority WA’s 10 July 2026 FOGO guidance says kerbside FOGO is for food organics, garden organics and certified compostable caddy liners only, and directs specified other compostable and non-recyclable packaging to general waste. It is WA guidance, not a new statewide statutory ban. Local services can vary, and AS 4736 or AS 5810 certification does not itself guarantee FOGO or processor acceptance.",
   keyTakeaways: [
-    "Waste Authority WA’s July 2026 guidance limits the accepted-list framing for kerbside FOGO to food organics, garden organics and certified compostable caddy liners.",
+    "Waste Authority WA updated its FOGO guidance on 10 July 2026, limiting the accepted-list framing to food organics, garden organics and certified compostable caddy liners.",
     "The guidance directs specified other compostable and non-recyclable packaging, including compostable cups, containers and trays, to general waste while alternative pathways are investigated.",
-    "Compostability certification and kerbside collection acceptance are different questions: certification does not automatically determine whether a local FOGO service will accept a packaging item.",
-    "The WA position should not be generalised across Australia, and local government guidance still matters because kerbside services and operational arrangements can vary.",
-    "For brands, disposal instructions should be tied to the exact packaging format and intended locality rather than relying on generic wording such as ‘put it in FOGO’.",
+    "The change is WA FOGO guidance, not a new statewide statutory ban, and it should not be generalised across Australia.",
+    "AS 4736 and AS 5810 certification establish compostability within different scheme and standard scopes but do not by themselves guarantee local FOGO or processor acceptance.",
+    "Local governments remain responsible for local kerbside services; FOGO is not universal across WA households and exact acceptance can vary with local collection arrangements and facility requirements.",
   ],
   sections: [
     {
       id: "introduction",
-      heading: "Can compostable packaging go in WA FOGO bins? What the July 2026 guidance means for brands",
+      heading: "WA’s July 2026 FOGO guidance: what changed for compostable packaging",
       paragraphs: [
-        "If a packaging item is compostable, it can be tempting to assume the disposal instruction is simple: put it in the organics bin.",
-        "Western Australia’s updated FOGO guidance shows why that assumption can be wrong.",
-        "Waste Authority WA’s 10 July 2026 ‘Towards cleaner compost’ guidance says WA kerbside FOGO is for food organics, garden organics and certified compostable caddy liners only. It also directs specified other compostable and non-recyclable packaging to general waste while alternative pathways are investigated.",
-        "That does not mean compostability certification is irrelevant, and it does not mean WA has introduced a new statewide statutory ban on compostable packaging in FOGO. The practical lesson is narrower and more useful: whether a material is compostable and whether a particular collection system accepts it are separate questions.",
-        "For brands using or considering compostable packaging, that distinction matters when writing disposal instructions, customer FAQs and sustainability claims.",
+        "On 10 July 2026, Waste Authority WA updated its kerbside FOGO guidance through its “Towards cleaner compost” information. The change narrows the accepted-list framing for FOGO and gives more specific direction about compostable and other non-recyclable packaging.",
+        "The update is important because compostability and kerbside acceptance are related but separate questions. A product may be compostable, or certified for specified composting conditions, without being accepted by a particular council FOGO service or processor.",
+        "The change is also narrower than a new legal ban. It is Western Australian FOGO guidance and consistent service communication, not newly enacted statewide legislation prohibiting compostable packaging in FOGO.",
       ],
     },
     {
-      id: "what-changed-in-western-australia",
-      heading: "What changed in Western Australia?",
+      id: "what-happened",
+      heading: "What happened?",
       paragraphs: [
-        "Waste Authority WA published updated FOGO guidance on 10 July 2026 through its ‘Towards cleaner compost’ information.",
-        "The guidance says kerbside FOGO is for three categories: food organics; garden organics; and certified compostable caddy liners.",
-        "It also says people who had previously placed items such as compostable food and drink containers, tissues, paper towels, food-soiled cardboard and animal droppings in FOGO should now put those specified items in general waste.",
-        "For packaging specifically, Waste Authority WA says kerbside systems cannot reliably distinguish certified compostable packaging from non-certified lookalike items. Under the updated guidance, non-recyclable packaging including compostable cups, containers and trays is directed to general waste while alternative pathways are investigated.",
-        "The important legal and operational qualification is that this is State-level FOGO guidance and consistent service communication. It should not be rewritten as ‘WA law bans compostable packaging in FOGO’. Western Australian local governments remain responsible for local kerbside waste services, and exact local guidance can depend on collection arrangements, regulations, receiving-facility licence conditions, standards and contracts.",
-        "FOGO is also not universal across every WA household. For a disposal instruction aimed at a particular customer, the current guidance for that local council or collection service remains relevant.",
+        "Waste Authority WA published the updated guidance on 10 July 2026. It says the accepted-list approach was developed through WALGA’s Consistent Communications Collective, with local government, waste industry and State Government representation.",
+        "Its stated purpose is cleaner compost and more consistent FOGO communication. The guidance changes the accepted-list framing used for kerbside FOGO, while local governments continue to be responsible for their own kerbside waste services.",
       ],
     },
     {
-      id: "compostable-does-not-automatically-mean-fogo-accepted",
-      heading: "Compostable does not automatically mean FOGO-accepted",
+      id: "what-changed",
+      heading: "What changed?",
       paragraphs: [
-        "This is the distinction most useful for packaging teams.",
-        "Compostability describes a material or product in relation to specified composting conditions and, where applicable, a certification or standard. Collection acceptance describes what a particular waste system is prepared to collect and process.",
-        "Those are related, but they are not interchangeable.",
-        "The Australasian Bioplastics Association distinguishes AS 4736 commercial compostability from AS 5810 home compostability within its certification framework. Its guidance also makes clear that certification does not guarantee acceptance by every kerbside organics collection or processor.",
-        "WA’s July 2026 guidance illustrates the point directly. Certified compostable caddy liners remain an accepted category, but other compostable packaging is not automatically included simply because it carries a compostability certification.",
-        "So there are at least two questions a brand needs to answer separately:",
-        "1. What does the relevant specification or certification establish about the packaging itself?",
-        "2. Does the intended local collection or processing system accept that exact packaging format?",
-        "A ‘yes’ to the first question does not automatically produce a ‘yes’ to the second.",
+        "Waste Authority WA’s updated guidance says kerbside FOGO is for:",
+        "• food organics;",
+        "• garden organics; and",
+        "• certified compostable caddy liners.",
+        "It also says people who had previously placed specified items such as compostable food and drink containers, tissues, paper towels, food-soiled cardboard and animal droppings in FOGO should now put those items in general waste under the updated guidance.",
+        "For packaging specifically, Waste Authority WA directs non-recyclable packaging including compostable cups, containers and trays to general waste while alternative pathways are investigated.",
       ],
     },
     {
-      id: "why-would-a-fogo-system-exclude-compostable-packaging",
-      heading: "Why would a FOGO system exclude compostable packaging?",
+      id: "what-waste-authority-wa-says-about-compostable-packaging",
+      heading: "What Waste Authority WA says about compostable packaging",
       paragraphs: [
-        "Waste Authority WA’s stated concern is practical system identification. Kerbside FOGO services cannot reliably distinguish certified compostable packaging from visually similar non-certified packaging.",
-        "That matters because collection systems are designed around what receiving facilities can consistently identify and process. A technically compostable product may still fall outside the accepted inputs for a particular service.",
-        "This does not invalidate certification. Certification can establish conformity within the scope of the relevant standard or scheme. It simply does a different job from a council or processor acceptance decision.",
-        "For packaging claims, that difference is important. Saying a product is certified for specified composting conditions is not the same as saying every household can place it in a FOGO bin.",
+        "The guidance identifies a practical collection-system issue: kerbside FOGO systems cannot reliably distinguish certified compostable packaging from visually similar non-certified packaging.",
+        "That is why certification alone does not determine whether an item appears on the accepted list. Certified compostable caddy liners remain an accepted category, but that category-specific position does not extend to every piece of packaging carrying a compostability certification.",
+        "This distinction is also reflected in Australasian Bioplastics Association guidance. Within its certification framework, AS 4736 relates to commercial compostability and AS 5810 to home compostability. Certification demonstrates conformity within the relevant scope; it does not guarantee acceptance by every council FOGO service or processor.",
       ],
     },
     {
-      id: "what-does-this-mean-for-brands",
-      heading: "What does this mean for brands using compostable packaging?",
+      id: "why-was-the-guidance-changed",
+      heading: "Why was the guidance changed?",
       paragraphs: [
-        "The main implication is not that brands should stop considering compostable packaging. It is that end-of-life communication needs the same discipline as the packaging claim itself.",
-        "A few practical checks can make that communication more defensible.",
+        "Waste Authority WA’s stated concern is the ability of kerbside systems to identify acceptable inputs consistently. Where certified compostable packaging can look similar to non-certified packaging, collection systems cannot reliably separate the two at the bin.",
+        "The updated accepted list therefore focuses on inputs the guidance identifies for kerbside FOGO and directs specified other non-recyclable packaging to general waste while alternative pathways are investigated.",
+        "The verified sources do not establish a definitive future pathway or timing for those alternatives.",
       ],
     },
     {
-      id: "separate-material-claim",
-      heading: "1. Separate the material claim from the disposal instruction",
+      id: "scope-and-jurisdiction",
+      heading: "Scope and jurisdiction",
       paragraphs: [
-        "If a packaging specification supports a compostability claim, communicate that claim within its verified scope. Do not automatically attach a universal bin instruction to it.",
-        "‘Compostable’ should not be treated as shorthand for ‘accepted in your local FOGO bin’.",
+        "This article is about Western Australia. The July 2026 position should not be treated as an Australia-wide FOGO rule.",
+        "It is also important to distinguish State guidance from local service delivery. Western Australian local governments remain responsible for local kerbside waste services. Exact local acceptance can depend on collection arrangements, State regulations, receiving-facility licence conditions, standards and contracts.",
+        "FOGO is not available to every WA household. WasteSorted WA identifies participating local governments, so the applicable local council or collection-service guidance remains relevant when checking what belongs in a particular kerbside service.",
       ],
     },
     {
-      id: "check-intended-locality",
-      heading: "2. Check the intended locality",
+      id: "what-the-guidance-does-not-mean",
+      heading: "What the guidance does not mean",
       paragraphs: [
-        "The evidence for this article is Western Australia-specific. It should not be treated as an Australia-wide disposal rule.",
-        "Even within WA, readers should check current local-government or collection-service guidance because operational arrangements can differ and can change over time.",
+        "The July 2026 update does not establish that compostable packaging has become illegal in WA FOGO bins under a newly enacted statewide law. The verified evidence supports a current State guidance and service-list change, not a new statutory prohibition, offence or statewide penalty.",
+        "It does not establish an Australia-wide disposal rule.",
+        "It does not make AS 4736 or AS 5810 certification meaningless. Those standards address different compostability contexts—commercial compostability and home compostability respectively—while local collection acceptance is a separate system decision.",
+        "It also does not mean every AS 4736-certified packaging item is accepted because certified compostable caddy liners remain on the accepted list. The caddy-liner position is category-specific.",
+        "Finally, the guidance does not establish what future pathway will apply to compostable packaging currently directed to general waste. Waste Authority WA says alternative pathways are being investigated, but the verified sources do not provide a definitive outcome or timing.",
       ],
     },
     {
-      id: "keep-product-categories-specific",
-      heading: "3. Keep product categories specific",
+      id: "what-remains-uncertain-or-locally-variable",
+      heading: "What remains uncertain or locally variable",
       paragraphs: [
-        "Waste Authority WA’s guidance accepts certified compostable caddy liners as a category. That does not establish that every AS 4736-certified packaging item is accepted.",
-        "For brands, a category-specific acceptance rule should stay category-specific.",
+        "Implementation can vary at the local-service level. Waste Authority WA itself notes that local guidance is shaped by local collection responsibility and by regulations, facility licence conditions, standards and contracts.",
+        "Local-government webpages, bin stickers and other operational materials may also update at different times. For a specific household, business or collection area, current local council or collection-service guidance is the relevant operational check.",
+        "The broader boundary remains clear: certification says something about the product within a defined standard or certification scope; collection acceptance says something about the waste system that will receive it. One should not be used as automatic proof of the other.",
       ],
     },
     {
-      id: "avoid-disposal-language-that-promises-too-much",
-      heading: "4. Avoid disposal language that promises too much",
+      id: "practical-implications",
+      heading: "Practical implications",
       paragraphs: [
-        "Generic statements such as ‘put it in your FOGO bin’ are risky when acceptance depends on geography, service design or the exact packaging format.",
-        "A better approach is to give disposal information that reflects the relevant locality and verified product evidence, or to direct customers to current local guidance where a single instruction cannot be supported.",
-      ],
-    },
-    {
-      id: "review-old-packaging-copy",
-      heading: "5. Review old packaging copy when collection guidance changes",
-      paragraphs: [
-        "If a brand has previously published bin instructions based on older assumptions, a change in local collection guidance is a good reason to review packaging artwork, website FAQs, post-purchase emails and customer-service scripts.",
-        "The aim is not to make the sustainability message weaker. It is to make it more accurate.",
-      ],
-    },
-    {
-      id: "what-this-guidance-does-not-mean",
-      heading: "What this guidance does not mean",
-      paragraphs: [
-        "The July 2026 update can easily be overstated, so several boundaries are worth making explicit.",
-        "It does not establish that compostable packaging is illegal in WA FOGO bins under a newly enacted statewide law.",
-        "It does not establish that the same disposal instruction applies across Australia.",
-        "It does not mean AS 4736 or AS 5810 certification is meaningless. Certification addresses conformity within the relevant standard or scheme; local collection acceptance is a separate decision.",
-        "It does not mean all certified compostable packaging is treated the same as certified compostable caddy liners under the WA accepted-list guidance.",
-        "And it does not establish a future disposal pathway for the compostable packaging that the current guidance directs to general waste. Waste Authority WA says alternative pathways are being investigated, but the verified sources do not establish a definitive future pathway or timing.",
-      ],
-    },
-    {
-      id: "claim-and-disposal-are-two-different-jobs",
-      heading: "A useful packaging principle: claim and disposal are two different jobs",
-      paragraphs: [
-        "For packaging teams, the broader lesson is straightforward.",
-        "A credible environmental claim needs evidence about the product or material. A credible disposal instruction needs evidence about the collection and processing system the customer will actually use.",
-        "Treating those as separate jobs helps avoid two common mistakes: weakening a legitimate certification by expecting it to answer questions outside its scope, or overstating a certification by turning it into a universal disposal guarantee.",
-        "That is particularly important for brands selling into more than one council area, state or country. The packaging may be the same, while the available end-of-life pathways are not.",
-      ],
-    },
-    {
-      id: "where-zero-pack-fits",
-      heading: "Where Zero Pack fits",
-      paragraphs: [
-        "Zero Pack specialises in custom compostable packaging for businesses looking to reduce reliance on conventional plastic while maintaining a considered brand presentation.",
-        "But choosing a compostable packaging format is only part of the decision. The exact material specification, any applicable certification and the customer-facing disposal guidance need to be treated carefully and separately.",
-        "For brands reviewing packaging, the practical next step is to confirm the packaging format and specification first, then make sure any environmental and disposal wording reflects the evidence for that exact product and the markets where it will be used.",
-      ],
-    },
-    {
-      id: "cta",
-      heading: "CTA",
-      paragraphs: [
-        "Reviewing your packaging or customer disposal messaging? Talk to Zero Pack about the packaging format, specification and branding requirements for your project. We can help you work through the packaging decision while keeping product and disposal claims appropriately scoped.",
+        "For organisations communicating disposal instructions, the main implication is to keep the product claim and the local disposal instruction separate. A generic statement such as “put it in FOGO” can overstate what is supported when acceptance depends on the exact packaging format and local service.",
+        "Where customer-facing disposal guidance is provided, check the applicable local service and keep the certified-compostable-caddy-liner exception specific to that category. This does not weaken a valid certification claim; it keeps the disposal instruction within the evidence that supports it.",
       ],
     },
     {
@@ -175,32 +127,13 @@ export const compostablePackagingWaFogoGuidance: Article = {
         "[WasteSorted WA — Go FOGO](https://www.wastesorted.wa.gov.au/be-a-great-sort/earth-cycle/fogo)",
       ],
     },
-  ],
-  faqs: [
     {
-      question: "Does compostable packaging go in WA FOGO bins?",
-      answer:
-        "Not automatically. Waste Authority WA’s July 2026 guidance says kerbside FOGO is for food organics, garden organics and certified compostable caddy liners only. It directs specified other compostable and non-recyclable packaging to general waste. This is WA guidance rather than a new statewide statutory ban, and local service arrangements can vary.",
-    },
-    {
-      question: "Does AS 4736 certification mean packaging can go in FOGO?",
-      answer:
-        "No. The verified guidance distinguishes certification from collection acceptance. AS 4736 relates to commercial compostability within the relevant certification scheme, but certification alone does not guarantee acceptance by a council FOGO service or processor. The WA guidance’s acceptance of certified compostable caddy liners should not be broadened to all AS 4736-certified packaging.",
-    },
-    {
-      question: "What is the difference between AS 4736 and AS 5810?",
-      answer:
-        "Within the Australasian Bioplastics Association certification framework, AS 4736 relates to commercial compostability and AS 5810 to home compostability. They are distinct standards, and neither certification by itself establishes that an item is accepted in a particular kerbside FOGO service.",
-    },
-    {
-      question: "Is compostable packaging banned from FOGO by WA law?",
-      answer:
-        "The verified evidence does not support that characterisation. Waste Authority WA’s July 2026 position is government and service guidance, not a newly enacted statewide statutory ban. Local governments remain responsible for local kerbside services within the WA waste framework.",
-    },
-    {
-      question: "Should brands put ‘place in FOGO’ on compostable packaging?",
-      answer:
-        "Only where that disposal instruction is supported for the exact packaging format and intended locality. The WA example shows why a compostability claim and a collection instruction should be verified separately. Where local acceptance varies, direct customers to current local guidance rather than implying universal acceptance.",
+      id: "next-actions",
+      heading: "Next Actions",
+      paragraphs: [
+        "If you use compostable packaging in Western Australia, check current local council or collection-service guidance before publishing a FOGO disposal instruction. If you are reviewing a packaging specification or customer-facing disposal wording, Zero Pack can help assess the packaging format and keep product and disposal claims appropriately scoped.",
+      ],
     },
   ],
+  faqs: [],
 };

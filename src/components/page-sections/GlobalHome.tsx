@@ -19,11 +19,7 @@ import { Reveal } from "@/components/Reveal";
 import { PrimasoyPackagingShowcase } from "@/components/PrimasoyPackagingShowcase";
 import { YoutubeVideoPlaceholder } from "@/components/YoutubeVideoPlaceholder";
 import { HomeCompostableProblemSolution } from "@/components/HomeCompostableProblemSolution";
-import { HubSpotFormEmbed } from "@/components/HubSpotFormEmbed";
 import cartridgesDirectCloseup from "@/content/images/zero_pack_cartridges_direct_blob_closeup.png";
-
-const WHAT_WE_DO_HUBSPOT_FORM_ID = "750eab93-2236-4bb9-a2b3-f2016dcd916f";
-
 
 export function GlobalHome() {
   const serviceJsonLd = {
@@ -167,7 +163,15 @@ export function GlobalHome() {
                   </p>
                 </div>
                 <div className="zp-hover-lift rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-300/20 sm:p-8">
-                  <HubSpotFormEmbed formId={WHAT_WE_DO_HUBSPOT_FORM_ID} />
+                  <p className="text-sm text-charcoal/70">
+                    Ready to discuss your packaging requirements? Use our quote form and we’ll collect the details needed to assess the right specification for your project.
+                  </p>
+                  <Link
+                    className="mt-5 inline-flex items-center justify-center rounded-lg bg-air px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0096d6]"
+                    href={QUOTE_FORM_HREF}
+                  >
+                    Get a Custom Quote
+                  </Link>
                 </div>
               </div>
             </div>

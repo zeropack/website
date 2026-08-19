@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Script from "next/script";
-import { GoogleAnalytics } from "@next/third-parties/google";
 import { Inter, Manrope, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Shell } from "@/components/Shell";
 import { SEOOrganization, SEOWebSite } from "@/components/SEOOrganization";
 import { KlaviyoOnsite } from "@/components/KlaviyoOnsite";
-import { GA_MEASUREMENT_ID, SITE_NAME } from "@/lib/site";
+import { SITE_NAME } from "@/lib/site";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope", display: "swap" });
@@ -38,7 +37,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: `!function(e,t,n,s,i,c){const a=t.getElementsByTagName(n)[0],d=t.createElement(n);d.id="cst-package",d.async=!0,d.src="https://cmp.consentik.com/sites/5a5eb279-8e4d-4daa-ad25-277fa627d7a4/b19585841572bc5a891525b33423d9f4/index.js?v="+(new Date().getMinutes()),a.parentNode.insertBefore(d,a)}(window,document,"script");` }}
         />
-        {/* Google Tag Manager — current implementation; consent behaviour audited separately. */}
+        {/* Google Tag Manager is the single Google measurement path. Consentik initializes Google Consent Mode before this tag. */}
         <Script
           id="gtm"
           strategy="afterInteractive"
@@ -51,7 +50,6 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         <SEOWebSite />
         <Shell>{children}</Shell>
       </body>
-      {process.env.NODE_ENV === "production" && <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />}
     </html>
   );
 }

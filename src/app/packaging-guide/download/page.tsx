@@ -67,21 +67,16 @@ export default function Page() {
           ))}
         </div>
 
-        <div className="mt-8 rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
+        <div className="mt-10">
           <p className="font-heading text-lg font-semibold text-charcoal">
             Download the Guide and Toolkit
           </p>
-          <div className="mt-5 overflow-hidden rounded-xl">
-            <iframe
-              src={PACKAGING_GUIDE_FORM_URL}
-              title="Download the Zero Pack packaging guide and toolkit"
-              width="650"
-              height="500"
-              loading="lazy"
-              className="min-h-[500px] w-full border-0"
-              style={{ boxShadow: "5px 5px 56px 0 rgba(0,0,0,0.25)" }}
-            />
-          </div>
+          <iframe
+            src={PACKAGING_GUIDE_FORM_URL}
+            title="Download the Zero Pack packaging guide and toolkit"
+            loading="lazy"
+            className="mt-5 h-[1100px] w-full border-0 sm:h-[1000px] lg:h-[900px]"
+          />
         </div>
 
         <div className="mt-8 rounded-2xl border border-black/5 bg-white p-6 shadow-sm">

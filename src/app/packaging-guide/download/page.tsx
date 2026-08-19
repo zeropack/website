@@ -75,7 +75,7 @@ export default function Page() {
             src={PACKAGING_GUIDE_FORM_URL}
             title="Download the Zero Pack packaging guide and toolkit"
             loading="lazy"
-            className="mt-5 h-[1100px] w-full border-0 sm:h-[1000px] lg:h-[900px]"
+            className="mt-5 h-[2200px] w-full border-0 sm:h-[1900px] lg:h-[1700px]"
           />
         </div>
 

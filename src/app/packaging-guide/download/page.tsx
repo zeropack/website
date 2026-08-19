@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/metadata";
 import { CTAButton } from "@/components/CTAButton";
-import { HubSpotFormEmbed } from "@/components/HubSpotFormEmbed";
 import { QUOTE_FORM_HREF } from "@/lib/site";
 
-const PACKAGING_GUIDE_HUBSPOT_FORM_ID = "fbbf0c51-3c65-4c5f-868d-5a2d8e9bcc5a";
+const PACKAGING_GUIDE_FORM_URL =
+  "https://forms.monday.com/forms/embed/da3a557474fde2298a1b591c6026a1bb?r=apse2&utm_source=&utm_medium=&utm_content=&utm_campaign=";
 
 export const metadata: Metadata = {
   ...buildMetadata({
@@ -71,8 +71,16 @@ export default function Page() {
           <p className="font-heading text-lg font-semibold text-charcoal">
             Download the Guide and Toolkit
           </p>
-          <div className="mt-5">
-            <HubSpotFormEmbed formId={PACKAGING_GUIDE_HUBSPOT_FORM_ID} />
+          <div className="mt-5 overflow-hidden rounded-xl">
+            <iframe
+              src={PACKAGING_GUIDE_FORM_URL}
+              title="Download the Zero Pack packaging guide and toolkit"
+              width="650"
+              height="500"
+              loading="lazy"
+              className="min-h-[500px] w-full border-0"
+              style={{ boxShadow: "5px 5px 56px 0 rgba(0,0,0,0.25)" }}
+            />
           </div>
         </div>
 

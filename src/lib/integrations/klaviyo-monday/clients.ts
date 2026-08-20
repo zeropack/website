@@ -6,7 +6,6 @@ import {
   MONDAY_API_VERSION,
   MONDAY_CONTACTS_BOARD_ID,
   MONDAY_KLAVIYO_PROFILES_BOARD_ID,
-  REGION_MAP,
   type CommercialLifecycleStatus,
 } from "./config";
 
@@ -14,6 +13,7 @@ type MondayColumnValue = {
   id: string;
   text: string | null;
   value: string | null;
+  linked_item_ids?: string[];
 };
 
 type MondayItem = {
@@ -120,19 +120,22 @@ function columnText(columns: MondayColumnValue[], id: string): string | null {
   return columns.find((column) => column.id === id)?.text?.trim() || null;
 }
 
-function columnRaw(columns: MondayColumnValue[], id: string): string | null {
-  return columns.find((column) => column.id === id)?.value || null;
-}
+function relationItemId(columns: MondayColumnValue[], id: string): string | null {
+  const column = columns.find((candidate) => candidate.id === id);
+  const linkedId = column?.linked_item_ids?.[0];
+  if (linkedId) return String(linkedId);
 
-function relationItemId(raw: string | null): string | null {
-  if (!raw) return null;
+  // Backwards-compatible fallback for older Monday responses. Current board_relation
+  // values should be read through BoardRelationValue.linked_item_ids.
+  if (!column?.value) return null;
   try {
-    const parsed = JSON.parse(raw) as {
+    const parsed = JSON.parse(column.value) as {
       linkedPulseIds?: Array<{ linkedPulseId?: number | string }>;
       item_ids?: Array<number | string>;
     };
-    const id = parsed.linkedPulseIds?.[0]?.linkedPulseId ?? parsed.item_ids?.[0];
-    return id == null ? null : String(id);
+    const legacyId =
+      parsed.linkedPulseIds?.[0]?.linkedPulseId ?? parsed.item_ids?.[0];
+    return legacyId == null ? null : String(legacyId);
   } catch {
     return null;
   }
@@ -150,7 +153,12 @@ async function listMondayItems(
           items {
             id
             name
-            column_values(ids: ${JSON.stringify(columnIds)}) { id text value }
+            column_values(ids: ${JSON.stringify(columnIds)}) {
+              id
+              text
+              value
+              ... on BoardRelationValue { linked_item_ids }
+            }
           }
         }
       }
@@ -216,7 +224,8 @@ export async function listMondayKlaviyoMirrors(): Promise<MondayKlaviyoMirror[]>
     profileId: columnText(item.column_values, KLAVIYO_PROFILE_COLUMNS.profileId),
     email: columnText(item.column_values, KLAVIYO_PROFILE_COLUMNS.email),
     linkedContactId: relationItemId(
-      columnRaw(item.column_values, KLAVIYO_PROFILE_COLUMNS.contact),
+      item.column_values,
+      KLAVIYO_PROFILE_COLUMNS.contact,
     ),
     subscriptionStatus: columnText(
       item.column_values,
@@ -489,107 +498,6 @@ export async function updateMondayContactSubscription(
     itemId: contactId,
     values: JSON.stringify({ [CONTACT_COLUMNS.subscription]: { label: status } }),
   });
-}
-
-function mirrorDesiredValues(params: {
-  contact: MondayContact | null;
-  profile: KlaviyoProfileState;
-}): Record<string, unknown> {
-  const mirrorStatus = marketingMirrorStatus(params.profile);
-  const region = params.contact?.region
-    ? REGION_MAP[params.contact.region] || "Global"
-    : "Global";
-  const values: Record<string, unknown> = {
-    [KLAVIYO_PROFILE_COLUMNS.email]: {
-      email: params.profile.email,
-      text: params.profile.email,
-    },
-    [KLAVIYO_PROFILE_COLUMNS.profileId]: params.profile.id,
-    [KLAVIYO_PROFILE_COLUMNS.subscriptionStatus]: { label: mirrorStatus },
-    [KLAVIYO_PROFILE_COLUMNS.consentSource]: params.profile.consentSource || "",
-    [KLAVIYO_PROFILE_COLUMNS.region]: { label: region },
-    [KLAVIYO_PROFILE_COLUMNS.consentDate]: params.profile.consentTimestamp
-      ? { date: params.profile.consentTimestamp.slice(0, 10) }
-      : null,
-    [KLAVIYO_PROFILE_COLUMNS.suppressionReason]:
-      params.profile.suppressionReason || "",
-    [KLAVIYO_PROFILE_COLUMNS.suppressionDate]: params.profile.suppressionTimestamp
-      ? { date: params.profile.suppressionTimestamp.slice(0, 10) }
-      : null,
-  };
-
-  if (params.contact) {
-    values[KLAVIYO_PROFILE_COLUMNS.contact] = {
-      item_ids: [Number(params.contact.id)],
-    };
-  }
-  return values;
-}
-
-function mirrorNeedsUpdate(
-  mirror: MondayKlaviyoMirror,
-  contact: MondayContact | null,
-  profile: KlaviyoProfileState,
-): boolean {
-  const desiredStatus = marketingMirrorStatus(profile);
-  const desiredRegion = contact?.region ? REGION_MAP[contact.region] || "Global" : "Global";
-  const desiredConsentDate = profile.consentTimestamp?.slice(0, 10) || null;
-  const desiredSuppressionDate = profile.suppressionTimestamp?.slice(0, 10) || null;
-
-  return (
-    mirror.email !== profile.email ||
-    mirror.linkedContactId !== (contact?.id || null) ||
-    mirror.subscriptionStatus !== desiredStatus ||
-    (mirror.consentSource || "") !== (profile.consentSource || "") ||
-    mirror.consentDate !== desiredConsentDate ||
-    (mirror.suppressionReason || "") !== (profile.suppressionReason || "") ||
-    mirror.suppressionDate !== desiredSuppressionDate ||
-    mirror.region !== desiredRegion
-  );
-}
-
-export async function upsertMondayKlaviyoMirror(params: {
-  contact: MondayContact | null;
-  profile: KlaviyoProfileState;
-  existing?: MondayKlaviyoMirror | null;
-  forceSyncTimestamp?: boolean;
-}): Promise<{ itemId: string; changed: boolean }> {
-  const values = mirrorDesiredValues(params);
-  const today = new Date().toISOString().slice(0, 10);
-  const existing = params.existing || null;
-  const changed = !existing || mirrorNeedsUpdate(existing, params.contact, params.profile);
-
-  if (!changed && !params.forceSyncTimestamp) {
-    return { itemId: existing!.id, changed: false };
-  }
-
-  values[KLAVIYO_PROFILE_COLUMNS.lastSync] = { date: today };
-
-  if (existing) {
-    const mutation = `
-      mutation UpdateMirror($boardId: ID!, $itemId: ID!, $values: JSON!) {
-        change_multiple_column_values(board_id: $boardId, item_id: $itemId, column_values: $values) { id }
-      }
-    `;
-    await mondayGraphql(mutation, {
-      boardId: MONDAY_KLAVIYO_PROFILES_BOARD_ID,
-      itemId: existing.id,
-      values: JSON.stringify(values),
-    });
-    return { itemId: existing.id, changed: true };
-  }
-
-  const mutation = `
-    mutation CreateMirror($boardId: ID!, $name: String!, $values: JSON!) {
-      create_item(board_id: $boardId, item_name: $name, column_values: $values) { id }
-    }
-  `;
-  const created = await mondayGraphql<{ create_item: { id: string } }>(mutation, {
-    boardId: MONDAY_KLAVIYO_PROFILES_BOARD_ID,
-    name: params.contact?.name || params.profile.email || params.profile.id,
-    values: JSON.stringify(values),
-  });
-  return { itemId: created.create_item.id, changed: true };
 }
 
 export async function getMondayLifecycleTransitions(

@@ -8,12 +8,12 @@ import {
   marketingMirrorStatus,
   setKlaviyoLifecycleStage,
   updateMondayContactSubscription,
-  upsertMondayKlaviyoMirror,
 } from "@/lib/integrations/klaviyo-monday/clients";
 import {
   isCommercialLifecycleStatus,
   KLAVIYO_LIFECYCLE_PROPERTY,
 } from "@/lib/integrations/klaviyo-monday/config";
+import { upsertMondayKlaviyoMirrorSafe } from "@/lib/integrations/klaviyo-monday/mirror";
 
 type CommissionRequest = {
   email?: string;
@@ -87,7 +87,7 @@ export async function POST(req: Request) {
         `Mirror Klaviyo marketing eligibility to Monday Contact Subscription: ${contactSubscriptionTarget}.`,
       );
     }
-    actions.push("Reconcile the Klaviyo Profiles operational mirror.");
+    actions.push("Reconcile the Klaviyo Profiles operational mirror using preserved consent provenance.");
 
     if (mode === "apply") {
       if (lifecycleNeedsSync) {
@@ -106,7 +106,7 @@ export async function POST(req: Request) {
         contact.subscription = contactSubscriptionTarget;
       }
 
-      const mirror = await upsertMondayKlaviyoMirror({
+      const mirror = await upsertMondayKlaviyoMirrorSafe({
         contact,
         profile,
         existing: existingMirror,

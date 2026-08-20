@@ -31,11 +31,32 @@ function safeResult(result: ReconcileResult) {
   };
 }
 
+function environmentStatus() {
+  return {
+    mondayApiToken: Boolean(process.env.MONDAY_API_TOKEN),
+    klaviyoPrivateApiKey: Boolean(process.env.KLAVIYO_PRIVATE_API_KEY),
+    lifecycleCutoverConfigured: Boolean(process.env.MONDAY_LIFECYCLE_SYNC_CUTOVER_AT),
+  };
+}
+
 // Temporary commissioning-only endpoint. It is unavailable on production deployments
 // and always runs the reconciliation engine in preview mode, which performs no writes.
 export async function GET() {
   if (process.env.VERCEL_ENV !== "preview") {
     return NextResponse.json({ ok: false }, { status: 404 });
+  }
+
+  const environment = environmentStatus();
+  if (!environment.mondayApiToken || !environment.klaviyoPrivateApiKey) {
+    return NextResponse.json(
+      {
+        ok: false,
+        ready: false,
+        environment,
+        note: "Required Preview environment variables are missing. Values are never exposed by this endpoint.",
+      },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   }
 
   try {
@@ -45,14 +66,21 @@ export async function GET() {
       lifecycleCutoverAt: process.env.MONDAY_LIFECYCLE_SYNC_CUTOVER_AT || null,
     });
 
-    return NextResponse.json(safeResult(result), {
-      headers: { "Cache-Control": "no-store" },
-    });
+    return NextResponse.json(
+      {
+        ready: true,
+        environment,
+        reconciliation: safeResult(result),
+      },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   } catch (error) {
     console.error("[klaviyo-monday self-test]", error);
     return NextResponse.json(
       {
         ok: false,
+        ready: true,
+        environment,
         error: error instanceof Error ? error.message : "Self-test failed.",
       },
       {

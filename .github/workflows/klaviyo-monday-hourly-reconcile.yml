@@ -1,0 +1,36 @@
+name: Klaviyo-Monday Hourly Reconcile
+
+on:
+  schedule:
+    # Run 5 minutes past every hour
+    - cron: "5 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: klaviyo-monday-hourly-reconcile
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Call production reconcile endpoint
+        env:
+          RECONCILE_URL: ${{ secrets.RECONCILE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$RECONCILE_URL" ]; then
+            RECONCILE_URL="https://www.zeropack.co/api/integrations/klaviyo-monday/reconcile"
+          fi
+
+          echo "Calling $RECONCILE_URL"
+
+          curl --fail-with-body --silent --show-error \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "User-Agent: github-actions/klaviyo-monday-hourly-reconcile" \
+            "$RECONCILE_URL"
+
+          echo ""
+          echo "Reconciliation call completed successfully."

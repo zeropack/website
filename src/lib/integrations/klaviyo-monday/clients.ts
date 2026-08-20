@@ -22,6 +22,15 @@ type MondayItem = {
   column_values: MondayColumnValue[];
 };
 
+type MondayItemsPageData = {
+  boards: Array<{
+    items_page: {
+      cursor: string | null;
+      items: MondayItem[];
+    };
+  }>;
+};
+
 export type MondayContact = {
   id: string;
   name: string;
@@ -151,12 +160,12 @@ async function listMondayItems(
   const items: MondayItem[] = [];
   let cursor: string | null = null;
   do {
-    const data = await mondayGraphql<{
-      boards: Array<{
-        items_page: { cursor: string | null; items: MondayItem[] };
-      }>;
-    }>(query, { boardId, cursor });
-    const page = data.boards[0]?.items_page;
+    const responseData: MondayItemsPageData = await mondayGraphql<MondayItemsPageData>(
+      query,
+      { boardId, cursor },
+    );
+    const page: MondayItemsPageData["boards"][number]["items_page"] | undefined =
+      responseData.boards[0]?.items_page;
     if (!page) break;
     items.push(...page.items);
     cursor = page.cursor;

@@ -40,7 +40,7 @@ function cronAuthorized(req: Request): boolean {
   return Boolean(secret && req.headers.get("authorization") === `Bearer ${secret}`);
 }
 
-// Production-only Vercel Cron entry point. The hourly schedule is declared in vercel.json.
+// Production-only Vercel Cron entry point. The production cadence is declared in vercel.json.
 export async function GET(req: Request) {
   if (process.env.VERCEL_ENV !== "production") {
     return NextResponse.json({ ok: false }, { status: 404 });

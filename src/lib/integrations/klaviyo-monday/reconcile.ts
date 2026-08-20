@@ -5,15 +5,17 @@ import {
   listKlaviyoProfiles,
   listMondayContacts,
   listMondayKlaviyoMirrors,
-  marketingMirrorStatus,
   setKlaviyoLifecycleStage,
   updateMondayContactSubscription,
-  upsertMondayKlaviyoMirror,
   type KlaviyoProfileState,
   type MondayContact,
   type MondayKlaviyoMirror,
 } from "./clients";
-import { REGION_MAP, isCommercialLifecycleStatus } from "./config";
+import { isCommercialLifecycleStatus } from "./config";
+import {
+  mirrorNeedsSafeUpdate,
+  upsertMondayKlaviyoMirrorSafe,
+} from "./mirror";
 
 export type ReconcileMode = "preview" | "apply";
 
@@ -62,28 +64,6 @@ function uniqueFromMap<T>(map: Map<string, T[]>, key: string | null): Match<T> {
   const values = map.get(key.trim().toLowerCase()) || [];
   if (values.length === 1) return { value: values[0], ambiguous: false };
   return { value: null, ambiguous: values.length > 1 };
-}
-
-function mirrorNeedsChange(
-  mirror: MondayKlaviyoMirror | null,
-  contact: MondayContact | null,
-  profile: KlaviyoProfileState,
-): boolean {
-  if (!mirror) return true;
-  const desiredRegion = contact?.region
-    ? REGION_MAP[contact.region] || "Global"
-    : "Global";
-  return (
-    mirror.profileId !== profile.id ||
-    (mirror.email || "").toLowerCase() !== profile.email.toLowerCase() ||
-    mirror.linkedContactId !== (contact?.id || null) ||
-    mirror.subscriptionStatus !== marketingMirrorStatus(profile) ||
-    (mirror.consentSource || "") !== (profile.consentSource || "") ||
-    mirror.consentDate !== (profile.consentTimestamp?.slice(0, 10) || null) ||
-    (mirror.suppressionReason || "") !== (profile.suppressionReason || "") ||
-    mirror.suppressionDate !== (profile.suppressionTimestamp?.slice(0, 10) || null) ||
-    mirror.region !== desiredRegion
-  );
 }
 
 function resolveContactForProfile(params: {
@@ -233,10 +213,16 @@ export async function reconcileKlaviyoMonday(
       }
     }
 
-    if (mirrorNeedsChange(existingMirror, contact, profile)) {
+    if (
+      mirrorNeedsSafeUpdate({
+        existing: existingMirror,
+        contact,
+        profile,
+      })
+    ) {
       result.mirrorsWouldChange += 1;
       if (mode === "apply") {
-        const written = await upsertMondayKlaviyoMirror({
+        const written = await upsertMondayKlaviyoMirrorSafe({
           contact,
           profile,
           existing: existingMirror,

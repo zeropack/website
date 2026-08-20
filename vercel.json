@@ -3,7 +3,7 @@
   "crons": [
     {
       "path": "/api/integrations/klaviyo-monday/reconcile",
-      "schedule": "0 * * * *"
+      "schedule": "0 22 * * *"
     }
   ]
 }

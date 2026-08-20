@@ -5,16 +5,28 @@ import {
   type ReconcileMode,
 } from "@/lib/integrations/klaviyo-monday/reconcile";
 
+const PRODUCTION_LIFECYCLE_CUTOVER_AT = "2026-08-20T08:35:00.000Z";
+
 function lifecycleLookbackHours(): number {
   const configured = Number(process.env.MONDAY_LIFECYCLE_LOOKBACK_HOURS || "72");
   return Number.isFinite(configured) && configured > 0 ? configured : 72;
+}
+
+function lifecycleCutoverAt(): string | null {
+  if (process.env.MONDAY_LIFECYCLE_SYNC_CUTOVER_AT) {
+    return process.env.MONDAY_LIFECYCLE_SYNC_CUTOVER_AT;
+  }
+
+  return process.env.VERCEL_ENV === "production"
+    ? PRODUCTION_LIFECYCLE_CUTOVER_AT
+    : null;
 }
 
 async function run(mode: ReconcileMode) {
   return reconcileKlaviyoMonday({
     mode,
     lifecycleLookbackHours: lifecycleLookbackHours(),
-    lifecycleCutoverAt: process.env.MONDAY_LIFECYCLE_SYNC_CUTOVER_AT || null,
+    lifecycleCutoverAt: lifecycleCutoverAt(),
   });
 }
 
@@ -28,16 +40,21 @@ function cronAuthorized(req: Request): boolean {
   return Boolean(secret && req.headers.get("authorization") === `Bearer ${secret}`);
 }
 
-// Vercel Cron can call this endpoint once a schedule is explicitly approved and added.
-// There is intentionally no vercel.json cron schedule during commissioning.
+// Production-only Vercel Cron entry point. The hourly schedule is declared in vercel.json.
 export async function GET(req: Request) {
+  if (process.env.VERCEL_ENV !== "production") {
+    return NextResponse.json({ ok: false }, { status: 404 });
+  }
+
   if (!cronAuthorized(req)) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
 
   try {
     const result = await run("apply");
-    return NextResponse.json(result);
+    return NextResponse.json(result, {
+      headers: { "Cache-Control": "no-store" },
+    });
   } catch (error) {
     console.error("[klaviyo-monday reconcile cron]", error);
     return NextResponse.json(
@@ -45,7 +62,7 @@ export async function GET(req: Request) {
         ok: false,
         error: error instanceof Error ? error.message : "Reconciliation failed.",
       },
-      { status: 500 },
+      { status: 500, headers: { "Cache-Control": "no-store" } },
     );
   }
 }
@@ -54,7 +71,7 @@ type ReconcileRequest = {
   mode?: ReconcileMode;
 };
 
-// Controlled commissioning/manual execution. Preview is the default and never writes.
+// Controlled manual execution. Preview is the default and never writes.
 export async function POST(req: Request) {
   if (!internalAuthorized(req)) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
@@ -65,7 +82,9 @@ export async function POST(req: Request) {
 
   try {
     const result = await run(mode);
-    return NextResponse.json(result);
+    return NextResponse.json(result, {
+      headers: { "Cache-Control": "no-store" },
+    });
   } catch (error) {
     console.error("[klaviyo-monday reconcile manual]", error);
     return NextResponse.json(
@@ -73,7 +92,7 @@ export async function POST(req: Request) {
         ok: false,
         error: error instanceof Error ? error.message : "Reconciliation failed.",
       },
-      { status: 500 },
+      { status: 500, headers: { "Cache-Control": "no-store" } },
     );
   }
 }

@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 
 import {
-  createLifecycleEvent,
+  contactSubscriptionForProfile,
   getKlaviyoProfileByEmail,
   getMondayContactByEmail,
+  listMondayKlaviyoMirrors,
   marketingMirrorStatus,
   setKlaviyoLifecycleStage,
+  updateMondayContactSubscription,
   upsertMondayKlaviyoMirror,
 } from "@/lib/integrations/klaviyo-monday/clients";
 import {
@@ -20,8 +22,7 @@ type CommissionRequest = {
 
 function authorized(req: Request): boolean {
   const secret = process.env.INTERNAL_API_SECRET;
-  if (!secret) return false;
-  return req.headers.get("x-zp-secret") === secret;
+  return Boolean(secret && req.headers.get("x-zp-secret") === secret);
 }
 
 export async function POST(req: Request) {
@@ -57,69 +58,69 @@ export async function POST(req: Request) {
         contact,
         profile: null,
         actions: [
-          "No Klaviyo profile exists yet. The subscription intake path must create/subscribe it before reconciliation can continue.",
+          "No Klaviyo profile exists. This endpoint will not create or subscribe one from CRM state.",
         ],
       });
     }
+
+    const mirrors = (await listMondayKlaviyoMirrors()).filter(
+      (mirror) => mirror.profileId === profile.id,
+    );
+    if (mirrors.length > 1) {
+      throw new Error(`Duplicate Klaviyo Profiles mirrors found for ${profile.id}.`);
+    }
+    const existingMirror = mirrors[0] || null;
 
     const actions: string[] = [];
     const lifecycle = contact.lifecycleStatus;
     const lifecycleNeedsSync =
       isCommercialLifecycleStatus(lifecycle) && profile.lifecycleStage !== lifecycle;
-
     if (lifecycleNeedsSync) {
       actions.push(
-        `Set Klaviyo ${KLAVIYO_LIFECYCLE_PROPERTY} from ${profile.lifecycleStage || "unset"} to ${lifecycle}.`,
-        `Emit idempotent Klaviyo lifecycle event: ${lifecycle}.`,
+        `Reconcile Klaviyo ${KLAVIYO_LIFECYCLE_PROPERTY} from ${profile.lifecycleStage || "unset"} to ${lifecycle} without emitting a synthetic lifecycle event.`,
       );
     }
 
-    const mirrorStatus = marketingMirrorStatus(profile);
-    const contactMirror =
-      mirrorStatus === "Subscribed"
-        ? "Subscribed"
-        : mirrorStatus === "Pending"
-          ? "Pending"
-          : "Unsubscribed";
-
-    if (contact.subscription !== contactMirror) {
+    const contactSubscriptionTarget = contactSubscriptionForProfile(profile);
+    if (contact.subscription !== contactSubscriptionTarget) {
       actions.push(
-        `Mirror Klaviyo marketing eligibility to Monday Contact Subscription: ${contactMirror}.`,
+        `Mirror Klaviyo marketing eligibility to Monday Contact Subscription: ${contactSubscriptionTarget}.`,
       );
     }
-    actions.push("Upsert the Klaviyo Profiles operational mirror and link it to the canonical Contact.");
+    actions.push("Reconcile the Klaviyo Profiles operational mirror.");
 
     if (mode === "apply") {
       if (lifecycleNeedsSync) {
-        await setKlaviyoLifecycleStage(profile.id, lifecycle);
-        await createLifecycleEvent({
-          profileId: profile.id,
-          stage: lifecycle,
-          mondayContactId: contact.id,
-        });
+        await setKlaviyoLifecycleStage(
+          profile.id,
+          lifecycle,
+          contact.id,
+          profile.acquisitionSource,
+        );
+        profile.lifecycleStage = lifecycle;
+        profile.mondayContactId = contact.id;
       }
 
-      const refreshedProfile = lifecycleNeedsSync
-        ? await getKlaviyoProfileByEmail(email)
-        : profile;
-
-      if (!refreshedProfile) {
-        throw new Error("Klaviyo profile disappeared during reconciliation.");
+      if (contact.subscription !== contactSubscriptionTarget) {
+        await updateMondayContactSubscription(contact.id, contactSubscriptionTarget);
+        contact.subscription = contactSubscriptionTarget;
       }
 
-      const mirrorItemId = await upsertMondayKlaviyoMirror({
+      const mirror = await upsertMondayKlaviyoMirror({
         contact,
-        profile: refreshedProfile,
+        profile,
+        existing: existingMirror,
       });
 
       return NextResponse.json({
         ok: true,
         mode,
         contactId: contact.id,
-        klaviyoProfileId: refreshedProfile.id,
-        mirrorItemId,
-        lifecycleStage: refreshedProfile.lifecycleStage,
-        marketingStatus: marketingMirrorStatus(refreshedProfile),
+        klaviyoProfileId: profile.id,
+        mirrorItemId: mirror.itemId,
+        mirrorChanged: mirror.changed,
+        lifecycleStage: profile.lifecycleStage,
+        marketingStatus: marketingMirrorStatus(profile),
         actions,
       });
     }
@@ -132,8 +133,8 @@ export async function POST(req: Request) {
       calculated: {
         lifecycleNeedsSync,
         lifecycleTarget: isCommercialLifecycleStatus(lifecycle) ? lifecycle : null,
-        mondaySubscriptionTarget: contactMirror,
-        klaviyoMarketingStatus: mirrorStatus,
+        mondaySubscriptionTarget: contactSubscriptionTarget,
+        klaviyoMarketingStatus: marketingMirrorStatus(profile),
       },
       actions,
     });

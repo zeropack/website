@@ -41,6 +41,7 @@ function environmentStatus() {
 
 // Temporary commissioning-only endpoint. It is unavailable on production deployments
 // and always runs the reconciliation engine in preview mode, which performs no writes.
+// This branch-only edit also forces a fresh Preview deployment after environment changes.
 export async function GET() {
   if (process.env.VERCEL_ENV !== "preview") {
     return NextResponse.json({ ok: false }, { status: 404 });

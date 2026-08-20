@@ -499,6 +499,14 @@ function mirrorDesiredValues(params: {
     [KLAVIYO_PROFILE_COLUMNS.subscriptionStatus]: { label: mirrorStatus },
     [KLAVIYO_PROFILE_COLUMNS.consentSource]: params.profile.consentSource || "",
     [KLAVIYO_PROFILE_COLUMNS.region]: { label: region },
+    [KLAVIYO_PROFILE_COLUMNS.consentDate]: params.profile.consentTimestamp
+      ? { date: params.profile.consentTimestamp.slice(0, 10) }
+      : null,
+    [KLAVIYO_PROFILE_COLUMNS.suppressionReason]:
+      params.profile.suppressionReason || "",
+    [KLAVIYO_PROFILE_COLUMNS.suppressionDate]: params.profile.suppressionTimestamp
+      ? { date: params.profile.suppressionTimestamp.slice(0, 10) }
+      : null,
   };
 
   if (params.contact) {
@@ -506,16 +514,6 @@ function mirrorDesiredValues(params: {
       item_ids: [Number(params.contact.id)],
     };
   }
-  values[KLAVIYO_PROFILE_COLUMNS.consentDate] = params.profile.consentTimestamp
-    ? { date: params.profile.consentTimestamp.slice(0, 10) }
-    : null;
-  values[KLAVIYO_PROFILE_COLUMNS.suppressionReason] =
-    params.profile.suppressionReason || "";
-  values[KLAVIYO_PROFILE_COLUMNS.suppressionDate] =
-    params.profile.suppressionTimestamp
-      ? { date: params.profile.suppressionTimestamp.slice(0, 10) }
-      : null;
-
   return values;
 }
 
@@ -591,7 +589,7 @@ export async function getMondayLifecycleTransitions(
   const now = new Date();
   const from = new Date(now.getTime() - lookbackHours * 60 * 60 * 1000);
   const query = `
-    query LifecycleActivity($from: Date!, $to: Date!) {
+    query LifecycleActivity($from: ISO8601DateTime!, $to: ISO8601DateTime!) {
       boards(ids: [${MONDAY_CONTACTS_BOARD_ID}]) {
         activity_logs(from: $from, to: $to) {
           id

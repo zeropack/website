@@ -282,23 +282,24 @@ export async function reconcileKlaviyoMonday(
     }
     const profile = profileMatch.value;
 
-    if (profile.lifecycleStage !== transition.stage) {
-      result.lifecycleProfilesWouldUpdate += 1;
-      if (mode === "apply") {
-        await setKlaviyoLifecycleStage(
-          profile.id,
-          transition.stage,
-          contact.id,
-          profile.acquisitionSource,
-        );
-        profile.lifecycleStage = transition.stage;
-        profile.mondayContactId = contact.id;
-        result.lifecycleProfilesUpdated += 1;
-      }
-    }
+    // The Klaviyo lifecycle property is also the durable processed-state marker for the latest
+    // real Monday transition. If it already matches, reconciliation is a true no-op: do not
+    // re-submit the same deterministic event request on every poll.
+    if (profile.lifecycleStage === transition.stage) continue;
 
+    result.lifecycleProfilesWouldUpdate += 1;
     result.lifecycleEventsWouldSubmit += 1;
     if (mode === "apply") {
+      await setKlaviyoLifecycleStage(
+        profile.id,
+        transition.stage,
+        contact.id,
+        profile.acquisitionSource,
+      );
+      profile.lifecycleStage = transition.stage;
+      profile.mondayContactId = contact.id;
+      result.lifecycleProfilesUpdated += 1;
+
       await createLifecycleEvent({
         profileId: profile.id,
         stage: transition.stage,

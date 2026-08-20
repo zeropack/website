@@ -16,6 +16,7 @@ import {
   mirrorNeedsSafeUpdate,
   upsertMondayKlaviyoMirrorSafe,
 } from "./mirror";
+import { markWelcomeExitedIfInProgress } from "./welcome";
 
 export type ReconcileMode = "preview" | "apply";
 
@@ -45,6 +46,7 @@ export type ReconcileResult = {
   lifecycleEventsWouldSubmit: number;
   lifecycleEventsSubmitted: number;
   lifecycleUnmatched: number;
+  welcomeProfilesExited: number;
   notes: string[];
 };
 
@@ -163,6 +165,7 @@ export async function reconcileKlaviyoMonday(
     lifecycleEventsWouldSubmit: 0,
     lifecycleEventsSubmitted: 0,
     lifecycleUnmatched: 0,
+    welcomeProfilesExited: 0,
     notes: [],
   };
 
@@ -281,6 +284,13 @@ export async function reconcileKlaviyoMonday(
       continue;
     }
     const profile = profileMatch.value;
+
+    // A real commercial lifecycle transition also terminates an active Welcome journey.
+    // Only profiles explicitly marked No or In Progress are changed; Yes and Exempt are preserved.
+    if (mode === "apply") {
+      const exited = await markWelcomeExitedIfInProgress(profile.id);
+      if (exited) result.welcomeProfilesExited += 1;
+    }
 
     // The Klaviyo lifecycle property is also the durable processed-state marker for the latest
     // real Monday transition. If it already matches, reconciliation is a true no-op: do not

@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 
-import { recoverStandardInboundProfiles } from "@/lib/integrations/klaviyo-monday/inbound-recovery";
+import {
+  recoverStandardInboundProfilesV2,
+  STANDARD_INBOUND_PRODUCTION_CUTOVER_AT,
+} from "@/lib/integrations/klaviyo-monday/standard-inbound-recovery";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +13,9 @@ export async function GET() {
   }
 
   try {
-    const result = await recoverStandardInboundProfiles("preview");
+    const result = await recoverStandardInboundProfilesV2("preview", {
+      cutoverAt: STANDARD_INBOUND_PRODUCTION_CUTOVER_AT,
+    });
     return NextResponse.json({ ok: true, result }, {
       headers: { "Cache-Control": "no-store" },
     });

@@ -69,7 +69,7 @@ export default function Page() {
           <p className="font-heading text-lg font-semibold text-charcoal">
             Download the Guide and Toolkit
           </p>
-          <KlaviyoEmbed formId="R8WtWh" className="mt-5 lg:w-3/4" />
+          <KlaviyoEmbed formId="R8WtWh" className="mt-5 lg:mx-auto lg:w-3/4" />
         </div>
 
         <div className="mt-8 rounded-2xl border border-black/5 bg-white p-6 shadow-sm">

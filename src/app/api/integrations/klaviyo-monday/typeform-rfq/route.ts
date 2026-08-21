@@ -62,6 +62,7 @@ export async function POST(req: Request) {
           profileId: result.profileId,
           responseId: signal.responseId,
           leadId: result.leadId || processed.leadId,
+          contactId: result.contactId || null,
         });
       }
     }

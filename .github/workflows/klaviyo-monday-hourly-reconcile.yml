@@ -1,4 +1,4 @@
-name: Klaviyo-Monday 30-Minute Reconcile
+name: Klaviyo-Monday Hourly Reconcile
 
 on:
   schedule:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: klaviyo-monday-30-minute-reconcile
+  group: klaviyo-monday-hourly-reconcile
   cancel-in-progress: false
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
 
           curl --fail-with-body --silent --show-error \
             -H "Authorization: Bearer $CRON_SECRET" \
-            -H "User-Agent: github-actions/klaviyo-monday-30-minute-reconcile" \
+            -H "User-Agent: github-actions/klaviyo-monday-hourly-reconcile" \
             "$RECONCILE_URL"
 
           echo ""

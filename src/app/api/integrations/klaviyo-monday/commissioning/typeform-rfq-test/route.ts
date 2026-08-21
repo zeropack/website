@@ -10,7 +10,7 @@ const TEST_CUTOVER = "2026-08-21T06:47:49.000Z";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
-  if (process.env.VERCEL_ENV !== "preview") {
+  if (process.env.VERCEL_ENV !== "preview" && process.env.VERCEL_ENV !== "production") {
     return NextResponse.json({ ok: false }, { status: 404 });
   }
 

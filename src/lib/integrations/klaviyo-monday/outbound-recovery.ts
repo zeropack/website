@@ -9,6 +9,32 @@ const LEAD_CONTACT_RELATION = "board_relation_mm5gpfwm";
 const LEAD_SOURCE = "color_mkyb8krc";
 const LEAD_RESEARCH_SOURCE_LABEL = "AI Agent";
 
+type ContactPageResponse = {
+  boards: Array<{
+    items_page: {
+      cursor: string | null;
+      items: Array<{ id: string; created_at: string }>;
+    };
+  }>;
+};
+
+type LeadPageResponse = {
+  boards: Array<{
+    items_page: {
+      cursor: string | null;
+      items: Array<{
+        id: string;
+        created_at: string;
+        column_values: Array<{
+          id: string;
+          text?: string | null;
+          linked_item_ids?: string[];
+        }>;
+      }>;
+    };
+  }>;
+};
+
 function requiredEnv(name: string) {
   const value = process.env[name];
   if (!value) throw new Error(`Missing required environment variable: ${name}`);
@@ -64,15 +90,11 @@ async function recentCreatedContactIds(from: Date, to: Date): Promise<string[]> 
   const ids: string[] = [];
   let cursor: string | null = null;
   do {
-    const data = await monday<{
-      boards: Array<{
-        items_page: {
-          cursor: string | null;
-          items: Array<{ id: string; created_at: string }>;
-        };
-      }>;
-    }>(query, { boardId: MONDAY_CONTACTS_BOARD_ID, cursor });
-    const page = data.boards[0]?.items_page;
+    const pageData: ContactPageResponse = await monday<ContactPageResponse>(
+      query,
+      { boardId: MONDAY_CONTACTS_BOARD_ID, cursor },
+    );
+    const page = pageData.boards[0]?.items_page;
     if (!page) break;
     for (const item of page.items) {
       const created = new Date(item.created_at);
@@ -105,31 +127,23 @@ async function recentLeadResearchContactIds(from: Date, to: Date): Promise<strin
   const ids: string[] = [];
   let cursor: string | null = null;
   do {
-    const data = await monday<{
-      boards: Array<{
-        items_page: {
-          cursor: string | null;
-          items: Array<{
-            id: string;
-            created_at: string;
-            column_values: Array<{
-              id: string;
-              text?: string | null;
-              linked_item_ids?: string[];
-            }>;
-          }>;
-        };
-      }>;
-    }>(query, { boardId: MONDAY_LEADS_BOARD_ID, cursor });
+    const pageData: LeadPageResponse = await monday<LeadPageResponse>(
+      query,
+      { boardId: MONDAY_LEADS_BOARD_ID, cursor },
+    );
 
-    const page = data.boards[0]?.items_page;
+    const page = pageData.boards[0]?.items_page;
     if (!page) break;
     for (const item of page.items) {
       const created = new Date(item.created_at);
       if (created < from || created > to) continue;
-      const source = item.column_values.find((c) => c.id === LEAD_SOURCE)?.text?.trim();
+      const source = item.column_values
+        .find((c) => c.id === LEAD_SOURCE)
+        ?.text?.trim();
       if (source !== LEAD_RESEARCH_SOURCE_LABEL) continue;
-      const relation = item.column_values.find((c) => c.id === LEAD_CONTACT_RELATION);
+      const relation = item.column_values.find(
+        (c) => c.id === LEAD_CONTACT_RELATION,
+      );
       ids.push(...(relation?.linked_item_ids || []).map(String));
     }
     cursor = page.cursor;

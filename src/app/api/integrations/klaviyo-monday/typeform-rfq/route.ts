@@ -6,6 +6,7 @@ import {
   verifyTypeformSignature,
 } from "@/lib/integrations/klaviyo-monday/rfq-intake";
 import {
+  findProcessedTypeformRfqByEmail,
   readProcessedTypeformRfq,
   stampProcessedTypeformRfq,
 } from "@/lib/integrations/klaviyo-monday/typeform-rfq-idempotency";
@@ -33,6 +34,25 @@ export async function POST(req: Request) {
   const body = JSON.parse(rawBody || "null") as unknown;
   try {
     const signal = parseTypeformSignal(body);
+
+    if (signal.responseId && signal.email) {
+      const previous = await findProcessedTypeformRfqByEmail(signal.email);
+      if (previous?.responseId === signal.responseId) {
+        return NextResponse.json(
+          {
+            ok: true,
+            mode: "apply",
+            action: "already-processed-response",
+            profileId: previous.profileId,
+            leadId: previous.leadId,
+            email: signal.email,
+            responseId: signal.responseId,
+          },
+          { status: 200, headers: { "Cache-Control": "no-store" } },
+        );
+      }
+    }
+
     const result = await processTypeformRfqIntake(body, "apply");
 
     if (signal.responseId && result.profileId) {

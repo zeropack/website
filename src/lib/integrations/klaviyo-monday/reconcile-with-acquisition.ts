@@ -3,8 +3,11 @@ import {
   type ReconcileMode,
   type ReconcileOptions,
 } from "./reconcile";
-import { recoverStandardInboundProfiles } from "./inbound-recovery";
 import { recoverGovernedOutboundProfiles } from "./outbound-recovery";
+import {
+  recoverStandardInboundProfilesV2,
+  STANDARD_INBOUND_PRODUCTION_CUTOVER_AT,
+} from "./standard-inbound-recovery";
 import {
   recoverTypeformRfqEventsV2,
   TYPEFORM_RFQ_PRODUCTION_CUTOVER_AT,
@@ -15,6 +18,7 @@ export type { ReconcileMode } from "./reconcile";
 export type ReconcileWithAcquisitionOptions = ReconcileOptions & {
   profileSyncCutoverAt?: string | null;
   typeformRfqCutoverAt?: string | null;
+  standardInboundCutoverAt?: string | null;
   standardInboundEnabled?: boolean;
 };
 
@@ -24,20 +28,14 @@ export async function reconcileKlaviyoMondayWithAcquisition(
   const mode: ReconcileMode = options.mode === "apply" ? "apply" : "preview";
 
   // Typeform is RFQ-only and has completed its separate production commissioning.
-  // It is therefore safe to run independently of the broader acquisition/profile
-  // sync gate. Every completed RFQ is recovered from Klaviyo's native Filled Out
-  // Form event before the core lifecycle stage.
   const typeformRfq = await recoverTypeformRfqEventsV2(mode, {
     lookbackHours: 168,
     cutoverAt:
       options.typeformRfqCutoverAt || TYPEFORM_RFQ_PRODUCTION_CUTOVER_AT,
   });
 
-  // Newly created CRM contacts and contacts linked to fresh AI-Agent Leads are
-  // upserted before the core reconciliation. This means a new Klaviyo profile is
-  // available to the same execution for mirror/profile-ID reconciliation rather
-  // than waiting for the following hourly run. Profile upsert never changes
-  // marketing consent or suppression.
+  // Governed outbound profile recovery runs before core reconciliation so newly
+  // created Klaviyo profiles can converge into the mirror during the same run.
   let outbound: Awaited<ReturnType<typeof recoverGovernedOutboundProfiles>> | null = null;
   if (options.profileSyncCutoverAt) {
     outbound = await recoverGovernedOutboundProfiles(mode, {
@@ -46,16 +44,18 @@ export async function reconcileKlaviyoMondayWithAcquisition(
     });
   }
 
-  // The commissioned consent/suppression/lifecycle reconciler remains the
-  // canonical state reconciliation stage and the sole owner of the Monday
-  // commercial lifecycle -> Klaviyo lifecycle property/event write.
+  // The commissioned consent/suppression/lifecycle reconciler remains canonical.
   const core = await reconcileKlaviyoMonday(options);
 
-  // Standard acquisition sources remain separately gated until their own
-  // commissioning is complete. Typeform never enters this profile-based path.
-  const standardInboundEnabled = options.standardInboundEnabled !== false;
+  // Standard inbound is independent from Typeform RFQ. It only considers the
+  // approved marketing-acquisition sources after its own hard no-replay cutover.
+  const standardInboundEnabled = options.standardInboundEnabled === true;
   const inbound = standardInboundEnabled
-    ? await recoverStandardInboundProfiles(mode)
+    ? await recoverStandardInboundProfilesV2(mode, {
+        cutoverAt:
+          options.standardInboundCutoverAt ||
+          STANDARD_INBOUND_PRODUCTION_CUTOVER_AT,
+      })
     : null;
 
   return {

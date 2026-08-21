@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BrandLogo } from "./BrandLogo";
-import { KlaviyoEmbed } from "./KlaviyoEmbed";
+import { NewsletterSignup } from "./NewsletterSignup";
 import { TREND_PACKAGING_FUNNEL_HREF } from "@/lib/site";
 
 const groups = [
@@ -28,6 +28,10 @@ export function Footer() {
   return (
     <footer className="mt-auto bg-[#214E34] text-white">
       <div className="mx-auto min-w-0 max-w-6xl px-4 py-14 sm:px-6">
+        <div className="mx-auto mb-12 w-full lg:w-1/2">
+          <NewsletterSignup />
+        </div>
+
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="min-w-0 sm:col-span-2 lg:col-span-1">
             <Link href="/" className="inline-block max-w-full py-1" aria-label="Zero Pack — Home">
@@ -71,10 +75,6 @@ export function Footer() {
               B2B custom compostable packaging for ecommerce brands — made to order and sold through custom quotes.
             </p>
           </div>
-        </div>
-
-        <div className="mt-10 lg:w-1/2">
-          <KlaviyoEmbed formId="Rw5KwJ" />
         </div>
       </div>
       <div className="border-t border-white/10 py-4 text-center text-xs text-white/60">

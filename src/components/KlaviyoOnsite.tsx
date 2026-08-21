@@ -13,28 +13,6 @@ declare global {
   }
 }
 
-function hasFunctionalOrAdvertisingConsent() {
-  const rawCookie = document.cookie
-    .split("; ")
-    .find((entry) => entry.startsWith("_consentik_cookie="))
-    ?.slice("_consentik_cookie=".length);
-
-  if (!rawCookie) return false;
-
-  try {
-    const consent = JSON.parse(decodeURIComponent(rawCookie)) as {
-      consent?: string[];
-    };
-    return (
-      Array.isArray(consent.consent) &&
-      (consent.consent.includes("functional") ||
-        consent.consent.includes("advertising"))
-    );
-  } catch {
-    return false;
-  }
-}
-
 function initialiseKlaviyoObject() {
   if (window.klaviyo) return;
 
@@ -93,36 +71,18 @@ function loadKlaviyo() {
   script.async = true;
   script.type = "text/javascript";
   script.src = KLAVIYO_SRC;
-  script.dataset.consentSource = "consentik-functional-or-advertising";
+  script.dataset.purpose = "klaviyo-forms-and-onsite";
   document.body.appendChild(script);
 }
 
 export function KlaviyoOnsite() {
   useEffect(() => {
-    // Initialise Klaviyo's queue/proxy contract on every page. The remote onsite
-    // tracking/forms script itself remains consent-gated and is appended near the
-    // end of <body>, matching Klaviyo's installation contract without bypassing
-    // the site's Consentik preference boundary.
+    // Embedded Klaviyo forms are an explicit user-facing site function and must
+    // remain available even when optional cookie/tracking consent is declined.
+    // Consentik remains responsible for optional tracking-cookie controls; do
+    // not gate the Klaviyo forms renderer itself behind a consent category.
     initialiseKlaviyoObject();
-
-    const reconcile = () => {
-      if (hasFunctionalOrAdvertisingConsent()) loadKlaviyo();
-    };
-
-    reconcile();
-
-    const startedAt = Date.now();
-    const interval = window.setInterval(() => {
-      reconcile();
-      if (
-        document.getElementById(KLAVIYO_SCRIPT_ID) ||
-        Date.now() - startedAt > 120_000
-      ) {
-        window.clearInterval(interval);
-      }
-    }, 500);
-
-    return () => window.clearInterval(interval);
+    loadKlaviyo();
   }, []);
 
   return null;

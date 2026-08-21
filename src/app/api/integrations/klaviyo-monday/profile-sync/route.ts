@@ -5,7 +5,7 @@ import {
   outboundSourceAllowed,
   syncMondayContactsToKlaviyo,
   type ProfileSyncRequest,
-} from "@/lib/integrations/klaviyo-monday/acquisition";
+} from "@/lib/integrations/klaviyo-monday/acquisition-runtime";
 
 export const dynamic = "force-dynamic";
 
@@ -28,16 +28,11 @@ export async function POST(req: Request) {
       source: body.source,
       mode: body.mode === "apply" ? "apply" : "preview",
     });
-    return NextResponse.json(result, {
-      headers: { "Cache-Control": "no-store" },
-    });
+    return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     console.error("[klaviyo-monday profile sync]", error);
     return NextResponse.json(
-      {
-        ok: false,
-        error: error instanceof Error ? error.message : "Profile sync failed.",
-      },
+      { ok: false, error: error instanceof Error ? error.message : "Profile sync failed." },
       { status: 500, headers: { "Cache-Control": "no-store" } },
     );
   }

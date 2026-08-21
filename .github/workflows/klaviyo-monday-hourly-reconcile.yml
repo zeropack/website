@@ -2,8 +2,8 @@ name: Klaviyo-Monday Hourly Reconcile
 
 on:
   schedule:
-    # Run 5 minutes past every hour
-    - cron: "5 * * * *"
+    # Run every 30 minutes at :05 and :35 UTC
+    - cron: "5,35 * * * *"
   workflow_dispatch:
 
 concurrency:

@@ -51,26 +51,70 @@ async function findProfileId(email: string): Promise<string | null> {
   return result.data[0]?.id || null;
 }
 
-async function createNewsletterProfile(email: string): Promise<string> {
-  const imported = await klaviyo<{ data: { id: string } }>(
-    "/api/profile-import?additional-fields[profile]=subscriptions",
-    {
-      method: "POST",
-      body: JSON.stringify({
-        data: {
-          type: "profile",
-          attributes: {
-            email,
-            properties: {
-              "Acquisition Source": ACQUISITION_SOURCE,
-              "Welcome Status": "No",
+async function waitForProfileId(email: string): Promise<string | null> {
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    const profileId = await findProfileId(email);
+    if (profileId) return profileId;
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+  return null;
+}
+
+async function setNewProfileProperties(profileId: string): Promise<void> {
+  await klaviyo<void>(`/api/profiles/${encodeURIComponent(profileId)}/`, {
+    method: "PATCH",
+    body: JSON.stringify({
+      data: {
+        type: "profile",
+        id: profileId,
+        attributes: {
+          properties: {
+            "Acquisition Source": ACQUISITION_SOURCE,
+            "Welcome Status": "No",
+          },
+        },
+      },
+    }),
+  });
+}
+
+async function subscribeEmail(email: string): Promise<void> {
+  await klaviyo<void>("/api/profile-subscription-bulk-create-jobs/", {
+    method: "POST",
+    body: JSON.stringify({
+      data: {
+        type: "profile-subscription-bulk-create-job",
+        attributes: {
+          custom_source: SUBSCRIPTION_SOURCE,
+          profiles: {
+            data: [
+              {
+                type: "profile",
+                attributes: {
+                  email,
+                  subscriptions: {
+                    email: {
+                      marketing: {
+                        consent: "SUBSCRIBED",
+                      },
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        },
+        relationships: {
+          list: {
+            data: {
+              type: "list",
+              id: NEWSLETTER_LIST_ID,
             },
           },
         },
-      }),
-    },
-  );
-  return imported.data.id;
+      },
+    }),
+  });
 }
 
 async function subscriptionConfirmed(profileId: string): Promise<boolean> {
@@ -104,7 +148,7 @@ async function subscriptionConfirmed(profileId: string): Promise<boolean> {
 }
 
 async function waitForSubscription(profileId: string): Promise<boolean> {
-  for (let attempt = 0; attempt < 20; attempt += 1) {
+  for (let attempt = 0; attempt < 30; attempt += 1) {
     if (await subscriptionConfirmed(profileId)) return true;
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
@@ -131,45 +175,21 @@ export async function POST(req: Request) {
   }
 
   try {
-    const profileId =
-      (await findProfileId(email)) || (await createNewsletterProfile(email));
+    const existingProfileId = await findProfileId(email);
 
-    await klaviyo<void>("/api/profile-subscription-bulk-create-jobs/", {
-      method: "POST",
-      body: JSON.stringify({
-        data: {
-          type: "profile-subscription-bulk-create-job",
-          attributes: {
-            custom_source: SUBSCRIPTION_SOURCE,
-            profiles: {
-              data: [
-                {
-                  type: "profile",
-                  attributes: {
-                    email,
-                    subscriptions: {
-                      email: {
-                        marketing: {
-                          consent: "SUBSCRIBED",
-                        },
-                      },
-                    },
-                  },
-                },
-              ],
-            },
-          },
-          relationships: {
-            list: {
-              data: {
-                type: "list",
-                id: NEWSLETTER_LIST_ID,
-              },
-            },
-          },
-        },
-      }),
-    });
+    // Let Klaviyo's subscribe endpoint create new profiles and consent them in the
+    // same operation. This avoids a race between a separate profile create call and
+    // the asynchronous subscription job for brand-new addresses.
+    await subscribeEmail(email);
+
+    const profileId = existingProfileId || (await waitForProfileId(email));
+    if (!profileId) {
+      throw new Error(`Klaviyo did not create a profile for ${email}.`);
+    }
+
+    if (!existingProfileId) {
+      await setNewProfileProperties(profileId);
+    }
 
     if (!(await waitForSubscription(profileId))) {
       throw new Error(

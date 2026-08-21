@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
 import {
-  reconcileKlaviyoMonday,
   type ReconcileMode,
 } from "@/lib/integrations/klaviyo-monday/reconcile";
 import { reconcileKlaviyoMondayWithAcquisition } from "@/lib/integrations/klaviyo-monday/reconcile-with-acquisition";
@@ -39,18 +38,15 @@ async function run(mode: ReconcileMode, includeAcquisition = false) {
     lifecycleCutoverAt: lifecycleCutoverAt(),
   };
 
-  if (!acquisitionRuntimeEnabled() && !includeAcquisition) {
-    // Preserve the already commissioned production reconciler exactly until the
-    // acquisition runtime has completed its separate acceptance test.
-    return reconcileKlaviyoMonday(common);
-  }
+  const broaderAcquisitionEnabled = acquisitionRuntimeEnabled() || includeAcquisition;
 
-  // Inbound acquisition recovery is independent of outbound CRM profile sync.
-  // MONDAY_PROFILE_SYNC_CUTOVER_AT gates only the outbound Monday -> Klaviyo
-  // recovery scan; it is not required for Typeform/Klaviyo inbound processing.
+  // Typeform RFQ recovery has completed its independent production commissioning
+  // and now runs on every reconciliation. Broader profile-based acquisition and
+  // outbound CRM profile sync remain separately gated until commissioned.
   return reconcileKlaviyoMondayWithAcquisition({
     ...common,
-    profileSyncCutoverAt: profileSyncCutoverAt(),
+    standardInboundEnabled: broaderAcquisitionEnabled,
+    profileSyncCutoverAt: broaderAcquisitionEnabled ? profileSyncCutoverAt() : null,
   });
 }
 
@@ -96,9 +92,9 @@ type ReconcileRequest = {
   includeAcquisition?: boolean;
 };
 
-// Controlled manual execution. Preview is the default and never writes. During
-// commissioning, includeAcquisition=true allows the acquisition path to be
-// previewed before the production feature gate is enabled.
+// Controlled manual execution. Preview is the default and never writes.
+// includeAcquisition=true additionally enables the still-gated broader
+// acquisition/profile-sync paths for explicit commissioning runs.
 export async function POST(req: Request) {
   if (!internalAuthorized(req)) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });

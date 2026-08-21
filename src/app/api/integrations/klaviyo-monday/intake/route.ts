@@ -6,6 +6,7 @@ import {
   processInboundKlaviyoIntake,
   type KlaviyoIntakePayload,
 } from "@/lib/integrations/klaviyo-monday/acquisition-runtime";
+import { processWebsiteRfqProfile } from "@/lib/integrations/klaviyo-monday/rfq-intake";
 
 export const dynamic = "force-dynamic";
 
@@ -25,11 +26,15 @@ export async function POST(req: Request) {
   }
 
   try {
-    const result = await processInboundKlaviyoIntake({
-      payload: { profile_id: String(body.profile_id), source: body.source },
-      flowId,
-      mode: "apply",
-    });
+    const result =
+      body.source === "Typeform"
+        ? await processWebsiteRfqProfile(String(body.profile_id), "apply")
+        : await processInboundKlaviyoIntake({
+            payload: { profile_id: String(body.profile_id), source: body.source },
+            flowId,
+            mode: "apply",
+          });
+
     return NextResponse.json(result, {
       status: 200,
       headers: { "Cache-Control": "no-store" },

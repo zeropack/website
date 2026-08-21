@@ -1,13 +1,13 @@
-name: Klaviyo-Monday Hourly Reconcile
+name: Klaviyo-Monday 30-Minute Reconcile
 
 on:
   schedule:
-    # Run 5 minutes past every hour
-    - cron: "5 * * * *"
+    # Run every 30 minutes at :05 and :35 UTC
+    - cron: "5,35 * * * *"
   workflow_dispatch:
 
 concurrency:
-  group: klaviyo-monday-hourly-reconcile
+  group: klaviyo-monday-30-minute-reconcile
   cancel-in-progress: false
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
 
           curl --fail-with-body --silent --show-error \
             -H "Authorization: Bearer $CRON_SECRET" \
-            -H "User-Agent: github-actions/klaviyo-monday-hourly-reconcile" \
+            -H "User-Agent: github-actions/klaviyo-monday-30-minute-reconcile" \
             "$RECONCILE_URL"
 
           echo ""

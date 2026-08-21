@@ -160,7 +160,7 @@ async function allProfiles(): Promise<Profile[]> {
   let next: string | null = `/api/profiles?${params}`;
   const result: Profile[] = [];
   while (next) {
-    const page = await klaviyo<{ data: any[]; links?: { next?: string | null } }>(next);
+    const page: { data: any[]; links?: { next?: string | null } } = await klaviyo(next);
     result.push(...page.data.map(mapProfile));
     next = page.links?.next || null;
   }
@@ -270,7 +270,6 @@ async function contactsByIds(ids: string[]): Promise<Contact[]> {
 
 async function upsertProfile(contact: Contact, source: ApprovedOutboundSource, existing: Profile | null) {
   const properties: Record<string, string> = { "Monday Contact ID": contact.id };
-  // Acquisition Source describes how the person first entered Zero Pack. Preserve it once known.
   if (!existing?.acquisitionSource) properties["Acquisition Source"] = source;
   if (contact.status) properties["CRM Status"] = contact.status;
   if (contact.region) properties.Region = contact.region;

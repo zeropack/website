@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import {
+  acquisitionFlowAllowed,
   intakeAuthorized,
   inboundSourceAllowed,
   processInboundKlaviyoIntake,
@@ -23,6 +24,9 @@ export async function POST(req: Request) {
       { ok: false, error: "profile_id and an approved source are required." },
       { status: 400 },
     );
+  }
+  if (!acquisitionFlowAllowed(flowId)) {
+    return NextResponse.json({ ok: false, error: "Unapproved Klaviyo acquisition flow." }, { status: 403 });
   }
 
   try {

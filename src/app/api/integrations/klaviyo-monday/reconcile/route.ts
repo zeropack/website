@@ -4,6 +4,7 @@ import {
   reconcileKlaviyoMonday,
   type ReconcileMode,
 } from "@/lib/integrations/klaviyo-monday/reconcile";
+import { reconcileKlaviyoMondayWithAcquisition } from "@/lib/integrations/klaviyo-monday/reconcile-with-acquisition";
 
 const PRODUCTION_LIFECYCLE_CUTOVER_AT = "2026-08-20T08:35:00.000Z";
 
@@ -22,11 +23,38 @@ function lifecycleCutoverAt(): string | null {
     : null;
 }
 
+function acquisitionRuntimeEnabled(): boolean {
+  return process.env.KLAVIYO_ACQUISITION_RUNTIME_ENABLED === "true";
+}
+
+function profileSyncCutoverAt(): string | null {
+  const configured = process.env.MONDAY_PROFILE_SYNC_CUTOVER_AT?.trim();
+  return configured || null;
+}
+
 async function run(mode: ReconcileMode) {
-  return reconcileKlaviyoMonday({
+  const common = {
     mode,
     lifecycleLookbackHours: lifecycleLookbackHours(),
     lifecycleCutoverAt: lifecycleCutoverAt(),
+  };
+
+  if (!acquisitionRuntimeEnabled()) {
+    // Preserve the already commissioned production reconciler exactly until the
+    // acquisition/profile-sync runtime has completed its separate acceptance test.
+    return reconcileKlaviyoMonday(common);
+  }
+
+  const cutover = profileSyncCutoverAt();
+  if (!cutover) {
+    throw new Error(
+      "KLAVIYO_ACQUISITION_RUNTIME_ENABLED is true but MONDAY_PROFILE_SYNC_CUTOVER_AT is missing; refusing acquisition recovery.",
+    );
+  }
+
+  return reconcileKlaviyoMondayWithAcquisition({
+    ...common,
+    profileSyncCutoverAt: cutover,
   });
 }
 

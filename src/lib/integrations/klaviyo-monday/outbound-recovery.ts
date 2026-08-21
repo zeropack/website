@@ -65,22 +65,12 @@ async function monday<T>(query: string, variables: Record<string, unknown>): Pro
 }
 
 async function recentCreatedContactIds(from: Date, to: Date): Promise<string[]> {
-  const fromDate = from.toISOString().slice(0, 10);
-  const toDate = to.toISOString().slice(0, 10);
+  // Contact creation time is available directly as item.created_at. Do not filter on a
+  // synthetic "creation_log" column: the Contacts board does not contain that column,
+  // and Monday rejects the whole reconciliation query with "Column not found".
   const query = `query RecentContacts($boardId: ID!, $cursor: String) {
     boards(ids: [$boardId]) {
-      items_page(
-        limit: 500,
-        cursor: $cursor,
-        query_params: {
-          rules: [{
-            column_id: "creation_log",
-            compare_attribute: "CREATED_AT",
-            compare_value: ["${fromDate}", "${toDate}"],
-            operator: between
-          }]
-        }
-      ) {
+      items_page(limit: 500, cursor: $cursor) {
         cursor
         items { id created_at }
       }

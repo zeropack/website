@@ -32,29 +32,25 @@ function profileSyncCutoverAt(): string | null {
   return configured || null;
 }
 
-async function run(mode: ReconcileMode) {
+async function run(mode: ReconcileMode, includeAcquisition = false) {
   const common = {
     mode,
     lifecycleLookbackHours: lifecycleLookbackHours(),
     lifecycleCutoverAt: lifecycleCutoverAt(),
   };
 
-  if (!acquisitionRuntimeEnabled()) {
+  if (!acquisitionRuntimeEnabled() && !includeAcquisition) {
     // Preserve the already commissioned production reconciler exactly until the
-    // acquisition/profile-sync runtime has completed its separate acceptance test.
+    // acquisition runtime has completed its separate acceptance test.
     return reconcileKlaviyoMonday(common);
   }
 
-  const cutover = profileSyncCutoverAt();
-  if (!cutover) {
-    throw new Error(
-      "KLAVIYO_ACQUISITION_RUNTIME_ENABLED is true but MONDAY_PROFILE_SYNC_CUTOVER_AT is missing; refusing acquisition recovery.",
-    );
-  }
-
+  // Inbound acquisition recovery is independent of outbound CRM profile sync.
+  // MONDAY_PROFILE_SYNC_CUTOVER_AT gates only the outbound Monday -> Klaviyo
+  // recovery scan; it is not required for Typeform/Klaviyo inbound processing.
   return reconcileKlaviyoMondayWithAcquisition({
     ...common,
-    profileSyncCutoverAt: cutover,
+    profileSyncCutoverAt: profileSyncCutoverAt(),
   });
 }
 
@@ -68,7 +64,7 @@ function cronAuthorized(req: Request): boolean {
   return Boolean(secret && req.headers.get("authorization") === `Bearer ${secret}`);
 }
 
-// Production-only Vercel Cron entry point. The production cadence is declared in vercel.json.
+// Production-only scheduled entry point.
 export async function GET(req: Request) {
   if (process.env.VERCEL_ENV !== "production") {
     return NextResponse.json({ ok: false }, { status: 404 });
@@ -97,9 +93,12 @@ export async function GET(req: Request) {
 
 type ReconcileRequest = {
   mode?: ReconcileMode;
+  includeAcquisition?: boolean;
 };
 
-// Controlled manual execution. Preview is the default and never writes.
+// Controlled manual execution. Preview is the default and never writes. During
+// commissioning, includeAcquisition=true allows the acquisition path to be
+// previewed before the production feature gate is enabled.
 export async function POST(req: Request) {
   if (!internalAuthorized(req)) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
@@ -109,7 +108,7 @@ export async function POST(req: Request) {
   const mode: ReconcileMode = body?.mode === "apply" ? "apply" : "preview";
 
   try {
-    const result = await run(mode);
+    const result = await run(mode, body?.includeAcquisition === true);
     return NextResponse.json(result, {
       headers: { "Cache-Control": "no-store" },
     });

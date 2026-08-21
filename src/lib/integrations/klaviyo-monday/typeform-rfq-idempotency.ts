@@ -29,12 +29,13 @@ async function klaviyo<T>(path: string, init?: RequestInit): Promise<T> {
   return (await response.json()) as T;
 }
 
-export async function readProcessedTypeformRfq(profileId: string) {
-  const payload = await klaviyo<{
-    data: { attributes?: { properties?: Record<string, unknown> } };
-  }>(`/api/profiles/${encodeURIComponent(profileId)}`);
-  const properties = payload.data.attributes?.properties || {};
+function processingState(profile: {
+  id: string;
+  attributes?: { properties?: Record<string, unknown> };
+}) {
+  const properties = profile.attributes?.properties || {};
   return {
+    profileId: String(profile.id),
     responseId:
       typeof properties[RESPONSE_PROPERTY] === "string"
         ? String(properties[RESPONSE_PROPERTY])
@@ -44,6 +45,27 @@ export async function readProcessedTypeformRfq(profileId: string) {
         ? String(properties[LEAD_PROPERTY])
         : null,
   };
+}
+
+export async function findProcessedTypeformRfqByEmail(email: string) {
+  const params = new URLSearchParams({
+    filter: `equals(email,"${email.replaceAll('"', '\\"')}")`,
+  });
+  const payload = await klaviyo<{
+    data: Array<{ id: string; attributes?: { properties?: Record<string, unknown> } }>;
+  }>(`/api/profiles?${params.toString()}`);
+  if (payload.data.length === 0) return null;
+  if (payload.data.length > 1) {
+    throw new Error(`Multiple Klaviyo profiles found for ${email}; refusing RFQ idempotency check.`);
+  }
+  return processingState(payload.data[0]);
+}
+
+export async function readProcessedTypeformRfq(profileId: string) {
+  const payload = await klaviyo<{
+    data: { id: string; attributes?: { properties?: Record<string, unknown> } };
+  }>(`/api/profiles/${encodeURIComponent(profileId)}`);
+  return processingState(payload.data);
 }
 
 export async function stampProcessedTypeformRfq(params: {

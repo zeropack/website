@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
 
-import { processTypeformRfqIntake, verifyTypeformSignature } from "@/lib/integrations/klaviyo-monday/rfq-intake";
+import {
+  parseTypeformSignal,
+  processTypeformRfqIntake,
+  verifyTypeformSignature,
+} from "@/lib/integrations/klaviyo-monday/rfq-intake";
+import {
+  readProcessedTypeformRfq,
+  stampProcessedTypeformRfq,
+} from "@/lib/integrations/klaviyo-monday/typeform-rfq-idempotency";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -24,7 +32,20 @@ export async function POST(req: Request) {
 
   const body = JSON.parse(rawBody || "null") as unknown;
   try {
+    const signal = parseTypeformSignal(body);
     const result = await processTypeformRfqIntake(body, "apply");
+
+    if (signal.responseId && result.profileId) {
+      const processed = await readProcessedTypeformRfq(result.profileId);
+      if (processed.responseId !== signal.responseId) {
+        await stampProcessedTypeformRfq({
+          profileId: result.profileId,
+          responseId: signal.responseId,
+          leadId: result.leadId || processed.leadId,
+        });
+      }
+    }
+
     return NextResponse.json(result, {
       status: 200,
       headers: { "Cache-Control": "no-store" },
@@ -51,5 +72,6 @@ export async function GET(req: Request) {
     formId: "m0adYoQw",
     mode: "signed-webhook",
     lifecycle: "RFQ Requested derived from route; rfq_requested variable not used",
+    idempotency: "Typeform response token + conservative duplicate fallback",
   });
 }

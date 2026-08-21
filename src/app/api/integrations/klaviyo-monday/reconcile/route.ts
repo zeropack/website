@@ -6,6 +6,7 @@ import {
 import { reconcileKlaviyoMondayWithAcquisition } from "@/lib/integrations/klaviyo-monday/reconcile-with-acquisition";
 
 const PRODUCTION_LIFECYCLE_CUTOVER_AT = "2026-08-20T08:35:00.000Z";
+const PRODUCTION_PROFILE_SYNC_CUTOVER_AT = "2026-08-21T08:26:00.000Z";
 
 function lifecycleLookbackHours(): number {
   const configured = Number(process.env.MONDAY_LIFECYCLE_LOOKBACK_HOURS || "72");
@@ -28,7 +29,15 @@ function acquisitionRuntimeEnabled(): boolean {
 
 function profileSyncCutoverAt(): string | null {
   const configured = process.env.MONDAY_PROFILE_SYNC_CUTOVER_AT?.trim();
-  return configured || null;
+  if (configured) return configured;
+
+  // Outbound Monday -> Klaviyo profile sync completed its separate production
+  // commissioning on 21 August 2026. The hard production cutover prevents the
+  // historical Contacts board from being imported while allowing all newly
+  // created Contacts and Contacts attached to fresh AI-Agent Leads to converge.
+  return process.env.VERCEL_ENV === "production"
+    ? PRODUCTION_PROFILE_SYNC_CUTOVER_AT
+    : null;
 }
 
 async function run(mode: ReconcileMode, includeAcquisition = false) {
@@ -38,15 +47,16 @@ async function run(mode: ReconcileMode, includeAcquisition = false) {
     lifecycleCutoverAt: lifecycleCutoverAt(),
   };
 
-  const broaderAcquisitionEnabled = acquisitionRuntimeEnabled() || includeAcquisition;
+  const standardInboundEnabled =
+    acquisitionRuntimeEnabled() || includeAcquisition;
 
-  // Typeform RFQ recovery has completed its independent production commissioning
-  // and now runs on every reconciliation. Broader profile-based acquisition and
-  // outbound CRM profile sync remain separately gated until commissioned.
+  // Typeform RFQ and governed outbound CRM profile recovery have completed
+  // independent commissioning and run on every production reconciliation.
+  // The broader profile-based inbound acquisition path remains separately gated.
   return reconcileKlaviyoMondayWithAcquisition({
     ...common,
-    standardInboundEnabled: broaderAcquisitionEnabled,
-    profileSyncCutoverAt: broaderAcquisitionEnabled ? profileSyncCutoverAt() : null,
+    standardInboundEnabled,
+    profileSyncCutoverAt: profileSyncCutoverAt(),
   });
 }
 
@@ -93,8 +103,9 @@ type ReconcileRequest = {
 };
 
 // Controlled manual execution. Preview is the default and never writes.
-// includeAcquisition=true additionally enables the still-gated broader
-// acquisition/profile-sync paths for explicit commissioning runs.
+// includeAcquisition=true additionally enables only the still-gated standard
+// inbound profile path; Typeform RFQ and outbound CRM profile recovery use their
+// independent commissioned cutovers.
 export async function POST(req: Request) {
   if (!internalAuthorized(req)) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });

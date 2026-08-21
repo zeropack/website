@@ -72,11 +72,16 @@ export async function stampProcessedTypeformRfq(params: {
   profileId: string;
   responseId: string;
   leadId?: string | null;
+  contactId?: string | null;
 }) {
   const properties: Record<string, string> = {
     [RESPONSE_PROPERTY]: params.responseId,
+    "Acquisition Source": "Typeform",
+    "Lead Source": "Website",
+    "CRM Status": "RFQ Requested",
   };
   if (params.leadId) properties[LEAD_PROPERTY] = params.leadId;
+  if (params.contactId) properties["Monday Contact ID"] = params.contactId;
 
   await klaviyo(`/api/profiles/${encodeURIComponent(params.profileId)}`, {
     method: "PATCH",

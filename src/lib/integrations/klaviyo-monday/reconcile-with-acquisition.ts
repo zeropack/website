@@ -15,6 +15,7 @@ export type { ReconcileMode } from "./reconcile";
 export type ReconcileWithAcquisitionOptions = ReconcileOptions & {
   profileSyncCutoverAt?: string | null;
   typeformRfqCutoverAt?: string | null;
+  standardInboundEnabled?: boolean;
 };
 
 export async function reconcileKlaviyoMondayWithAcquisition(
@@ -22,25 +23,27 @@ export async function reconcileKlaviyoMondayWithAcquisition(
 ) {
   const mode: ReconcileMode = options.mode === "apply" ? "apply" : "preview";
 
-  // Typeform is RFQ-only. The native Typeform -> Klaviyo integration emits a
-  // distinct Filled Out Form event for every completed RFQ. Recover that event
-  // before the core lifecycle stage so the same execution can move the Monday
-  // Contact to RFQ Requested and then reflect that canonical lifecycle to Klaviyo.
+  // Typeform is RFQ-only and has completed its separate production commissioning.
+  // It is therefore safe to run independently of the broader acquisition/profile
+  // sync gate. Every completed RFQ is recovered from Klaviyo's native Filled Out
+  // Form event before the core lifecycle stage.
   const typeformRfq = await recoverTypeformRfqEventsV2(mode, {
     lookbackHours: 168,
     cutoverAt:
       options.typeformRfqCutoverAt || TYPEFORM_RFQ_PRODUCTION_CUTOVER_AT,
   });
 
-  // Preserve the commissioned consent/suppression/lifecycle reconciler as the
-  // canonical state reconciliation stage. It remains the only owner of the
-  // Monday commercial lifecycle -> Klaviyo lifecycle property/event write.
+  // The commissioned consent/suppression/lifecycle reconciler remains the
+  // canonical state reconciliation stage and the sole owner of the Monday
+  // commercial lifecycle -> Klaviyo lifecycle property/event write.
   const core = await reconcileKlaviyoMonday(options);
 
-  // Standard Klaviyo acquisition sources remain profile-based and are routed
-  // through the existing Contact Us intake path. Typeform is deliberately not
-  // included here; its RFQ path is event-specific above.
-  const inbound = await recoverStandardInboundProfiles(mode);
+  // Standard acquisition sources remain separately gated until their own
+  // commissioning is complete. Typeform never enters this profile-based path.
+  const standardInboundEnabled = options.standardInboundEnabled !== false;
+  const inbound = standardInboundEnabled
+    ? await recoverStandardInboundProfiles(mode)
+    : null;
 
   let outbound: Awaited<ReturnType<typeof recoverRecentOutboundProfiles>> | null = null;
   if (options.profileSyncCutoverAt) {
@@ -55,6 +58,7 @@ export async function reconcileKlaviyoMondayWithAcquisition(
     acquisitionRecovery: {
       typeformRfq,
       inbound,
+      standardInboundEnabled,
       outbound,
       outboundEnabled: Boolean(options.profileSyncCutoverAt),
     },

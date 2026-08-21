@@ -175,7 +175,7 @@ async function contactMatches(email: string) {
 
 async function createContactUs(profile: Profile, source: StandardInboundSource) {
   const values: Record<string, unknown> = {
-    [CONTACT_US.email]: profile.email,
+    [CONTACT_US.email]: { email: profile.email, text: profile.email },
     [CONTACT_US.subscribed]: { label: "Subscribed" },
     [CONTACT_US.comments]:
       `Klaviyo inbound intake | Profile ID: ${profile.id} | Source: ${source}`,

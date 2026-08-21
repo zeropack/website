@@ -23,18 +23,9 @@ function lifecycleCutoverAt(): string | null {
     : null;
 }
 
-function acquisitionRuntimeEnabled(): boolean {
-  return process.env.KLAVIYO_ACQUISITION_RUNTIME_ENABLED === "true";
-}
-
 function profileSyncCutoverAt(): string | null {
   const configured = process.env.MONDAY_PROFILE_SYNC_CUTOVER_AT?.trim();
   if (configured) return configured;
-
-  // Outbound Monday -> Klaviyo profile sync completed its separate production
-  // commissioning on 21 August 2026. The hard production cutover prevents the
-  // historical Contacts board from being imported while allowing all newly
-  // created Contacts and Contacts attached to fresh AI-Agent Leads to converge.
   return process.env.VERCEL_ENV === "production"
     ? PRODUCTION_PROFILE_SYNC_CUTOVER_AT
     : null;
@@ -47,12 +38,12 @@ async function run(mode: ReconcileMode, includeAcquisition = false) {
     lifecycleCutoverAt: lifecycleCutoverAt(),
   };
 
+  // Standard inbound completed its no-replay preview commissioning on
+  // 21 August 2026 and is enabled for production. Preview/manual runs can opt in
+  // explicitly. Its runtime owns its own hard cutover and approved-source checks.
   const standardInboundEnabled =
-    acquisitionRuntimeEnabled() || includeAcquisition;
+    process.env.VERCEL_ENV === "production" || includeAcquisition;
 
-  // Typeform RFQ and governed outbound CRM profile recovery have completed
-  // independent commissioning and run on every production reconciliation.
-  // The broader profile-based inbound acquisition path remains separately gated.
   return reconcileKlaviyoMondayWithAcquisition({
     ...common,
     standardInboundEnabled,
@@ -70,12 +61,10 @@ function cronAuthorized(req: Request): boolean {
   return Boolean(secret && req.headers.get("authorization") === `Bearer ${secret}`);
 }
 
-// Production-only scheduled entry point.
 export async function GET(req: Request) {
   if (process.env.VERCEL_ENV !== "production") {
     return NextResponse.json({ ok: false }, { status: 404 });
   }
-
   if (!cronAuthorized(req)) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
@@ -102,10 +91,6 @@ type ReconcileRequest = {
   includeAcquisition?: boolean;
 };
 
-// Controlled manual execution. Preview is the default and never writes.
-// includeAcquisition=true additionally enables only the still-gated standard
-// inbound profile path; Typeform RFQ and outbound CRM profile recovery use their
-// independent commissioned cutovers.
 export async function POST(req: Request) {
   if (!internalAuthorized(req)) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });

@@ -4,11 +4,11 @@ import {
   type ReconcileOptions,
 } from "./reconcile";
 import { recoverRecentOutboundProfiles } from "./acquisition-runtime";
+import { recoverStandardInboundProfiles } from "./inbound-recovery";
 import {
-  recoverStandardInboundProfiles,
-  recoverTypeformRfqEvents,
+  recoverTypeformRfqEventsV2,
   TYPEFORM_RFQ_PRODUCTION_CUTOVER_AT,
-} from "./inbound-recovery";
+} from "./typeform-event-rfq";
 
 export type { ReconcileMode } from "./reconcile";
 
@@ -22,14 +22,14 @@ export async function reconcileKlaviyoMondayWithAcquisition(
 ) {
   const mode: ReconcileMode = options.mode === "apply" ? "apply" : "preview";
 
-  // Typeform is RFQ-only. Recover the Klaviyo Filled Out Form event first so
-  // the canonical Monday Contact can move to RFQ Requested before the already
-  // commissioned lifecycle reconciler runs. That lets the same execution push
-  // Lifecycle Stage / RFQ Requested back to Klaviyo without Typeform owning
-  // commercial lifecycle or marketing consent.
-  const typeformRfq = await recoverTypeformRfqEvents(mode, {
+  // Typeform is RFQ-only. The native Typeform -> Klaviyo integration emits a
+  // distinct Filled Out Form event for every completed RFQ. Recover that event
+  // before the core lifecycle stage so the same execution can move the Monday
+  // Contact to RFQ Requested and then reflect that canonical lifecycle to Klaviyo.
+  const typeformRfq = await recoverTypeformRfqEventsV2(mode, {
     lookbackHours: 168,
-    cutoverAt: options.typeformRfqCutoverAt || TYPEFORM_RFQ_PRODUCTION_CUTOVER_AT,
+    cutoverAt:
+      options.typeformRfqCutoverAt || TYPEFORM_RFQ_PRODUCTION_CUTOVER_AT,
   });
 
   // Preserve the commissioned consent/suppression/lifecycle reconciler as the
@@ -39,7 +39,7 @@ export async function reconcileKlaviyoMondayWithAcquisition(
 
   // Standard Klaviyo acquisition sources remain profile-based and are routed
   // through the existing Contact Us intake path. Typeform is deliberately not
-  // included here; it is handled only by the event-specific RFQ recovery above.
+  // included here; its RFQ path is event-specific above.
   const inbound = await recoverStandardInboundProfiles(mode);
 
   let outbound: Awaited<ReturnType<typeof recoverRecentOutboundProfiles>> | null = null;

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BrandLogo } from "./BrandLogo";
+import { KlaviyoEmbed } from "./KlaviyoEmbed";
 import { TREND_PACKAGING_FUNNEL_HREF } from "@/lib/site";
 
 const groups = [
@@ -34,6 +35,7 @@ export function Footer() {
           <p className="mt-3 text-sm text-white/80">
             Custom compostable packaging, made for brands that care what they send out.
           </p>
+          <KlaviyoEmbed formId="Rw5KwJ" className="mt-6" />
         </div>
         {groups.map((g) => (
           <div key={g.title}>

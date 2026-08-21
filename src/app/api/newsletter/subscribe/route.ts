@@ -37,6 +37,41 @@ function validEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+async function findProfileId(email: string): Promise<string | null> {
+  const params = new URLSearchParams({
+    filter: `equals(email,"${email.replaceAll('"', '\\"')}")`,
+  });
+  const result = await klaviyo<{ data: Array<{ id: string }> }>(
+    `/api/profiles?${params.toString()}`,
+  );
+  if (result.data.length > 1) {
+    throw new Error(`Multiple Klaviyo profiles found for ${email}.`);
+  }
+  return result.data[0]?.id || null;
+}
+
+async function createNewsletterProfile(email: string): Promise<string> {
+  const imported = await klaviyo<{ data: { id: string } }>(
+    "/api/profile-import?additional-fields[profile]=subscriptions",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        data: {
+          type: "profile",
+          attributes: {
+            email,
+            properties: {
+              "Acquisition Source": ACQUISITION_SOURCE,
+              "Welcome Status": "No",
+            },
+          },
+        },
+      }),
+    },
+  );
+  return imported.data.id;
+}
+
 export async function POST(req: Request) {
   const body = (await req.json().catch(() => null)) as
     | { email?: string; website?: string }
@@ -57,24 +92,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const imported = await klaviyo<{ data: { id: string } }>(
-      "/api/profile-import?additional-fields[profile]=subscriptions",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          data: {
-            type: "profile",
-            attributes: {
-              email,
-              properties: {
-                "Acquisition Source": ACQUISITION_SOURCE,
-                "Welcome Status": "No",
-              },
-            },
-          },
-        }),
-      },
-    );
+    const profileId = (await findProfileId(email)) || (await createNewsletterProfile(email));
 
     await klaviyo<void>("/api/profile-subscription-bulk-create-jobs", {
       method: "POST",
@@ -87,7 +105,7 @@ export async function POST(req: Request) {
               data: [
                 {
                   type: "profile",
-                  id: imported.data.id,
+                  id: profileId,
                   attributes: {
                     email,
                     subscriptions: {

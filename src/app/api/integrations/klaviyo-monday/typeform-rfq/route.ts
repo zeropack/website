@@ -73,7 +73,9 @@ export async function POST(req: Request) {
   } catch (error) {
     const message = error instanceof Error ? error.message : "Typeform RFQ intake failed.";
     console.error("[typeform-rfq intake]", error);
-    const retryable = message.includes("not available yet");
+    const retryable =
+      message.includes("not available yet") ||
+      message.includes("not currently marketable");
     return NextResponse.json(
       { ok: false, error: message, retryable },
       { status: retryable ? 503 : 422, headers: { "Cache-Control": "no-store" } },

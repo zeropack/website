@@ -10,10 +10,11 @@ export function NewsletterSignup() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
     setState("submitting");
     setMessage("");
 
-    const form = new FormData(event.currentTarget);
+    const form = new FormData(formElement);
     const email = String(form.get("email") || "").trim();
     const website = String(form.get("website") || "").trim();
 
@@ -31,7 +32,7 @@ export function NewsletterSignup() {
         throw new Error(payload?.error || "Unable to subscribe right now.");
       }
 
-      event.currentTarget.reset();
+      formElement.reset();
       setState("success");
       setMessage("You’re subscribed. Welcome to the Zero Pack newsletter.");
     } catch (error) {

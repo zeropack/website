@@ -4,6 +4,7 @@ import { KLAVIYO_API_REVISION } from "@/lib/integrations/klaviyo-monday/config";
 
 const NEWSLETTER_LIST_ID = "VaVKfk";
 const ACQUISITION_SOURCE = "Newsletter";
+const SUBSCRIPTION_SOURCE = "Zero Pack website footer newsletter";
 
 function requiredEnv(name: string): string {
   const value = process.env[name];
@@ -72,6 +73,44 @@ async function createNewsletterProfile(email: string): Promise<string> {
   return imported.data.id;
 }
 
+async function subscriptionConfirmed(profileId: string): Promise<boolean> {
+  const profile = await klaviyo<{
+    data: {
+      attributes?: {
+        subscriptions?: {
+          email?: {
+            marketing?: {
+              consent?: string | null;
+              can_receive_email_marketing?: boolean;
+            };
+          };
+        };
+      };
+    };
+  }>(`/api/profiles/${encodeURIComponent(profileId)}?additional-fields[profile]=subscriptions`);
+
+  const marketing = profile.data.attributes?.subscriptions?.email?.marketing;
+  if (
+    marketing?.consent !== "SUBSCRIBED" ||
+    marketing.can_receive_email_marketing !== true
+  ) {
+    return false;
+  }
+
+  const lists = await klaviyo<{ data: Array<{ id: string }> }>(
+    `/api/profiles/${encodeURIComponent(profileId)}/lists/`,
+  );
+  return lists.data.some((list) => list.id === NEWSLETTER_LIST_ID);
+}
+
+async function waitForSubscription(profileId: string): Promise<boolean> {
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    if (await subscriptionConfirmed(profileId)) return true;
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+  return false;
+}
+
 export async function POST(req: Request) {
   const body = (await req.json().catch(() => null)) as
     | { email?: string; website?: string }
@@ -92,20 +131,20 @@ export async function POST(req: Request) {
   }
 
   try {
-    const profileId = (await findProfileId(email)) || (await createNewsletterProfile(email));
+    const profileId =
+      (await findProfileId(email)) || (await createNewsletterProfile(email));
 
-    await klaviyo<void>("/api/profile-subscription-bulk-create-jobs", {
+    await klaviyo<void>("/api/profile-subscription-bulk-create-jobs/", {
       method: "POST",
       body: JSON.stringify({
         data: {
           type: "profile-subscription-bulk-create-job",
           attributes: {
-            custom_source: "Zero Pack website footer newsletter",
+            custom_source: SUBSCRIPTION_SOURCE,
             profiles: {
               data: [
                 {
                   type: "profile",
-                  id: profileId,
                   attributes: {
                     email,
                     subscriptions: {
@@ -131,6 +170,12 @@ export async function POST(req: Request) {
         },
       }),
     });
+
+    if (!(await waitForSubscription(profileId))) {
+      throw new Error(
+        `Klaviyo did not confirm subscribed status and Newsletter list membership for ${profileId}.`,
+      );
+    }
 
     return NextResponse.json({ ok: true });
   } catch (error) {

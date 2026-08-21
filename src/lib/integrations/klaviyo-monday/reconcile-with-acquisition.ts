@@ -3,8 +3,8 @@ import {
   type ReconcileMode,
   type ReconcileOptions,
 } from "./reconcile";
-import { recoverRecentOutboundProfiles } from "./acquisition-runtime";
 import { recoverStandardInboundProfiles } from "./inbound-recovery";
+import { recoverGovernedOutboundProfiles } from "./outbound-recovery";
 import {
   recoverTypeformRfqEventsV2,
   TYPEFORM_RFQ_PRODUCTION_CUTOVER_AT,
@@ -33,6 +33,19 @@ export async function reconcileKlaviyoMondayWithAcquisition(
       options.typeformRfqCutoverAt || TYPEFORM_RFQ_PRODUCTION_CUTOVER_AT,
   });
 
+  // Newly created CRM contacts and contacts linked to fresh AI-Agent Leads are
+  // upserted before the core reconciliation. This means a new Klaviyo profile is
+  // available to the same execution for mirror/profile-ID reconciliation rather
+  // than waiting for the following hourly run. Profile upsert never changes
+  // marketing consent or suppression.
+  let outbound: Awaited<ReturnType<typeof recoverGovernedOutboundProfiles>> | null = null;
+  if (options.profileSyncCutoverAt) {
+    outbound = await recoverGovernedOutboundProfiles(mode, {
+      cutoverAt: options.profileSyncCutoverAt,
+      lookbackHours: options.lifecycleLookbackHours ?? 72,
+    });
+  }
+
   // The commissioned consent/suppression/lifecycle reconciler remains the
   // canonical state reconciliation stage and the sole owner of the Monday
   // commercial lifecycle -> Klaviyo lifecycle property/event write.
@@ -44,14 +57,6 @@ export async function reconcileKlaviyoMondayWithAcquisition(
   const inbound = standardInboundEnabled
     ? await recoverStandardInboundProfiles(mode)
     : null;
-
-  let outbound: Awaited<ReturnType<typeof recoverRecentOutboundProfiles>> | null = null;
-  if (options.profileSyncCutoverAt) {
-    outbound = await recoverRecentOutboundProfiles(mode, {
-      cutoverAt: options.profileSyncCutoverAt,
-      lookbackHours: options.lifecycleLookbackHours ?? 72,
-    });
-  }
 
   return {
     ...core,

@@ -25,16 +25,23 @@ export function NewsletterSignup() {
         body: JSON.stringify({ email, website }),
       });
       const payload = (await response.json().catch(() => null)) as
-        | { ok?: boolean; error?: string }
+        | { ok?: boolean; pending?: boolean; error?: string }
         | null;
 
-      if (!response.ok || !payload?.ok) {
+      if (!response.ok && response.status !== 202) {
+        throw new Error(payload?.error || "Unable to subscribe right now.");
+      }
+      if (!payload?.ok) {
         throw new Error(payload?.error || "Unable to subscribe right now.");
       }
 
       formElement.reset();
       setState("success");
-      setMessage("You’re subscribed. Welcome to the Zero Pack newsletter.");
+      setMessage(
+        payload.pending
+          ? "Thanks — your subscription is being processed."
+          : "You’re subscribed. Welcome to the Zero Pack newsletter.",
+      );
     } catch (error) {
       setState("error");
       setMessage(

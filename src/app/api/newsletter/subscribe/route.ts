@@ -51,19 +51,27 @@ async function findProfileId(email: string): Promise<string | null> {
   return result.data[0]?.id || null;
 }
 
-async function waitForProfileId(email: string): Promise<string | null> {
-  for (let attempt = 0; attempt < 4; attempt += 1) {
-    const profileId = await findProfileId(email);
-    if (profileId) return profileId;
-    await new Promise((resolve) => setTimeout(resolve, 500));
-  }
-  return null;
+async function createNewsletterProfile(email: string): Promise<string> {
+  const result = await klaviyo<{ data: { id: string } }>("/api/profile-import", {
+    method: "POST",
+    body: JSON.stringify({
+      data: {
+        type: "profile",
+        attributes: {
+          email,
+          properties: {
+            "Acquisition Source": ACQUISITION_SOURCE,
+            "Welcome Status": "No",
+          },
+        },
+      },
+    }),
+  });
+
+  return result.data.id;
 }
 
-async function subscribeEmail(
-  email: string,
-  includeNewProfileProperties: boolean,
-): Promise<void> {
+async function subscribeEmail(profileId: string, email: string): Promise<void> {
   await klaviyo<void>("/api/profile-subscription-bulk-create-jobs/", {
     method: "POST",
     body: JSON.stringify({
@@ -75,16 +83,9 @@ async function subscribeEmail(
             data: [
               {
                 type: "profile",
+                id: profileId,
                 attributes: {
                   email,
-                  ...(includeNewProfileProperties
-                    ? {
-                        properties: {
-                          "Acquisition Source": ACQUISITION_SOURCE,
-                          "Welcome Status": "No",
-                        },
-                      }
-                    : {}),
                   subscriptions: {
                     email: {
                       marketing: {
@@ -170,18 +171,15 @@ export async function POST(req: Request) {
   try {
     const existingProfileId = await findProfileId(email);
 
-    // Klaviyo's server-side subscribe endpoint returns 202 and processes the job
-    // asynchronously. For new profiles, carry acquisition properties in that same
-    // job so they cannot be lost when profile creation is delayed in Klaviyo's queue.
-    await subscribeEmail(email, !existingProfileId);
+    // Create a brand-new profile synchronously so its acquisition provenance is
+    // durable before the asynchronous subscription job is accepted. Existing
+    // profiles are never overwritten, preserving their original provenance.
+    const profileId = existingProfileId || (await createNewsletterProfile(email));
 
-    const profileId = existingProfileId || (await waitForProfileId(email));
-    if (!profileId) {
-      return NextResponse.json(
-        { ok: true, pending: true },
-        { status: 202 },
-      );
-    }
+    // Subscribe the known Klaviyo profile by ID. This job is asynchronous: a 202
+    // means Klaviyo accepted it for processing, not that read-after-write state is
+    // already visible.
+    await subscribeEmail(profileId, email);
 
     if (!(await waitForConsent(profileId))) {
       return NextResponse.json(

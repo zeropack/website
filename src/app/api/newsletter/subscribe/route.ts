@@ -52,7 +52,7 @@ async function findProfileId(email: string): Promise<string | null> {
 }
 
 async function waitForProfileId(email: string): Promise<string | null> {
-  for (let attempt = 0; attempt < 20; attempt += 1) {
+  for (let attempt = 0; attempt < 4; attempt += 1) {
     const profileId = await findProfileId(email);
     if (profileId) return profileId;
     await new Promise((resolve) => setTimeout(resolve, 500));
@@ -60,25 +60,10 @@ async function waitForProfileId(email: string): Promise<string | null> {
   return null;
 }
 
-async function setNewProfileProperties(profileId: string): Promise<void> {
-  await klaviyo<void>(`/api/profiles/${encodeURIComponent(profileId)}/`, {
-    method: "PATCH",
-    body: JSON.stringify({
-      data: {
-        type: "profile",
-        id: profileId,
-        attributes: {
-          properties: {
-            "Acquisition Source": ACQUISITION_SOURCE,
-            "Welcome Status": "No",
-          },
-        },
-      },
-    }),
-  });
-}
-
-async function subscribeEmail(email: string): Promise<void> {
+async function subscribeEmail(
+  email: string,
+  includeNewProfileProperties: boolean,
+): Promise<void> {
   await klaviyo<void>("/api/profile-subscription-bulk-create-jobs/", {
     method: "POST",
     body: JSON.stringify({
@@ -92,6 +77,14 @@ async function subscribeEmail(email: string): Promise<void> {
                 type: "profile",
                 attributes: {
                   email,
+                  ...(includeNewProfileProperties
+                    ? {
+                        properties: {
+                          "Acquisition Source": ACQUISITION_SOURCE,
+                          "Welcome Status": "No",
+                        },
+                      }
+                    : {}),
                   subscriptions: {
                     email: {
                       marketing: {
@@ -117,7 +110,7 @@ async function subscribeEmail(email: string): Promise<void> {
   });
 }
 
-async function subscriptionConfirmed(profileId: string): Promise<boolean> {
+async function consentConfirmed(profileId: string): Promise<boolean> {
   const profile = await klaviyo<{
     data: {
       attributes?: {
@@ -134,22 +127,22 @@ async function subscriptionConfirmed(profileId: string): Promise<boolean> {
   }>(`/api/profiles/${encodeURIComponent(profileId)}?additional-fields[profile]=subscriptions`);
 
   const marketing = profile.data.attributes?.subscriptions?.email?.marketing;
-  if (
-    marketing?.consent !== "SUBSCRIBED" ||
-    marketing.can_receive_email_marketing !== true
-  ) {
-    return false;
-  }
+  return (
+    marketing?.consent === "SUBSCRIBED" &&
+    marketing.can_receive_email_marketing === true
+  );
+}
 
+async function newsletterListConfirmed(profileId: string): Promise<boolean> {
   const lists = await klaviyo<{ data: Array<{ id: string }> }>(
     `/api/profiles/${encodeURIComponent(profileId)}/lists/`,
   );
   return lists.data.some((list) => list.id === NEWSLETTER_LIST_ID);
 }
 
-async function waitForSubscription(profileId: string): Promise<boolean> {
-  for (let attempt = 0; attempt < 30; attempt += 1) {
-    if (await subscriptionConfirmed(profileId)) return true;
+async function waitForConsent(profileId: string): Promise<boolean> {
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    if (await consentConfirmed(profileId)) return true;
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
   return false;
@@ -164,7 +157,7 @@ export async function POST(req: Request) {
   const honeypot = body?.website?.trim() || "";
 
   if (honeypot) {
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, pending: false });
   }
 
   if (!validEmail(email)) {
@@ -177,27 +170,36 @@ export async function POST(req: Request) {
   try {
     const existingProfileId = await findProfileId(email);
 
-    // Let Klaviyo's subscribe endpoint create new profiles and consent them in the
-    // same operation. This avoids a race between a separate profile create call and
-    // the asynchronous subscription job for brand-new addresses.
-    await subscribeEmail(email);
+    // Klaviyo's server-side subscribe endpoint returns 202 and processes the job
+    // asynchronously. For new profiles, carry acquisition properties in that same
+    // job so they cannot be lost when profile creation is delayed in Klaviyo's queue.
+    await subscribeEmail(email, !existingProfileId);
 
     const profileId = existingProfileId || (await waitForProfileId(email));
     if (!profileId) {
-      throw new Error(`Klaviyo did not create a profile for ${email}.`);
-    }
-
-    if (!existingProfileId) {
-      await setNewProfileProperties(profileId);
-    }
-
-    if (!(await waitForSubscription(profileId))) {
-      throw new Error(
-        `Klaviyo did not confirm subscribed status and Newsletter list membership for ${profileId}.`,
+      return NextResponse.json(
+        { ok: true, pending: true },
+        { status: 202 },
       );
     }
 
-    return NextResponse.json({ ok: true });
+    if (!(await waitForConsent(profileId))) {
+      return NextResponse.json(
+        { ok: true, pending: true },
+        { status: 202 },
+      );
+    }
+
+    // The list relationship is submitted in the same accepted Klaviyo job. It can
+    // become readable after consent does, so delayed list visibility is observability
+    // only and must not turn a valid accepted/subscribed request into a false error.
+    if (!(await newsletterListConfirmed(profileId))) {
+      console.warn(
+        `[newsletter subscribe] Consent confirmed before Newsletter list membership became readable for ${profileId}.`,
+      );
+    }
+
+    return NextResponse.json({ ok: true, pending: false });
   } catch (error) {
     console.error("[newsletter subscribe]", error);
     return NextResponse.json(

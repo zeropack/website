@@ -52,7 +52,7 @@ async function findProfileId(email: string): Promise<string | null> {
 }
 
 async function waitForProfileId(email: string): Promise<string | null> {
-  for (let attempt = 0; attempt < 20; attempt += 1) {
+  for (let attempt = 0; attempt < 4; attempt += 1) {
     const profileId = await findProfileId(email);
     if (profileId) return profileId;
     await new Promise((resolve) => setTimeout(resolve, 500));
@@ -141,7 +141,7 @@ async function newsletterListConfirmed(profileId: string): Promise<boolean> {
 }
 
 async function waitForConsent(profileId: string): Promise<boolean> {
-  for (let attempt = 0; attempt < 30; attempt += 1) {
+  for (let attempt = 0; attempt < 4; attempt += 1) {
     if (await consentConfirmed(profileId)) return true;
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
@@ -157,7 +157,7 @@ export async function POST(req: Request) {
   const honeypot = body?.website?.trim() || "";
 
   if (honeypot) {
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, pending: false });
   }
 
   if (!validEmail(email)) {
@@ -170,33 +170,36 @@ export async function POST(req: Request) {
   try {
     const existingProfileId = await findProfileId(email);
 
-    // Klaviyo's server-side subscribe endpoint is asynchronous. For brand-new
-    // addresses, include acquisition properties in the same job that creates and
-    // subscribes the profile so there is no separate profile-write race.
+    // Klaviyo's server-side subscribe endpoint returns 202 and processes the job
+    // asynchronously. For new profiles, carry acquisition properties in that same
+    // job so they cannot be lost when profile creation is delayed in Klaviyo's queue.
     await subscribeEmail(email, !existingProfileId);
 
     const profileId = existingProfileId || (await waitForProfileId(email));
     if (!profileId) {
-      throw new Error(`Klaviyo did not create a profile for ${email}.`);
-    }
-
-    // Consent is the customer-facing success gate. The list relationship is part of
-    // the same accepted subscription job but can become visible slightly later, so
-    // delayed list read-after-write consistency must not create a false 502 after
-    // Klaviyo has already recorded affirmative marketing consent.
-    if (!(await waitForConsent(profileId))) {
-      throw new Error(
-        `Klaviyo did not confirm subscribed consent for ${profileId}.`,
+      return NextResponse.json(
+        { ok: true, pending: true },
+        { status: 202 },
       );
     }
 
+    if (!(await waitForConsent(profileId))) {
+      return NextResponse.json(
+        { ok: true, pending: true },
+        { status: 202 },
+      );
+    }
+
+    // The list relationship is submitted in the same accepted Klaviyo job. It can
+    // become readable after consent does, so delayed list visibility is observability
+    // only and must not turn a valid accepted/subscribed request into a false error.
     if (!(await newsletterListConfirmed(profileId))) {
       console.warn(
         `[newsletter subscribe] Consent confirmed before Newsletter list membership became readable for ${profileId}.`,
       );
     }
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, pending: false });
   } catch (error) {
     console.error("[newsletter subscribe]", error);
     return NextResponse.json(

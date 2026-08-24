@@ -292,24 +292,15 @@ export async function reconcileKlaviyoMonday(
       if (exited) result.welcomeProfilesExited += 1;
     }
 
-    // The Klaviyo lifecycle property is also the durable processed-state marker for the latest
-    // real Monday transition. If it already matches, reconciliation is a true no-op: do not
-    // re-submit the same deterministic event request on every poll.
-    if (profile.lifecycleStage === transition.stage) continue;
-
-    result.lifecycleProfilesWouldUpdate += 1;
+    // Submit the deterministic lifecycle event before using the profile property as a durable
+    // stage marker. Re-submitting the same transition is safe because createLifecycleEvent uses
+    // a unique_id derived from the Monday contact, stage and occurrence. This also self-heals
+    // the former failure mode where the property was written but the triggering event was lost.
+    const stageNeedsUpdate = profile.lifecycleStage !== transition.stage;
+    if (stageNeedsUpdate) result.lifecycleProfilesWouldUpdate += 1;
     result.lifecycleEventsWouldSubmit += 1;
-    if (mode === "apply") {
-      await setKlaviyoLifecycleStage(
-        profile.id,
-        transition.stage,
-        contact.id,
-        profile.acquisitionSource,
-      );
-      profile.lifecycleStage = transition.stage;
-      profile.mondayContactId = contact.id;
-      result.lifecycleProfilesUpdated += 1;
 
+    if (mode === "apply") {
       await createLifecycleEvent({
         profileId: profile.id,
         stage: transition.stage,
@@ -319,6 +310,18 @@ export async function reconcileKlaviyoMonday(
         occurrenceId: transition.occurrenceId,
       });
       result.lifecycleEventsSubmitted += 1;
+
+      if (stageNeedsUpdate) {
+        await setKlaviyoLifecycleStage(
+          profile.id,
+          transition.stage,
+          contact.id,
+          profile.acquisitionSource,
+        );
+        profile.lifecycleStage = transition.stage;
+        profile.mondayContactId = contact.id;
+        result.lifecycleProfilesUpdated += 1;
+      }
     }
   }
 

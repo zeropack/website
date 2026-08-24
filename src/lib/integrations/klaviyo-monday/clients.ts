@@ -448,7 +448,12 @@ export async function createLifecycleEvent(params: {
       data: {
         type: "event",
         attributes: {
-          metric: { data: { type: "metric", attributes: { name: params.stage } } },
+          metric: {
+            data: {
+              type: "metric",
+              attributes: { name: `Monday CRM — ${params.stage}` },
+            },
+          },
           profile: { data: { type: "profile", id: params.profileId } },
           properties,
           unique_id: uniqueId,

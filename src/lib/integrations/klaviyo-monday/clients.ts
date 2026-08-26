@@ -475,8 +475,16 @@ export function marketingMirrorStatus(
     return "Unsubscribed";
   }
   if (profile.suppressionReason) return "Suppressed";
-  if (profile.canReceiveMarketing) return "Subscribed";
-  if (profile.consent === "PENDING") return "Pending";
+  if (profile.consent === "SUBSCRIBED" && profile.canReceiveMarketing) {
+    return "Subscribed";
+  }
+  if (
+    profile.consent === "PENDING" ||
+    profile.consent === "NEVER_SUBSCRIBED" ||
+    profile.consent == null
+  ) {
+    return "Pending";
+  }
   return "Unknown";
 }
 
@@ -485,8 +493,8 @@ export function contactSubscriptionForProfile(
 ): "Subscribed" | "Unsubscribed" | "Pending" {
   const state = marketingMirrorStatus(profile);
   if (state === "Subscribed") return "Subscribed";
-  if (state === "Pending") return "Pending";
-  return "Unsubscribed";
+  if (state === "Unsubscribed" || state === "Suppressed") return "Unsubscribed";
+  return "Pending";
 }
 
 export async function updateMondayContactSubscription(

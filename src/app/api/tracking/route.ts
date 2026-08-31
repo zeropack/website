@@ -28,98 +28,25 @@ function decodeEntities(value: string): string {
     );
 }
 
-function htmlToText(value: string): string {
-  return decodeEntities(
-    value
-      .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
-      .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
-      .replace(/<br\s*\/?\s*>/gi, "\n")
-      .replace(/<[^>]+>/g, " "),
-  )
-    .replace(/[\t\r ]+/g, " ")
-    .replace(/\n\s+/g, "\n")
-    .trim();
-}
-
-function tableRows(html: string): string[][] {
-  const rows: string[][] = [];
-  for (const rowMatch of html.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)) {
-    const cells = Array.from(
-      rowMatch[1].matchAll(/<t[dh]\b[^>]*>([\s\S]*?)<\/t[dh]>/gi),
-      (cell) => htmlToText(cell[1]),
-    ).filter(Boolean);
-    if (cells.length) rows.push(cells);
-  }
-  return rows;
-}
-
-function looksLikeHeader(cells: string[]): boolean {
-  const joined = cells.join(" ").toLowerCase();
-  return joined.includes("date/time") && joined.includes("location");
-}
-
-function looksLikeDateTime(value: string): boolean {
-  return (
-    /\d{1,4}[\-/]\d{1,2}[\-/]\d{1,4}/.test(value) ||
-    /\d{1,2}:\d{2}/.test(value) ||
-    /\d{1,2}\s+[A-Za-z]{3,9}/.test(value)
-  );
-}
-
 function readAttribute(tag: string, name: string): string {
   const match = tag.match(new RegExp(`\\b${name}\\s*=\\s*["']([^"']*)["']`, "i"));
   return match ? decodeEntities(match[1]).trim() : "";
 }
 
-function parseAttributeEvents(payload: string): TrackingEvent[] {
-  const events: TrackingEvent[] = [];
+function parseXmlEvents(payload: string, fallbackTrackingNumber: string): TrackingEvent[] {
+  const parentTrack = payload.match(/<track\b[^>]*>/i)?.[0] || "";
+  const waybill = readAttribute(parentTrack, "billid") || fallbackTrackingNumber || null;
+  const trackingNumber =
+    readAttribute(parentTrack, "transbillid") || fallbackTrackingNumber || null;
 
-  for (const match of payload.matchAll(/<[^>]+\bclass\s*=\s*["'][^"']*\btrackitem\b[^"']*["'][^>]*>/gi)) {
+  const events: TrackingEvent[] = [];
+  for (const match of payload.matchAll(/<trackitem\b[^>]*\/?\s*>/gi)) {
     const tag = match[0];
     const dateTime = readAttribute(tag, "sdate");
     const location = readAttribute(tag, "place");
     const details = readAttribute(tag, "intro");
-    const waybill = readAttribute(tag, "billid") || null;
-    const trackingNumber = readAttribute(tag, "transbillid") || null;
-
     if (!dateTime || !details) continue;
     events.push({ waybill, trackingNumber, dateTime, location, details });
-  }
-
-  return events;
-}
-
-function parseEvents(payload: string): TrackingEvent[] {
-  const events: TrackingEvent[] = [...parseAttributeEvents(payload)];
-
-  for (const cells of tableRows(payload)) {
-    if (looksLikeHeader(cells)) continue;
-
-    if (cells.length >= 5) {
-      const [waybill, trackingNumber, dateTime, location, details] = cells;
-      if (!dateTime || !details || !looksLikeDateTime(dateTime)) continue;
-      events.push({
-        waybill: waybill || null,
-        trackingNumber: trackingNumber || null,
-        dateTime,
-        location: location || "",
-        details,
-      });
-      continue;
-    }
-
-    if (cells.length >= 3 && looksLikeDateTime(cells[0])) {
-      const [dateTime, location, ...detailCells] = cells;
-      const details = detailCells.join(" — ").trim();
-      if (!details) continue;
-      events.push({
-        waybill: null,
-        trackingNumber: null,
-        dateTime,
-        location: location || "",
-        details,
-      });
-    }
   }
 
   const deduped = new Map<string, TrackingEvent>();
@@ -127,7 +54,10 @@ function parseEvents(payload: string): TrackingEvent[] {
     const key = `${event.dateTime}|${event.location}|${event.details}`.toLowerCase();
     if (!deduped.has(key)) deduped.set(key, event);
   }
-  return Array.from(deduped.values());
+
+  return Array.from(deduped.values()).sort((a, b) =>
+    b.dateTime.localeCompare(a.dateTime),
+  );
 }
 
 function statusFromEvents(events: TrackingEvent[]): { stage: TrackingStage; label: string } {
@@ -140,14 +70,18 @@ function statusFromEvents(events: TrackingEvent[]): { stage: TrackingStage; labe
   if (/out for delivery|onboard for delivery|with courier|courier for delivery/.test(text)) {
     return { stage: "out_for_delivery", label: "Out for delivery" };
   }
-  if (/ordered|shipping information received|label created|manifested|information received/.test(text)) {
+  if (/ordered|shipping information received|label created|manifested|information received|shipment submitted/.test(text)) {
     return { stage: "ordered", label: "Ordered" };
   }
   return { stage: "in_transit", label: "In transit" };
 }
 
 function detectCarrier(events: TrackingEvent[]): string | null {
-  const text = events.map((event) => `${event.location} ${event.details}`).join(" ").toLowerCase();
+  const text = events
+    .map((event) => `${event.location} ${event.details}`)
+    .join(" ")
+    .toLowerCase();
+
   if (text.includes("australia post") || text.includes("auspost")) return "Australia Post";
   if (text.includes("startrack")) return "StarTrack";
   if (text.includes("dhl")) return "DHL";
@@ -156,21 +90,16 @@ function detectCarrier(events: TrackingEvent[]): string | null {
   return null;
 }
 
-async function fetchKingtrans(url: string, init?: RequestInit): Promise<string> {
-  const response = await fetch(url, {
-    ...init,
-    headers: {
-      Accept: "*/*",
-      "Accept-Language": "en-AU,en;q=0.9",
-      "User-Agent": "Mozilla/5.0 (compatible; ZeroPackTracking/1.0; +https://zeropack.co/track)",
-      ...(init?.headers || {}),
-    },
-    cache: "no-store",
-    signal: AbortSignal.timeout(12_000),
-  });
+function cookieHeader(response: Response): string | null {
+  const getSetCookie = (response.headers as Headers & { getSetCookie?: () => string[] }).getSetCookie;
+  const cookies = typeof getSetCookie === "function" ? getSetCookie.call(response.headers) : [];
+  const values = cookies.length ? cookies : response.headers.get("set-cookie") ? [response.headers.get("set-cookie")!] : [];
+  if (!values.length) return null;
+  return values.map((value) => value.split(";", 1)[0]).join("; ");
+}
 
+async function readBody(response: Response): Promise<string> {
   if (!response.ok) throw new Error(`Kingtrans returned ${response.status}.`);
-
   const body = await response.text();
   if (body.length > MAX_UPSTREAM_BYTES) {
     throw new Error("Kingtrans tracking response exceeded the allowed size.");
@@ -179,8 +108,27 @@ async function fetchKingtrans(url: string, init?: RequestInit): Promise<string> 
 }
 
 async function fetchRepeatEvents(number: string): Promise<TrackingEvent[]> {
-  const url = new URL(KINGTRANS_TRACK_PATH, KINGTRANS_ORIGIN);
-  url.searchParams.set("action", "repeat");
+  const initialUrl = new URL(KINGTRANS_TRACK_PATH, KINGTRANS_ORIGIN);
+  initialUrl.searchParams.set("bills", number);
+  initialUrl.searchParams.set("language", "en");
+
+  const commonHeaders = {
+    Accept: "*/*",
+    "Accept-Language": "en-AU,en;q=0.9",
+    "User-Agent": "Mozilla/5.0 (compatible; ZeroPackTracking/1.0; +https://zeropack.co/track)",
+  };
+
+  const initialResponse = await fetch(initialUrl, {
+    headers: commonHeaders,
+    cache: "no-store",
+    redirect: "follow",
+    signal: AbortSignal.timeout(12_000),
+  });
+  await readBody(initialResponse);
+  const cookie = cookieHeader(initialResponse);
+
+  const repeatUrl = new URL(KINGTRANS_TRACK_PATH, KINGTRANS_ORIGIN);
+  repeatUrl.searchParams.set("action", "repeat");
 
   const body = new URLSearchParams({
     index: "0",
@@ -189,25 +137,24 @@ async function fetchRepeatEvents(number: string): Promise<TrackingEvent[]> {
     language: "en",
   });
 
-  const payload = await fetchKingtrans(url.toString(), {
+  const repeatResponse = await fetch(repeatUrl, {
     method: "POST",
     headers: {
+      ...commonHeaders,
+      Accept: "application/xml,text/xml,*/*;q=0.8",
       "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
       "X-Requested-With": "XMLHttpRequest",
-      Referer: `${KINGTRANS_ORIGIN}${KINGTRANS_TRACK_PATH}?bills=${encodeURIComponent(number)}&language=en`,
+      Origin: KINGTRANS_ORIGIN,
+      Referer: initialUrl.toString(),
+      ...(cookie ? { Cookie: cookie } : {}),
     },
     body: body.toString(),
+    cache: "no-store",
+    signal: AbortSignal.timeout(12_000),
   });
 
-  let parseTarget = payload;
-  try {
-    const json = JSON.parse(payload) as unknown;
-    parseTarget = JSON.stringify(json);
-  } catch {
-    // Kingtrans commonly returns HTML/XML-like fragments rather than JSON.
-  }
-
-  return parseEvents(parseTarget);
+  const payload = await readBody(repeatResponse);
+  return parseXmlEvents(payload, number);
 }
 
 export async function GET(request: Request) {
@@ -225,7 +172,7 @@ export async function GET(request: Request) {
     const events = await fetchRepeatEvents(number);
 
     if (!events.length) {
-      console.warn(`[tracking] Kingtrans returned no parsed events for ${number}`);
+      console.warn(`[tracking] Kingtrans returned no parsed XML events for ${number}`);
       return NextResponse.json(
         {
           ok: false,

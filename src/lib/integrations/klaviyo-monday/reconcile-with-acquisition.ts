@@ -3,7 +3,6 @@ import {
   type ReconcileMode,
   type ReconcileOptions,
 } from "./reconcile";
-import { recoverGovernedOutboundProfiles } from "./outbound-recovery";
 import {
   recoverStandardInboundProfilesV2,
   STANDARD_INBOUND_PRODUCTION_CUTOVER_AT,
@@ -16,7 +15,6 @@ import {
 export type { ReconcileMode } from "./reconcile";
 
 export type ReconcileWithAcquisitionOptions = ReconcileOptions & {
-  profileSyncCutoverAt?: string | null;
   typeformRfqCutoverAt?: string | null;
   standardInboundCutoverAt?: string | null;
   standardInboundEnabled?: boolean;
@@ -34,15 +32,11 @@ export async function reconcileKlaviyoMondayWithAcquisition(
       options.typeformRfqCutoverAt || TYPEFORM_RFQ_PRODUCTION_CUTOVER_AT,
   });
 
-  // Governed outbound profile recovery runs before core reconciliation so newly
-  // created Klaviyo profiles can converge into the mirror during the same run.
-  let outbound: Awaited<ReturnType<typeof recoverGovernedOutboundProfiles>> | null = null;
-  if (options.profileSyncCutoverAt) {
-    outbound = await recoverGovernedOutboundProfiles(mode, {
-      cutoverAt: options.profileSyncCutoverAt,
-      lookbackHours: options.lifecycleLookbackHours ?? 72,
-    });
-  }
+  // Monday-originated Contacts, including Lead Research / AI Agent Contacts, must
+  // not be created or updated as Klaviyo profiles by unattended reconciliation.
+  // Klaviyo profiles are created through approved consented inbound acquisition
+  // routes or through the separate protected manual profile-sync endpoint when a
+  // deliberate case-by-case operation is required.
 
   // The commissioned consent/suppression/lifecycle reconciler remains canonical.
   const core = await reconcileKlaviyoMonday(options);
@@ -64,8 +58,8 @@ export async function reconcileKlaviyoMondayWithAcquisition(
       typeformRfq,
       inbound,
       standardInboundEnabled,
-      outbound,
-      outboundEnabled: Boolean(options.profileSyncCutoverAt),
+      outbound: null,
+      outboundEnabled: false,
     },
   };
 }

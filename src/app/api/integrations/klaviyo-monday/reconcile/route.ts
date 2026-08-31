@@ -6,7 +6,6 @@ import {
 import { reconcileKlaviyoMondayWithAcquisition } from "@/lib/integrations/klaviyo-monday/reconcile-with-acquisition";
 
 const PRODUCTION_LIFECYCLE_CUTOVER_AT = "2026-08-20T08:35:00.000Z";
-const PRODUCTION_PROFILE_SYNC_CUTOVER_AT = "2026-08-21T08:26:00.000Z";
 
 function lifecycleLookbackHours(): number {
   const configured = Number(process.env.MONDAY_LIFECYCLE_LOOKBACK_HOURS || "72");
@@ -20,14 +19,6 @@ function lifecycleCutoverAt(): string | null {
 
   return process.env.VERCEL_ENV === "production"
     ? PRODUCTION_LIFECYCLE_CUTOVER_AT
-    : null;
-}
-
-function profileSyncCutoverAt(): string | null {
-  const configured = process.env.MONDAY_PROFILE_SYNC_CUTOVER_AT?.trim();
-  if (configured) return configured;
-  return process.env.VERCEL_ENV === "production"
-    ? PRODUCTION_PROFILE_SYNC_CUTOVER_AT
     : null;
 }
 
@@ -47,7 +38,6 @@ async function run(mode: ReconcileMode, includeAcquisition = false) {
   return reconcileKlaviyoMondayWithAcquisition({
     ...common,
     standardInboundEnabled,
-    profileSyncCutoverAt: profileSyncCutoverAt(),
   });
 }
 
@@ -107,10 +97,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("[klaviyo-monday reconcile manual]", error);
     return NextResponse.json(
-      {
-        ok: false,
-        error: error instanceof Error ? error.message : "Reconciliation failed.",
-      },
+      { ok: false, error: error instanceof Error ? error.message : "Reconciliation failed." },
       { status: 500, headers: { "Cache-Control": "no-store" } },
     );
   }

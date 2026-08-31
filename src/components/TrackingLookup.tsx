@@ -164,11 +164,11 @@ function MapPanel({
             </div>
           )}
 
-          <p className="mt-3 text-xs leading-5 text-charcoal/55">
-            {destinationFallback
-              ? "Kingtrans has not supplied a current scan location, so the map is centred on the delivery destination."
-              : "Map position is based on the location text supplied in the tracking feed. It is not a live courier GPS position."}
-          </p>
+          {!destinationFallback && (
+            <p className="mt-3 text-xs leading-5 text-charcoal/55">
+              Map position is based on the location text supplied in the tracking feed. It is not a live courier GPS position.
+            </p>
+          )}
         </div>
       )}
     </div>

@@ -12,6 +12,20 @@ type TrackingEvent = {
   details: string;
 };
 
+type PublicDestination = {
+  label: string;
+  locality: string | null;
+  state: string | null;
+  postcode: string | null;
+  country: string | null;
+};
+
+type ProjectEnrichment = {
+  eta: string | null;
+  status: string | null;
+  destination: PublicDestination | null;
+};
+
 type TrackingResponse = {
   ok: true;
   trackingNumber: string;
@@ -19,6 +33,7 @@ type TrackingResponse = {
   status: { stage: TrackingStage; label: string };
   latestUpdate: string;
   latestLocation: string | null;
+  project: ProjectEnrichment | null;
   events: TrackingEvent[];
 };
 
@@ -70,8 +85,31 @@ function prettyDateTime(value: string): { date: string; time: string } {
   };
 }
 
-function MapPanel({ location, events }: { location: string | null; events: TrackingEvent[] }) {
-  const query = location?.trim();
+function prettyEta(value: string): string {
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return value;
+  const date = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])));
+  return new Intl.DateTimeFormat("en-AU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}
+
+function MapPanel({
+  location,
+  destination,
+  events,
+}: {
+  location: string | null;
+  destination: PublicDestination | null;
+  events: TrackingEvent[];
+}) {
+  const currentLocation = location?.trim() || null;
+  const destinationLabel = destination?.label?.trim() || null;
+  const query = currentLocation || destinationLabel;
+  const destinationFallback = !currentLocation && Boolean(destinationLabel);
   const mapSrc = query
     ? `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`
     : null;
@@ -97,14 +135,23 @@ function MapPanel({ location, events }: { location: string | null; events: Track
 
       <div className="absolute left-5 top-5 flex items-center gap-2 rounded-full border border-black/5 bg-white/95 px-4 py-2 text-sm font-semibold text-charcoal shadow-lg backdrop-blur">
         <span className="inline-block h-2.5 w-2.5 rounded-full bg-leaf" />
-        Latest tracking location
+        {destinationFallback ? "Delivery destination" : "Latest tracking location"}
       </div>
 
       {query && (
         <div className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/70 bg-white/95 p-4 shadow-xl backdrop-blur sm:right-auto sm:max-w-sm">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal/45">Latest location</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal/45">
+            {destinationFallback ? "On its way to" : "Latest location"}
+          </p>
           <p className="mt-1 font-heading text-xl font-bold text-compost">{query}</p>
-          {recentLocations.length > 1 && (
+
+          {!destinationFallback && destinationLabel && (
+            <p className="mt-2 text-sm font-medium text-charcoal/65">
+              On its way to <span className="font-bold text-charcoal">{destinationLabel}</span>
+            </p>
+          )}
+
+          {!destinationFallback && recentLocations.length > 1 && (
             <div className="mt-3 flex flex-wrap gap-2">
               {recentLocations.map((item, index) => (
                 <span
@@ -116,8 +163,11 @@ function MapPanel({ location, events }: { location: string | null; events: Track
               ))}
             </div>
           )}
+
           <p className="mt-3 text-xs leading-5 text-charcoal/55">
-            Map position is based on the location text supplied in the tracking feed. It is not a live courier GPS position.
+            {destinationFallback
+              ? "Kingtrans has not supplied a current scan location, so the map is centred on the delivery destination."
+              : "Map position is based on the location text supplied in the tracking feed. It is not a live courier GPS position."}
           </p>
         </div>
       )}
@@ -180,10 +230,14 @@ export function TrackingLookup() {
 
   const currentStage = data ? stageIndex[data.status.stage] : -1;
   const latestEvent = data?.events[0] || null;
+  const destination = data?.project?.destination || null;
   const statusNote = useMemo(() => {
     if (!data || !latestEvent) return null;
     if (data.status.stage === "delivered") {
       return `Latest update: ${latestEvent.details}`;
+    }
+    if (!data.latestLocation && data.project?.destination?.label) {
+      return `On its way to ${data.project.destination.label}`;
     }
     return latestEvent.details;
   }, [data, latestEvent]);
@@ -251,7 +305,7 @@ export function TrackingLookup() {
                 ))}
               </div>
             </div>
-            <MapPanel location={null} events={[]} />
+            <MapPanel location={null} destination={null} events={[]} />
           </div>
         ) : null}
 
@@ -282,7 +336,7 @@ export function TrackingLookup() {
                     </div>
                     <div className="rounded-2xl border border-black/5 bg-white/90 px-4 py-3 shadow-sm">
                       <p className="text-xs font-semibold text-charcoal/45">Carrier</p>
-                      <p className="mt-1 text-sm font-bold text-charcoal">{data.carrier || "Carrier tracking"}</p>
+                      <p className="mt-1 text-sm font-bold text-charcoal">{data.carrier || "Kingtrans"}</p>
                     </div>
                   </div>
 
@@ -295,6 +349,23 @@ export function TrackingLookup() {
                       {statusNote && <p className="mt-1 text-sm leading-6 text-charcoal/60">{statusNote}</p>}
                     </div>
                   </div>
+
+                  {(data.project?.eta || destination) && (
+                    <div className="mt-7 grid gap-3 sm:grid-cols-2">
+                      {destination && (
+                        <div className="rounded-2xl border border-compost/10 bg-white/85 px-4 py-4 shadow-sm">
+                          <p className="text-xs font-semibold uppercase tracking-[0.15em] text-charcoal/40">Delivering to</p>
+                          <p className="mt-1 font-heading text-lg font-bold text-charcoal">{destination.label}</p>
+                        </div>
+                      )}
+                      {data.project?.eta && (
+                        <div className="rounded-2xl border border-compost/10 bg-white/85 px-4 py-4 shadow-sm">
+                          <p className="text-xs font-semibold uppercase tracking-[0.15em] text-charcoal/40">Estimated arrival</p>
+                          <p className="mt-1 font-heading text-lg font-bold text-charcoal">{prettyEta(data.project.eta)}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   <div className="mt-8 grid grid-cols-4 gap-2 sm:gap-3">
                     {steps.map((step, index) => {
@@ -348,12 +419,12 @@ export function TrackingLookup() {
               </div>
             </div>
 
-            <MapPanel location={data.latestLocation} events={data.events} />
+            <MapPanel location={data.latestLocation} destination={destination} events={data.events} />
           </div>
         )}
 
         <p className="mt-6 text-center text-xs leading-5 text-charcoal/45">
-          Tracking events are supplied by the carrier network. Update timing and location detail can vary during transit.
+          Tracking events are supplied by Kingtrans. Update timing and location detail can vary during transit.
         </p>
       </div>
     </section>

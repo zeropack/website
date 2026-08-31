@@ -3,6 +3,7 @@ import {
   type ReconcileMode,
   type ReconcileOptions,
 } from "./reconcile";
+import { recoverLifecycleProfiles } from "./lifecycle-profile-recovery";
 import {
   recoverStandardInboundProfilesV2,
   STANDARD_INBOUND_PRODUCTION_CUTOVER_AT,
@@ -32,11 +33,22 @@ export async function reconcileKlaviyoMondayWithAcquisition(
       options.typeformRfqCutoverAt || TYPEFORM_RFQ_PRODUCTION_CUTOVER_AT,
   });
 
-  // Monday-originated Contacts, including Lead Research / AI Agent Contacts, must
-  // not be created or updated as Klaviyo profiles by unattended reconciliation.
-  // Klaviyo profiles are created through approved consented inbound acquisition
-  // routes or through the separate protected manual profile-sync endpoint when a
-  // deliberate case-by-case operation is required.
+  // Ordinary Monday-created cold Contacts must not be created in Klaviyo.
+  // The sole unattended Monday -> Klaviyo profile-creation exception is a recent,
+  // still-current governed commercial lifecycle transition: RFQ Requested,
+  // RFQ Sent, Won or Lost. Recovery runs before core reconciliation so a profile
+  // created for that transition can receive the lifecycle property/event in the
+  // same execution. Profile upsert never grants marketing consent or unsuppresses.
+  const lifecycleCutoverAt =
+    options.lifecycleCutoverAt ??
+    process.env.MONDAY_LIFECYCLE_SYNC_CUTOVER_AT ??
+    null;
+  const lifecycleProfiles = lifecycleCutoverAt
+    ? await recoverLifecycleProfiles(mode, {
+        cutoverAt: lifecycleCutoverAt,
+        lookbackHours: options.lifecycleLookbackHours ?? 72,
+      })
+    : null;
 
   // The commissioned consent/suppression/lifecycle reconciler remains canonical.
   const core = await reconcileKlaviyoMonday(options);
@@ -58,6 +70,7 @@ export async function reconcileKlaviyoMondayWithAcquisition(
       typeformRfq,
       inbound,
       standardInboundEnabled,
+      lifecycleProfiles,
       outbound: null,
       outboundEnabled: false,
     },

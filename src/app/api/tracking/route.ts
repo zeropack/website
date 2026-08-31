@@ -10,9 +10,31 @@ type TrackingEvent = {
 
 type TrackingStage = "ordered" | "in_transit" | "out_for_delivery" | "delivered";
 
+type PublicDestination = {
+  label: string;
+  locality: string | null;
+  state: string | null;
+  postcode: string | null;
+  country: string | null;
+};
+
+type ProjectEnrichment = {
+  eta: string | null;
+  status: string | null;
+  destination: PublicDestination | null;
+};
+
 const KINGTRANS_ORIGIN = "https://ausdirect.kingtrans.net";
 const KINGTRANS_TRACK_PATH = "/WebTrack";
 const MAX_UPSTREAM_BYTES = 1_500_000;
+
+const MONDAY_API_URL = "https://api.monday.com/v2";
+const MONDAY_CLIENT_PROJECTS_BOARD_ID = "5029468197";
+const MONDAY_TRACKING_COLUMN_ID = "text_mm4p92n3";
+const MONDAY_ETA_COLUMN_ID = "date_mm5ncqc6";
+const MONDAY_STATUS_COLUMN_ID = "project_status";
+const MONDAY_COMPANY_RELATION_COLUMN_ID = "board_relation_mm6471v8";
+const MONDAY_COMPANY_LOCATION_COLUMN_ID = "location_mm4nwpvd";
 
 function decodeEntities(value: string): string {
   return value
@@ -74,20 +96,6 @@ function statusFromEvents(events: TrackingEvent[]): { stage: TrackingStage; labe
     return { stage: "ordered", label: "Ordered" };
   }
   return { stage: "in_transit", label: "In transit" };
-}
-
-function detectCarrier(events: TrackingEvent[]): string | null {
-  const text = events
-    .map((event) => `${event.location} ${event.details}`)
-    .join(" ")
-    .toLowerCase();
-
-  if (text.includes("australia post") || text.includes("auspost")) return "Australia Post";
-  if (text.includes("startrack")) return "StarTrack";
-  if (text.includes("dhl")) return "DHL";
-  if (text.includes("fedex")) return "FedEx";
-  if (text.includes("ups")) return "UPS";
-  return null;
 }
 
 function cookieHeader(response: Response): string | null {
@@ -157,6 +165,120 @@ async function fetchRepeatEvents(number: string): Promise<TrackingEvent[]> {
   return parseXmlEvents(payload, number);
 }
 
+function parsePublicDestination(rawValue: string | null | undefined): PublicDestination | null {
+  if (!rawValue) return null;
+
+  try {
+    const parsed = JSON.parse(rawValue) as {
+      address?: string;
+      city?: { long_name?: string };
+      country?: { long_name?: string };
+    };
+    const address = parsed.address?.trim() || "";
+    const locality = parsed.city?.long_name?.trim() || null;
+    const state = address.match(/\b(ACT|NSW|NT|QLD|SA|TAS|VIC|WA)\b/i)?.[1]?.toUpperCase() || null;
+    const postcode = address.match(/\b(\d{4})\b(?=\s*(?:Australia)?\s*$)/i)?.[1] || null;
+    const country = parsed.country?.long_name?.trim() || null;
+
+    const label = [locality, state, postcode].filter(Boolean).join(" ").trim();
+    if (!label) return null;
+
+    return { label, locality, state, postcode, country };
+  } catch {
+    return null;
+  }
+}
+
+async function fetchProjectEnrichment(number: string): Promise<ProjectEnrichment | null> {
+  const token = process.env.MONDAY_API_TOKEN?.trim();
+  if (!token) return null;
+
+  const query = `
+    query TrackingProject($boardId: ID!, $columnId: String!, $value: String!) {
+      items_page_by_column_values(
+        board_id: $boardId,
+        columns: [{ column_id: $columnId, column_values: [$value] }],
+        limit: 2
+      ) {
+        items {
+          column_values(ids: ["${MONDAY_ETA_COLUMN_ID}", "${MONDAY_STATUS_COLUMN_ID}", "${MONDAY_COMPANY_RELATION_COLUMN_ID}"]) {
+            id
+            text
+            value
+            ... on BoardRelationValue {
+              linked_items {
+                column_values(ids: ["${MONDAY_COMPANY_LOCATION_COLUMN_ID}"]) {
+                  id
+                  value
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const response = await fetch(MONDAY_API_URL, {
+    method: "POST",
+    headers: {
+      Authorization: token,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query,
+      variables: {
+        boardId: MONDAY_CLIENT_PROJECTS_BOARD_ID,
+        columnId: MONDAY_TRACKING_COLUMN_ID,
+        value: number,
+      },
+    }),
+    cache: "no-store",
+    signal: AbortSignal.timeout(8_000),
+  });
+
+  if (!response.ok) throw new Error(`Monday returned ${response.status}.`);
+
+  const payload = (await response.json()) as {
+    errors?: Array<{ message?: string }>;
+    data?: {
+      items_page_by_column_values?: {
+        items?: Array<{
+          column_values?: Array<{
+            id: string;
+            text?: string | null;
+            value?: string | null;
+            linked_items?: Array<{
+              column_values?: Array<{ id: string; value?: string | null }>;
+            }>;
+          }>;
+        }>;
+      };
+    };
+  };
+
+  if (payload.errors?.length) {
+    throw new Error(payload.errors[0]?.message || "Monday tracking lookup failed.");
+  }
+
+  const items = payload.data?.items_page_by_column_values?.items || [];
+  if (items.length !== 1) return null;
+
+  const columns = items[0].column_values || [];
+  const eta = columns.find((column) => column.id === MONDAY_ETA_COLUMN_ID)?.text?.trim() || null;
+  const status = columns.find((column) => column.id === MONDAY_STATUS_COLUMN_ID)?.text?.trim() || null;
+  const relation = columns.find((column) => column.id === MONDAY_COMPANY_RELATION_COLUMN_ID);
+  const locationValue = relation?.linked_items?.[0]?.column_values?.find(
+    (column) => column.id === MONDAY_COMPANY_LOCATION_COLUMN_ID,
+  )?.value;
+
+  return {
+    eta,
+    status,
+    destination: parsePublicDestination(locationValue),
+  };
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const number = searchParams.get("number")?.trim() || "";
@@ -169,7 +291,12 @@ export async function GET(request: Request) {
   }
 
   try {
+    const projectPromise = fetchProjectEnrichment(number).catch((error) => {
+      console.warn("[tracking] Monday enrichment unavailable", error);
+      return null;
+    });
     const events = await fetchRepeatEvents(number);
+    const project = await projectPromise;
 
     if (!events.length) {
       console.warn(`[tracking] Kingtrans returned no parsed XML events for ${number}`);
@@ -189,10 +316,11 @@ export async function GET(request: Request) {
       {
         ok: true,
         trackingNumber: number,
-        carrier: detectCarrier(events),
+        carrier: "Kingtrans",
         status,
         latestUpdate: latest.dateTime,
         latestLocation: latest.location || null,
+        project,
         events,
       },
       { headers: { "Cache-Control": "no-store, max-age=0" } },

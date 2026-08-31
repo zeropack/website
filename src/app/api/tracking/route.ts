@@ -55,11 +55,7 @@ function tableRows(html: string): string[][] {
 
 function looksLikeHeader(cells: string[]): boolean {
   const joined = cells.join(" ").toLowerCase();
-  return (
-    joined.includes("waybill") &&
-    (joined.includes("date/time") || joined.includes("datetime")) &&
-    joined.includes("details")
-  );
+  return joined.includes("date/time") && joined.includes("location");
 }
 
 function looksLikeDateTime(value: string): boolean {
@@ -70,10 +66,33 @@ function looksLikeDateTime(value: string): boolean {
   );
 }
 
-function parseEvents(html: string): TrackingEvent[] {
+function readAttribute(tag: string, name: string): string {
+  const match = tag.match(new RegExp(`\\b${name}\\s*=\\s*["']([^"']*)["']`, "i"));
+  return match ? decodeEntities(match[1]).trim() : "";
+}
+
+function parseAttributeEvents(payload: string): TrackingEvent[] {
   const events: TrackingEvent[] = [];
 
-  for (const cells of tableRows(html)) {
+  for (const match of payload.matchAll(/<[^>]+\bclass\s*=\s*["'][^"']*\btrackitem\b[^"']*["'][^>]*>/gi)) {
+    const tag = match[0];
+    const dateTime = readAttribute(tag, "sdate");
+    const location = readAttribute(tag, "place");
+    const details = readAttribute(tag, "intro");
+    const waybill = readAttribute(tag, "billid") || null;
+    const trackingNumber = readAttribute(tag, "transbillid") || null;
+
+    if (!dateTime || !details) continue;
+    events.push({ waybill, trackingNumber, dateTime, location, details });
+  }
+
+  return events;
+}
+
+function parseEvents(payload: string): TrackingEvent[] {
+  const events: TrackingEvent[] = [...parseAttributeEvents(payload)];
+
+  for (const cells of tableRows(payload)) {
     if (looksLikeHeader(cells)) continue;
 
     if (cells.length >= 5) {
@@ -111,38 +130,7 @@ function parseEvents(html: string): TrackingEvent[] {
   return Array.from(deduped.values());
 }
 
-function sameOriginDetailUrls(html: string, trackingNumber: string): string[] {
-  const urls = new Set<string>();
-
-  for (const match of html.matchAll(/href\s*=\s*["']([^"']+)["']/gi)) {
-    const href = decodeEntities(match[1]).trim();
-    if (!href || href.startsWith("#") || href.toLowerCase().startsWith("javascript:")) {
-      continue;
-    }
-
-    try {
-      const url = new URL(href, KINGTRANS_ORIGIN);
-      if (url.origin !== KINGTRANS_ORIGIN) continue;
-      const candidate = url.toString();
-      const lower = candidate.toLowerCase();
-      if (
-        lower.includes("track") &&
-        (candidate.includes(trackingNumber) || lower.includes("detail"))
-      ) {
-        urls.add(candidate);
-      }
-    } catch {
-      // Ignore malformed links in the upstream HTML.
-    }
-  }
-
-  return Array.from(urls).slice(0, 3);
-}
-
-function statusFromEvents(events: TrackingEvent[]): {
-  stage: TrackingStage;
-  label: string;
-} {
+function statusFromEvents(events: TrackingEvent[]): { stage: TrackingStage; label: string } {
   const latest = events[0];
   const text = `${latest?.details || ""} ${latest?.location || ""}`.toLowerCase();
 
@@ -159,11 +147,7 @@ function statusFromEvents(events: TrackingEvent[]): {
 }
 
 function detectCarrier(events: TrackingEvent[]): string | null {
-  const text = events
-    .map((event) => `${event.location} ${event.details}`)
-    .join(" ")
-    .toLowerCase();
-
+  const text = events.map((event) => `${event.location} ${event.details}`).join(" ").toLowerCase();
   if (text.includes("australia post") || text.includes("auspost")) return "Australia Post";
   if (text.includes("startrack")) return "StarTrack";
   if (text.includes("dhl")) return "DHL";
@@ -172,26 +156,58 @@ function detectCarrier(events: TrackingEvent[]): string | null {
   return null;
 }
 
-async function fetchKingtrans(url: string): Promise<string> {
+async function fetchKingtrans(url: string, init?: RequestInit): Promise<string> {
   const response = await fetch(url, {
+    ...init,
     headers: {
-      Accept: "text/html,application/xhtml+xml",
+      Accept: "*/*",
       "Accept-Language": "en-AU,en;q=0.9",
-      "User-Agent": "ZeroPackTracking/1.0 (+https://zeropack.co/track)",
+      "User-Agent": "Mozilla/5.0 (compatible; ZeroPackTracking/1.0; +https://zeropack.co/track)",
+      ...(init?.headers || {}),
     },
     cache: "no-store",
     signal: AbortSignal.timeout(12_000),
   });
 
-  if (!response.ok) {
-    throw new Error(`Kingtrans returned ${response.status}.`);
-  }
+  if (!response.ok) throw new Error(`Kingtrans returned ${response.status}.`);
 
   const body = await response.text();
   if (body.length > MAX_UPSTREAM_BYTES) {
     throw new Error("Kingtrans tracking response exceeded the allowed size.");
   }
   return body;
+}
+
+async function fetchRepeatEvents(number: string): Promise<TrackingEvent[]> {
+  const url = new URL(KINGTRANS_TRACK_PATH, KINGTRANS_ORIGIN);
+  url.searchParams.set("action", "repeat");
+
+  const body = new URLSearchParams({
+    index: "0",
+    billid: number,
+    isRepeat: "no",
+    language: "en",
+  });
+
+  const payload = await fetchKingtrans(url.toString(), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+      "X-Requested-With": "XMLHttpRequest",
+      Referer: `${KINGTRANS_ORIGIN}${KINGTRANS_TRACK_PATH}?bills=${encodeURIComponent(number)}&language=en`,
+    },
+    body: body.toString(),
+  });
+
+  let parseTarget = payload;
+  try {
+    const json = JSON.parse(payload) as unknown;
+    parseTarget = JSON.stringify(json);
+  } catch {
+    // Kingtrans commonly returns HTML/XML-like fragments rather than JSON.
+  }
+
+  return parseEvents(parseTarget);
 }
 
 export async function GET(request: Request) {
@@ -205,34 +221,11 @@ export async function GET(request: Request) {
     );
   }
 
-  const upstream = new URL(KINGTRANS_TRACK_PATH, KINGTRANS_ORIGIN);
-  upstream.searchParams.set("bills", number);
-  upstream.searchParams.set("language", "en");
-
   try {
-    const summaryHtml = await fetchKingtrans(upstream.toString());
-    const allEvents = [...parseEvents(summaryHtml)];
-
-    if (allEvents.length < 2) {
-      const detailUrls = sameOriginDetailUrls(summaryHtml, number);
-      for (const detailUrl of detailUrls) {
-        try {
-          const detailHtml = await fetchKingtrans(detailUrl);
-          allEvents.push(...parseEvents(detailHtml));
-        } catch (error) {
-          console.warn("[tracking] Unable to fetch Kingtrans detail page", error);
-        }
-      }
-    }
-
-    const deduped = new Map<string, TrackingEvent>();
-    for (const event of allEvents) {
-      const key = `${event.dateTime}|${event.location}|${event.details}`.toLowerCase();
-      if (!deduped.has(key)) deduped.set(key, event);
-    }
-    const events = Array.from(deduped.values());
+    const events = await fetchRepeatEvents(number);
 
     if (!events.length) {
+      console.warn(`[tracking] Kingtrans returned no parsed events for ${number}`);
       return NextResponse.json(
         {
           ok: false,
@@ -255,11 +248,7 @@ export async function GET(request: Request) {
         latestLocation: latest.location || null,
         events,
       },
-      {
-        headers: {
-          "Cache-Control": "no-store, max-age=0",
-        },
-      },
+      { headers: { "Cache-Control": "no-store, max-age=0" } },
     );
   } catch (error) {
     console.error("[tracking]", error);

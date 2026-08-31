@@ -2,26 +2,24 @@ import { NextResponse } from "next/server";
 
 const KINGTRANS_ORIGIN = "https://ausdirect.kingtrans.net";
 
-function summarizeHtml(html: string) {
+function summarizeHtml(html: string, number: string) {
   const scripts = Array.from(html.matchAll(/<script\b[^>]*src=["']([^"']+)["']/gi), (m) => m[1]);
   const forms = Array.from(html.matchAll(/<form\b([^>]*)>/gi), (m) => m[1].trim());
   const inputs = Array.from(html.matchAll(/<input\b([^>]*)>/gi), (m) => m[1].trim());
-  const links = Array.from(html.matchAll(/href=["']([^"']+)["']/gi), (m) => m[1]);
-  const ajaxHints = Array.from(
-    html.matchAll(/(?:fetch\(|ajax\(|axios\.|XMLHttpRequest|WebTrack|track)[\s\S]{0,180}/gi),
-    (m) => m[0].replace(/\s+/g, " ").slice(0, 220),
+  const attrs = Array.from(
+    html.matchAll(/\b(?:sdate|place|intro|billid|transbillid|index)\s*=\s*["']([^"']*)["']/gi),
+    (m) => m[0],
   );
 
   return {
     length: html.length,
-    hasTrackingNumber: /ADF8555349902/i.test(html),
-    scripts: scripts.slice(0, 20),
-    forms: forms.slice(0, 20),
-    inputs: inputs.slice(0, 40),
-    links: links.filter((v) => /track|bill|query|search/i.test(v)).slice(0, 30),
-    ajaxHints: ajaxHints.slice(0, 30),
+    hasTrackingNumber: html.includes(number),
+    scripts: scripts.slice(0, 10),
+    forms: forms.slice(0, 10),
+    inputs: inputs.slice(0, 20),
+    trackingAttrs: attrs.slice(0, 40),
     tableCount: (html.match(/<table\b/gi) || []).length,
-    rowCount: (html.match(/<tr\b/gi) || []).length,
+    dlCount: (html.match(/<dl\b/gi) || []).length,
     bodyTextSample: html
       .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
       .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
@@ -29,7 +27,8 @@ function summarizeHtml(html: string) {
       .replace(/&nbsp;/gi, " ")
       .replace(/\s+/g, " ")
       .trim()
-      .slice(0, 2500),
+      .slice(0, 2000),
+    rawSample: html.slice(0, 3000),
   };
 }
 
@@ -41,12 +40,12 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok: false, error: "Invalid number" }, { status: 400 });
   }
 
-  const upstream = new URL("/WebTrack", KINGTRANS_ORIGIN);
-  upstream.searchParams.set("bills", number);
-  upstream.searchParams.set("language", "en");
+  const initialUrl = new URL("/WebTrack", KINGTRANS_ORIGIN);
+  initialUrl.searchParams.set("bills", number);
+  initialUrl.searchParams.set("language", "en");
 
   try {
-    const response = await fetch(upstream, {
+    const initial = await fetch(initialUrl, {
       headers: {
         Accept: "text/html,application/xhtml+xml",
         "Accept-Language": "en-AU,en;q=0.9",
@@ -57,18 +56,57 @@ export async function GET(request: Request) {
       signal: AbortSignal.timeout(12000),
     });
 
-    const html = await response.text();
-    const summary = summarizeHtml(html);
-    console.log("[tracking-diagnostic]", JSON.stringify({ status: response.status, finalUrl: response.url, ...summary }));
+    const initialHtml = await initial.text();
+    const setCookies = initial.headers.getSetCookie?.() || [];
+    const cookieHeader = setCookies.map((cookie) => cookie.split(";", 1)[0]).join("; ");
 
-    return NextResponse.json({
-      ok: response.ok,
-      upstreamStatus: response.status,
-      finalUrl: response.url,
-      ...summary,
+    const repeatUrl = new URL("/WebTrack?action=repeat", KINGTRANS_ORIGIN);
+    const body = new URLSearchParams({
+      index: "0",
+      billid: number,
+      isRepeat: "no",
+      language: "en",
     });
+
+    const repeat = await fetch(repeatUrl, {
+      method: "POST",
+      headers: {
+        Accept: "application/json, text/javascript, */*; q=0.01",
+        "Accept-Language": "en-AU,en;q=0.9",
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "User-Agent": "Mozilla/5.0 (compatible; ZeroPackTrackingDiagnostic/1.0; +https://zeropack.co)",
+        "X-Requested-With": "XMLHttpRequest",
+        Referer: initial.url,
+        Origin: KINGTRANS_ORIGIN,
+        ...(cookieHeader ? { Cookie: cookieHeader } : {}),
+      },
+      body,
+      cache: "no-store",
+      redirect: "follow",
+      signal: AbortSignal.timeout(12000),
+    });
+
+    const repeatText = await repeat.text();
+    const result = {
+      ok: true,
+      initial: {
+        status: initial.status,
+        finalUrl: initial.url,
+        setCookieCount: setCookies.length,
+        ...summarizeHtml(initialHtml, number),
+      },
+      repeat: {
+        status: repeat.status,
+        finalUrl: repeat.url,
+        contentType: repeat.headers.get("content-type"),
+        ...summarizeHtml(repeatText, number),
+      },
+    };
+
+    console.log("[tracking-diagnostic-repeat]", JSON.stringify(result));
+    return NextResponse.json(result);
   } catch (error) {
-    console.error("[tracking-diagnostic]", error);
+    console.error("[tracking-diagnostic-repeat]", error);
     return NextResponse.json({ ok: false, error: "Diagnostic fetch failed" }, { status: 502 });
   }
 }

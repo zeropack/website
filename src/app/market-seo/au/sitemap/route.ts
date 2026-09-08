@@ -7,7 +7,16 @@ function xmlEscape(value: string): string {
 }
 
 export function GET() {
-  const urls = [buildMarketUrl("au", "/"), buildMarketUrl("au", "/custom-compostable-mailers")];
+  const paths = [
+    "/",
+    "/custom-compostable-mailers",
+    "/custom-compostable-packaging",
+    "/how-it-works",
+    "/about",
+    "/quote",
+    "/contact",
+  ];
+  const urls = paths.map((path) => buildMarketUrl("au", path));
   const body = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
     .map((url) => `  <url><loc>${xmlEscape(url)}</loc></url>`)
     .join("\n")}\n</urlset>`;

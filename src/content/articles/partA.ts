@@ -89,7 +89,7 @@ export const articlesPartA: Article[] = [
         heading: "How to evaluate suppliers making compostable or biodegradable claims",
         paragraphs: [
           "The practical test is straightforward: ask for the specific standard, the certifying body, a certificate number, and an expiry date. If they can provide all four, the claim is on solid ground. If they respond with marketing language, refer you to a brochure, or cannot name a certifying body, the claim is not independently supported.",
-          "Requesting samples before a production run is a further practical step. Samples allow you to test seal strength, waterproofing, and how the packaging handles your actual products. A supplier confident in their product should provide samples readily. Zero Pack provides certification documentation and samples on request as part of the quoting process. To begin a quote for custom branded compostable packaging, use the [custom compostable mailers enquiry page](/trend-packaging-funnel/).",
+          "Requesting samples before a production run is a further practical step. Samples allow you to test seal strength, waterproofing, and how the packaging handles your actual products. A supplier confident in their product should provide samples readily. Zero Pack provides certification documentation and samples on request as part of the quoting process. To begin a quote for custom branded compostable packaging, use the [custom compostable mailers enquiry page](/custom-compostable-mailers/).",
         ],
       },
     ],
@@ -202,7 +202,7 @@ export const articlesPartA: Article[] = [
         heading: "What to have ready before enquiring",
         paragraphs: [
           "You do not need finalised artwork, exact dimensions, or a precise order quantity to begin. Estimates are enough. The information that produces the most useful initial quote: your website URL or brand references; approximate mailer dimensions based on your most common products; estimated monthly order volume; print intent (logo-only, multi-colour, or full coverage); delivery country; and the date you need packaging by.",
-          "Free design support is available if your brand assets are not yet print-ready. A PNG logo, HEX colour codes, and a sense of the layout you want is enough to begin. Zero Pack can prepare artwork to production standards as part of the quoting and approval process. The starting point is the [custom compostable mailers enquiry page](/trend-packaging-funnel/).",
+          "Free design support is available if your brand assets are not yet print-ready. A PNG logo, HEX colour codes, and a sense of the layout you want is enough to begin. Zero Pack can prepare artwork to production standards as part of the quoting and approval process. The starting point is the [custom compostable mailers enquiry page](/custom-compostable-mailers/).",
         ],
       },
     ],
@@ -299,7 +299,7 @@ export const articlesPartA: Article[] = [
         heading: "What to do if you are below MOQ",
         paragraphs: [
           "Not being at MOQ is a temporary state for most growing brands. If your current volume means 2,000 units would last more than 24 months, map the volume trajectory and identify when custom packaging becomes practical — then begin the enquiry process at that point, leaving enough lead time for production.",
-          "In the interim, plain packaging with a branded sticker or insert maintains some brand presence without requiring custom production. It is not a permanent solution, but it is a reasonable bridge while volumes build. Zero Pack is happy to have an early enquiry conversation even when a brand is not yet at MOQ — the most useful outcome is often a clear picture of what needs to happen first. Not sure if you are ready? Ask us before you order. To start the conversation, use the [custom compostable mailers enquiry page](/trend-packaging-funnel/).",
+          "In the interim, plain packaging with a branded sticker or insert maintains some brand presence without requiring custom production. It is not a permanent solution, but it is a reasonable bridge while volumes build. Zero Pack is happy to have an early enquiry conversation even when a brand is not yet at MOQ — the most useful outcome is often a clear picture of what needs to happen first. Not sure if you are ready? Ask us before you order. To start the conversation, use the [custom compostable mailers enquiry page](/custom-compostable-mailers/).",
         ],
       },
       {
@@ -543,7 +543,7 @@ export const articlesPartA: Article[] = [
         heading: "When is the right time to invest in custom branded packaging?",
         paragraphs: [
           "Custom branded packaging is not the right investment for every ecommerce business at every stage. The typical readiness signals: shipping 100 or more orders per month consistently, a stable brand identity with defined logo and colours, products with a consistent size profile that suits a mailer format, and a desire to bring packaging in line with the quality and positioning of everything else.",
-          "For brands with sustainability positioning, the case for custom branded compostable packaging is often even clearer — it closes both the brand gap and the environmental gap simultaneously. For the full eco friendly packaging landscape, the [2026 Branded and Eco Friendly Packaging Guide](/packaging-guide/) covers all major categories in detail. When you are ready to enquire, begin at the [custom compostable mailers page](/trend-packaging-funnel/).",
+          "For brands with sustainability positioning, the case for custom branded compostable packaging is often even clearer — it closes both the brand gap and the environmental gap simultaneously. For the full eco friendly packaging landscape, the [2026 Branded and Eco Friendly Packaging Guide](/packaging-guide/) covers all major categories in detail. When you are ready to enquire, begin at the [custom compostable mailers page](/custom-compostable-mailers/).",
         ],
       },
     ],
@@ -649,7 +649,7 @@ export const articlesPartA: Article[] = [
         heading: "Compostable packaging for fashion brands",
         paragraphs: [
           "Fashion is one of the industries most associated with sustainability challenges — the environmental impact of fast fashion, synthetic fibres, and conventional plastic packaging is well-documented and top of mind for a significant proportion of fashion consumers. Brands that communicate sustainability values are expected to demonstrate those values in the physical experience of receiving an order.",
-          "Certified compostable mailers — branded with the fashion brand's artwork and carrying clear disposal instructions — close the gap between the sustainability story told online and the experience delivered at the door. For fashion brands in the mid-to-premium segment, this alignment is a meaningful competitive advantage. The [Compostable Mailers guide](/articles/compostable-mailers-guide/) covers materials and certification in detail. To begin a quote for fashion-focused branded compostable mailers, use the [custom compostable mailers enquiry page](/trend-packaging-funnel/).",
+          "Certified compostable mailers — branded with the fashion brand's artwork and carrying clear disposal instructions — close the gap between the sustainability story told online and the experience delivered at the door. For fashion brands in the mid-to-premium segment, this alignment is a meaningful competitive advantage. The [Compostable Mailers guide](/articles/compostable-mailers-guide/) covers materials and certification in detail. To begin a quote for fashion-focused branded compostable mailers, use the [custom compostable mailers enquiry page](/custom-compostable-mailers/).",
         ],
       },
     ],

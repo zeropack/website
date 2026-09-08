@@ -6,6 +6,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const base = getSiteUrl();
   const lastModified = new Date();
 
+  // Global/default sitemap only. AU and UK have hostname-specific sitemaps;
+  // future US/EU/CA routes stay out of discovery until those markets launch.
   const staticPaths = [
     "/",
     "/trend-packaging-funnel/",
@@ -20,22 +22,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/contact/",
     "/privacy/",
     "/terms/",
-    "/au/",
-    "/uk/",
-    "/us/",
-    "/eu/",
-    "/au/articles/",
-    "/uk/articles/",
-    "/au/custom-compostable-mailers/",
-    "/uk/custom-compostable-mailers/",
-    "/us/custom-compostable-mailers/",
-    "/eu/custom-compostable-mailers/",
   ];
 
-  const articles = getAllArticles().map((article) => ({
-    url: `${base}${getArticlePath(article)}`,
-    lastModified,
-  }));
+  const articles = getAllArticles()
+    .filter((article) => !getArticlePath(article).startsWith("/au/") && !getArticlePath(article).startsWith("/uk/"))
+    .map((article) => ({
+      url: `${base}${getArticlePath(article)}`,
+      lastModified,
+    }));
 
   return [
     ...staticPaths.map((path) => ({

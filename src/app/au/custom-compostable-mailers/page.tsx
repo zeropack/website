@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { buildMetadata, mailersHreflang } from "@/lib/metadata";
+import { buildMarketCanonical, buildMetadata, mailersHreflang } from "@/lib/metadata";
 import { MailersLanding } from "@/components/page-sections/MailersLanding";
 import { getRegionConfig } from "@/lib/regions";
 
@@ -9,12 +9,9 @@ export const metadata: Metadata = buildMetadata({
     getRegionConfig("au").seo.mailers?.description ??
     "Create custom branded compostable mailers for your business.",
   path: "/au/custom-compostable-mailers/",
-  hreflang: mailersHreflang({
-    au: "/au/custom-compostable-mailers/",
-    uk: "/uk/custom-compostable-mailers/",
-    us: "/us/custom-compostable-mailers/",
-    eu: "/eu/custom-compostable-mailers/",
-  }),
+  canonicalUrl: buildMarketCanonical("au", "/custom-compostable-mailers"),
+  hreflang: mailersHreflang(),
+  locale: "en-AU",
 });
 
 export default function Page() {

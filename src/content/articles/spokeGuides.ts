@@ -121,7 +121,7 @@ export const spokeGuides: Article[] = [
         paragraphs: [
           "Compostability claims are only credible when they are specific and backed by certification documentation. Vague language — 'eco-friendly', 'planet-safe', 'biodegradable' — is increasingly scrutinised by customers and, in some markets, by consumer protection regulators. Ask your supplier for the specific certification standard and whether the material is home or industrial compostable before making any claims.",
           "The disposal guidance you put on your packaging must match your certification exactly. Home compostable packaging directs customers to their home compost bin. Industrial compostable packaging directs customers to a managed organics collection service. Mismatched guidance undermines the environmental outcome and the credibility of the claim. For artwork guidance and certification language, see the full [2026 Branded and Eco Friendly Packaging Guide](/packaging-guide/).",
-          "If you are ready to move forward, start with a [custom compostable mailer quote](/trend-packaging-funnel/). If your artwork is not yet print-ready, first read the guide on how to [prepare your artwork files](/articles/how-to-prepare-artwork-for-custom-mailers/) — it covers file formats, safe zones, colour references, and what Zero Pack needs from you to produce an accurate proof.",
+          "If you are ready to move forward, start with a [custom compostable mailer quote](/custom-compostable-mailers/). If your artwork is not yet print-ready, first read the guide on how to [prepare your artwork files](/articles/how-to-prepare-artwork-for-custom-mailers/) — it covers file formats, safe zones, colour references, and what Zero Pack needs from you to produce an accurate proof.",
         ],
       },
     ],
@@ -254,7 +254,7 @@ export const spokeGuides: Article[] = [
         paragraphs: [
           "The starting point for most brands is a quote based on their primary mailer size, estimated monthly order volume, and print direction. Zero Pack supplies custom compostable mailers — branded to your specification — with certification documentation and disposal guidance support.",
           "If you are evaluating compostable mailers for the first time, requesting samples before committing to a production run is a practical step. Samples let you test material quality, seal strength, gauge, and how the mailer handles your actual products. Zero Pack can provide samples as part of the quoting process.",
-          "For branded compostable mailers produced to your specification, the [custom compostable mailers enquiry page](/trend-packaging-funnel/) is the right starting point. For full detail on MOQ, lead times, and specification decisions, see the [Custom Compostable Mailers guide](/articles/custom-compostable-mailers-guide/).",
+          "For branded compostable mailers produced to your specification, the [custom compostable mailers enquiry page](/custom-compostable-mailers/) is the right starting point. For full detail on MOQ, lead times, and specification decisions, see the [Custom Compostable Mailers guide](/articles/custom-compostable-mailers-guide/).",
         ],
       },
     ],
@@ -400,7 +400,7 @@ export const spokeGuides: Article[] = [
         heading: "When is the right time to invest in branded mailers?",
         paragraphs: [
           "You are likely ready if most of the following are true: you ship 100 or more orders per month consistently; you have a stable brand identity with a defined logo and colours; your products have a consistent size profile that suits a mailer format; and you want packaging that matches your product quality and positioning. If your brand is still evolving or volumes are unpredictable, the right step is often to get clear on what needs to happen first — Zero Pack is happy to have that conversation early.",
-          "When you are ready, the starting point is a quote request via the [custom compostable mailers enquiry page](/trend-packaging-funnel/). Rough dimensions, a monthly volume estimate, and any logo or brand files you have are enough to begin.",
+          "When you are ready, the starting point is a quote request via the [custom compostable mailers enquiry page](/custom-compostable-mailers/). Rough dimensions, a monthly volume estimate, and any logo or brand files you have are enough to begin.",
         ],
       },
     ],
@@ -568,7 +568,7 @@ export const spokeGuides: Article[] = [
         heading: "When branded compostable mailers are the right upgrade",
         paragraphs: [
           "For brands in fashion, beauty, wellness, lifestyle, and subscription categories that are ready to invest in packaging, branded compostable mailers are the strongest combined specification: fulfilment-ready performance, full brand artwork, and a certifiable environmental story. They replace conventional plastic in the same workflow without operational changes.",
-          "Zero Pack supplies custom branded compostable mailers produced to your size, print, and quantity specification. Free design support is available if your brand assets are not yet print-ready. To begin a quote, use the [custom compostable mailers enquiry page](/trend-packaging-funnel/). For more on design, brand impact, and the commercial case, read the [Branded Mailers for Ecommerce guide](/articles/branded-mailers-for-ecommerce/).",
+          "Zero Pack supplies custom branded compostable mailers produced to your size, print, and quantity specification. Free design support is available if your brand assets are not yet print-ready. To begin a quote, use the [custom compostable mailers enquiry page](/custom-compostable-mailers/). For more on design, brand impact, and the commercial case, read the [Branded Mailers for Ecommerce guide](/articles/branded-mailers-for-ecommerce/).",
         ],
       },
     ],
@@ -697,7 +697,7 @@ export const spokeGuides: Article[] = [
         paragraphs: [
           "Once you have moved past the label and understand what you are actually evaluating, the choice between material types becomes clearer. For a detailed comparison of [compostable mailers vs recycled plastic mailers](/articles/compostable-mailers-vs-recycled-plastic-mailers/), that article covers the trade-offs in full, including a side-by-side verdict table. For the distinction between [compostable and biodegradable packaging](/articles/compostable-vs-biodegradable-packaging/), see that guide for the regulatory context and a quick comparison table.",
           "In summary: recycled plastic mailers reduce upstream virgin plastic use but remain plastic at end of life. Paper mailers offer a natural disposal pathway but have transit and moisture-resistance limitations for many soft-goods categories. Certified compostable mailers offer a genuine alternative end-of-life pathway — composting rather than landfill — when backed by a named certification and correct disposal guidance.",
-          "For brands wanting to make a specific and defensible claim — not a vague one — certified compostable is the clearest position. The certification standard can be named. The certifying body can be identified. The disposal instruction is precise. And the claim can be documented if a customer or regulator asks. For detail on how compostable mailer certification works in practice, see the [compostable mailers guide](/articles/compostable-mailers-guide/). To start a quote, use the [custom compostable mailers enquiry page](/trend-packaging-funnel/).",
+          "For brands wanting to make a specific and defensible claim — not a vague one — certified compostable is the clearest position. The certification standard can be named. The certifying body can be identified. The disposal instruction is precise. And the claim can be documented if a customer or regulator asks. For detail on how compostable mailer certification works in practice, see the [compostable mailers guide](/articles/compostable-mailers-guide/). To start a quote, use the [custom compostable mailers enquiry page](/custom-compostable-mailers/).",
         ],
       },
     ],
@@ -840,7 +840,7 @@ export const spokeGuides: Article[] = [
         heading: "What to say to customers about compostable packaging",
         paragraphs: [
           "The claim you make to customers must be specific, accurate, and matched to the certification you have. Vague language — 'eco packaging', 'sustainable mailers', 'planet-friendly' — is increasingly scrutinised by consumer protection regulators in Australia, the UK, and the EU. Specific language — 'certified home compostable — place in your home compost bin' — is accurate, actionable, and defensible.",
-          "Include disposal guidance on the mailer itself, not only on a card or insert that may be discarded. Brief, clear instructions — ideally with the certification mark where space allows — give customers the information they need in the moment they need it. For the first step in specifying custom compostable mailers, use the [custom compostable mailers enquiry page](/trend-packaging-funnel/).",
+          "Include disposal guidance on the mailer itself, not only on a card or insert that may be discarded. Brief, clear instructions — ideally with the certification mark where space allows — give customers the information they need in the moment they need it. For the first step in specifying custom compostable mailers, use the [custom compostable mailers enquiry page](/custom-compostable-mailers/).",
         ],
       },
     ],
@@ -1058,7 +1058,7 @@ export const spokeGuides: Article[] = [
         paragraphs: [
           "For brands shipping soft goods in categories where packaging quality, brand presentation, and environmental positioning all matter — fashion, beauty, lifestyle, wellness, gifts — certified custom compostable packaging is the strongest available combination. It offers a defined material (plant-based), a defined disposal pathway (composting), a certification that can be named and documented, and disposal instructions that tell customers exactly what to do.",
           "It is not the cheapest option. It is the most coherent option for brands that have made sustainability part of their identity and need the packaging to be consistent with that. Custom branded compostable mailers from Zero Pack combine certified compostable material with full brand artwork in a format operationally identical to the conventional plastic mailer it replaces.",
-          "For detail on the compostable mailer format, see the [Compostable Mailers guide](/articles/compostable-mailers-guide/). To begin a quote for custom branded eco friendly packaging, use the [custom compostable packaging enquiry page](/trend-packaging-funnel/).",
+          "For detail on the compostable mailer format, see the [Compostable Mailers guide](/articles/compostable-mailers-guide/). To begin a quote for custom branded eco friendly packaging, use the [custom compostable packaging enquiry page](/custom-compostable-mailers/).",
         ],
       },
     ],

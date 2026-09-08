@@ -1,4 +1,5 @@
 import { buildMarketUrl } from "@/lib/marketRouting";
+import { getMarketArticleSlugs } from "@/content/articles";
 
 export const dynamic = "force-static";
 
@@ -17,6 +18,8 @@ export function GET() {
     "/quote",
     "/packaging-guide",
     "/contact",
+    "/articles",
+    ...getMarketArticleSlugs("AU").map((slug) => `/articles/${slug}`),
   ];
   const urls = paths.map((path) => buildMarketUrl("au", path));
   const body = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls

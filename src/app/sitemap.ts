@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
 import { getAllArticles, getArticlePath } from "@/content/articles";
-import { getSiteUrl } from "@/lib/site";
+import { MARKET_ROUTES } from "@/lib/marketRouting";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = getSiteUrl();
+  const base = MARKET_ROUTES.global.canonicalOrigin;
   const lastModified = new Date();
 
   // Global/default sitemap only. AU and UK have hostname-specific sitemaps;

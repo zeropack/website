@@ -1,5 +1,7 @@
 import type { ReactElement } from "react";
 
+type PublicMarket = "global" | "au" | "uk";
+
 type Badge = {
   text: string;
   description: string;
@@ -42,31 +44,84 @@ function CheckIcon({ className }: { className?: string }) {
   );
 }
 
-const badges: Badge[] = [
-  {
-    icon: AwardIcon,
-    text: "AS5810 certified",
-    description: "The Gold Standard for Home Compostable Certification",
-  },
-  {
-    icon: PackageIcon,
-    text: "Made to order from 2,000 units",
-    description: "Practical MOQ for growing ecommerce brands",
-  },
-  {
-    icon: GlobeIcon,
-    text: "Shipped worldwide",
-    description: "Global fulfilment support for ecommerce-led brands",
-  },
-  {
-    icon: CheckIcon,
-    text: "Quote response in 48 hours",
-    description: "Fast, clear guidance and free design support",
-  },
-];
+const badgesByMarket: Record<PublicMarket, Badge[]> = {
+  global: [
+    {
+      icon: AwardIcon,
+      text: "AS5810 certified",
+      description: "Independently certified for home compostability",
+    },
+    {
+      icon: PackageIcon,
+      text: "Made to order from 2,000 units",
+      description: "Practical MOQ for growing ecommerce brands",
+    },
+    {
+      icon: GlobeIcon,
+      text: "Shipped worldwide",
+      description: "Global fulfilment support for ecommerce-led brands",
+    },
+    {
+      icon: CheckIcon,
+      text: "Free design support",
+      description: "Practical help with artwork, sizing and specification",
+    },
+  ],
+  au: [
+    {
+      icon: AwardIcon,
+      text: "AS5810 certified",
+      description: "Independently certified for home compostability",
+    },
+    {
+      icon: PackageIcon,
+      text: "Made to order from 2,000 units",
+      description: "Practical MOQ for growing Australian brands",
+    },
+    {
+      icon: GlobeIcon,
+      text: "Australian owned",
+      description: "Local service with made-to-order production",
+    },
+    {
+      icon: CheckIcon,
+      text: "Free design support",
+      description: "Practical help with artwork, sizing and specification",
+    },
+  ],
+  uk: [
+    {
+      icon: AwardIcon,
+      text: "TÜV OK compost HOME",
+      description: "Recognised independent home-compostability certification",
+    },
+    {
+      icon: PackageIcon,
+      text: "Made to order from 2,000 units",
+      description: "Practical MOQ for growing UK ecommerce brands",
+    },
+    {
+      icon: GlobeIcon,
+      text: "UK delivery available",
+      description: "Planned production and freight confirmed with your quote",
+    },
+    {
+      icon: CheckIcon,
+      text: "Free design support",
+      description: "Practical help with artwork, sizing and specification",
+    },
+  ],
+};
 
-export function TrustBadges({ variant = "default" }: { variant?: "default" | "climate" }) {
+export function TrustBadges({
+  variant = "default",
+  market = "global",
+}: {
+  variant?: "default" | "climate";
+  market?: PublicMarket;
+}) {
   const isClimate = variant === "climate";
+  const badges = badgesByMarket[market];
 
   return (
     <section className={isClimate ? "border-y border-slate-800/80 bg-charcoal py-8 sm:py-10" : "bg-white py-8 sm:py-10"}>

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { absoluteUrl, getSiteUrl } from "./site";
+import { buildMarketUrl, marketAlternates } from "./marketRouting";
+import type { MarketCode } from "./marketRouting";
 import type { RegionCode } from "./types";
 
 const DEFAULT_OG_IMAGE = "/og/default.png";
@@ -10,17 +12,21 @@ export function buildMetadata(opts: {
   title: string;
   description: string;
   path: string;
+  canonicalUrl?: string;
   hreflang?: HreflangSpec;
   ogImagePath?: string;
   openGraphType?: "website" | "article";
+  locale?: string;
 }): Metadata {
-  const url = absoluteUrl(opts.path);
+  const url = opts.canonicalUrl ?? absoluteUrl(opts.path);
+  const metadataOrigin = new URL(url).origin;
   const ogPath = opts.ogImagePath ?? DEFAULT_OG_IMAGE;
-  const og = absoluteUrl(ogPath);
+  const og = /^https?:\/\//i.test(ogPath) ? ogPath : `${metadataOrigin}${ogPath.startsWith("/") ? ogPath : `/${ogPath}`}`;
+
   return {
     title: opts.title,
     description: opts.description,
-    metadataBase: new URL(getSiteUrl()),
+    metadataBase: new URL(metadataOrigin),
     alternates: {
       canonical: url,
       languages: opts.hreflang,
@@ -30,7 +36,7 @@ export function buildMetadata(opts: {
       description: opts.description,
       url,
       siteName: "Zero Pack",
-      locale: "en",
+      locale: opts.locale ?? "en",
       type: opts.openGraphType ?? "website",
       images: [{ url: og }],
     },
@@ -43,24 +49,16 @@ export function buildMetadata(opts: {
   };
 }
 
-/** Hreflang for regional home routes */
-export function regionHomeHreflang(): HreflangSpec {
-  return {
-    "en-AU": absoluteUrl("/au/"),
-    "en-GB": absoluteUrl("/uk/"),
-    "en-US": absoluteUrl("/us/"),
-    "en": absoluteUrl("/eu/"),
-    "x-default": absoluteUrl("/"),
-  };
+export function buildMarketCanonical(market: MarketCode, path = "/"): string {
+  return buildMarketUrl(market, path);
 }
 
-/** Common hreflang for mailers landing family */
-export function mailersHreflang(pathByRegion: Record<RegionCode, string>): HreflangSpec {
-  return {
-    "en-AU": absoluteUrl(pathByRegion.au),
-    "en-GB": absoluteUrl(pathByRegion.uk),
-    "en-US": absoluteUrl(pathByRegion.us),
-    "en": absoluteUrl(pathByRegion.eu),
-    "x-default": absoluteUrl("/custom-compostable-mailers/"),
-  };
+/** Hreflang for regional home routes across canonical market origins. */
+export function regionHomeHreflang(): HreflangSpec {
+  return marketAlternates("/");
+}
+
+/** Common hreflang for mailers landing family across canonical market origins. */
+export function mailersHreflang(_pathByRegion?: Record<RegionCode, string>): HreflangSpec {
+  return marketAlternates("/custom-compostable-mailers");
 }

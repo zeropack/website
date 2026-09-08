@@ -2,17 +2,48 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getGlobalArticles } from "@/content/articles";
 import { ArticleCard } from "@/components/ArticleCard";
-import { buildMetadata } from "@/lib/metadata";
+import { RegionalArticlesPage } from "@/components/RegionalArticlesPage";
 import { brandGuide } from "@/content/guides/brandGuide";
+import { buildMarketPageMetadata, getRequestMarket } from "@/lib/requestMarket";
 
-export const metadata: Metadata = buildMetadata({
-  title: "Articles | Compostable Packaging & Branded Packaging Guides",
-  description:
-    "Education on branded packaging, eco friendly packaging, custom compostable mailers, fulfilment, compliance and artwork — built for B2B buyers.",
-  path: "/articles/",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const market = await getRequestMarket();
 
-export default function Page() {
+  if (market === "au") {
+    return buildMarketPageMetadata({
+      market,
+      title: "Australia Articles | Packaging Guides & Market Updates",
+      description:
+        "Australian packaging guidance, regulation and market updates from Zero Pack, plus global guides relevant to ecommerce and packaging teams.",
+      path: "/articles/",
+    });
+  }
+
+  if (market === "uk") {
+    return buildMarketPageMetadata({
+      market,
+      title: "UK Articles | Packaging Guides & Market Updates",
+      description:
+        "UK packaging guidance, regulation and market updates from Zero Pack, plus global guides relevant to ecommerce and packaging teams.",
+      path: "/articles/",
+    });
+  }
+
+  return buildMarketPageMetadata({
+    market: "global",
+    title: "Articles | Compostable Packaging & Branded Packaging Guides",
+    description:
+      "Education on branded packaging, eco friendly packaging, custom compostable mailers, fulfilment, compliance and artwork — built for B2B buyers.",
+    path: "/articles/",
+  });
+}
+
+export default async function Page() {
+  const market = await getRequestMarket();
+
+  if (market === "au") return <RegionalArticlesPage market="AU" marketName="Australia" />;
+  if (market === "uk") return <RegionalArticlesPage market="UK" marketName="United Kingdom" />;
+
   const articles = getGlobalArticles();
 
   return (

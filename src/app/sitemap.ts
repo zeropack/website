@@ -10,7 +10,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // future US/EU/CA routes stay out of discovery until those markets launch.
   const staticPaths = [
     "/",
-    "/trend-packaging-funnel/",
     "/custom-compostable-mailers/",
     "/custom-compostable-packaging/",
     "/how-it-works/",

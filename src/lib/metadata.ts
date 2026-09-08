@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { absoluteUrl, getSiteUrl } from "./site";
-import { buildMarketUrl, marketAlternates } from "./marketRouting";
+import { buildMarketUrl, launchedMarketAlternates } from "./marketRouting";
 import type { MarketCode } from "./marketRouting";
 import type { RegionCode } from "./types";
 
@@ -53,12 +53,12 @@ export function buildMarketCanonical(market: MarketCode, path = "/"): string {
   return buildMarketUrl(market, path);
 }
 
-/** Hreflang for regional home routes across canonical market origins. */
+/** Hreflang for launched regional home routes across canonical market origins. */
 export function regionHomeHreflang(): HreflangSpec {
-  return marketAlternates("/");
+  return launchedMarketAlternates("/");
 }
 
-/** Common hreflang for mailers landing family across canonical market origins. */
+/** Common hreflang for the launched mailers landing family. */
 export function mailersHreflang(_pathByRegion?: Record<RegionCode, string>): HreflangSpec {
-  return marketAlternates("/custom-compostable-mailers");
+  return launchedMarketAlternates("/custom-compostable-mailers");
 }

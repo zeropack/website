@@ -80,7 +80,7 @@ export const articlesPartB: Article[] = [
         paragraphs: [
           "Customers in fashion, beauty, lifestyle, and wellness categories notice packaging changes and comment on them — positively when the change is clearly explained, critically when it is not. Getting the communication right turns a packaging switch into a brand moment.",
           "The core message should be specific: what changed, why, and what customers should do with the new packaging. For certified compostable mailers: the material is plant-based, certified to AS5810 (or EN 13432, as applicable), and customers should place it in their home compost bin (or organics collection, as applicable). Include the certification mark on the packaging itself where space allows.",
-          "Avoid overclaiming. 'We have switched to certified home compostable packaging to reduce our reliance on conventional plastic' is accurate and credible. 'Our packaging is now zero waste' is not. Specific and honest claims build more trust than aspirational ones that cannot be substantiated. When you are ready to begin, start with the [custom compostable mailers enquiry page](/trend-packaging-funnel/).",
+          "Avoid overclaiming. 'We have switched to certified home compostable packaging to reduce our reliance on conventional plastic' is accurate and credible. 'Our packaging is now zero waste' is not. Specific and honest claims build more trust than aspirational ones that cannot be substantiated. When you are ready to begin, start with the [custom compostable mailers enquiry page](/custom-compostable-mailers/).",
         ],
       },
     ],
@@ -199,7 +199,7 @@ export const articlesPartB: Article[] = [
         heading: "What to have ready before getting a quote",
         paragraphs: [
           "Estimates are enough to begin — you do not need finalised artwork or exact dimensions. What helps is a clear picture of your product range, dispatch volume, timeline, and print intent. Useful information: your website URL or brand references; approximate internal dimensions based on your most common products; estimated monthly dispatch volume; print direction; delivery country; required-by date. If you use a 3PL, mention it.",
-          "Useful files: vector logo if available (.ai, .eps, PDF), or a high-resolution PNG/JPG as a starting point; Pantone or HEX colour references; any brand guidelines. Zero Pack offers free design support. The starting point is the [custom compostable mailers enquiry page](/trend-packaging-funnel/).",
+          "Useful files: vector logo if available (.ai, .eps, PDF), or a high-resolution PNG/JPG as a starting point; Pantone or HEX colour references; any brand guidelines. Zero Pack offers free design support. The starting point is the [custom compostable mailers enquiry page](/custom-compostable-mailers/).",
         ],
       },
     ],
@@ -313,7 +313,7 @@ export const articlesPartB: Article[] = [
         heading: "Making the transition: sequential or direct?",
         paragraphs: [
           "Many brands make this decision sequentially — recycled plastic as a transitional step while volumes build to the custom compostable MOQ threshold, then custom branded compostable as the long-term position. That path is pragmatic and commercially coherent. The important thing is to be honest with customers about where you are in the journey.",
-          "For brands ready to move directly to custom compostable, the starting point is the [custom compostable mailers enquiry page](/trend-packaging-funnel/). For brands evaluating the comparison in more depth, the [Compostable Mailers guide](/articles/compostable-mailers-guide/) covers certification and specification in detail.",
+          "For brands ready to move directly to custom compostable, the starting point is the [custom compostable mailers enquiry page](/custom-compostable-mailers/). For brands evaluating the comparison in more depth, the [Compostable Mailers guide](/articles/compostable-mailers-guide/) covers certification and specification in detail.",
         ],
       },
     ],
@@ -401,7 +401,7 @@ export const articlesPartB: Article[] = [
         heading: "Branded compostable packaging: when values and experience align",
         paragraphs: [
           "For brands in fashion, beauty, lifestyle, and wellness — where sustainability values are part of the brand positioning — receiving an order in a certified compostable branded mailer creates an alignment between the story the brand tells and the experience it delivers. Customers who care about environmental issues notice when a brand's packaging contradicts its values. Branded compostable packaging turns the sustainability claim from a marketing assertion into a tangible customer experience.",
-          "'We are committed to reducing plastic waste' is a statement. A certified home compostable mailer with disposal instructions printed on the pack is the same commitment, physically in the customer's hands. For the full overview of branded packaging's commercial and environmental case, the [2026 Branded and Eco Friendly Packaging Guide](/packaging-guide/) covers both in detail. To begin a quote for branded compostable packaging, use the [custom compostable mailers enquiry page](/trend-packaging-funnel/).",
+          "'We are committed to reducing plastic waste' is a statement. A certified home compostable mailer with disposal instructions printed on the pack is the same commitment, physically in the customer's hands. For the full overview of branded packaging's commercial and environmental case, the [2026 Branded and Eco Friendly Packaging Guide](/packaging-guide/) covers both in detail. To begin a quote for branded compostable packaging, use the [custom compostable mailers enquiry page](/custom-compostable-mailers/).",
         ],
       },
       {
@@ -513,7 +513,7 @@ export const articlesPartB: Article[] = [
         heading: "How to choose between home and industrial compostable",
         paragraphs: [
           "The right choice depends on three factors: your customers' composting access, the material performance requirements of your products, and what disposal guidance you can credibly provide. For most ecommerce brands selling to consumers across Australia, the UK, or the EU, home compostable is the more accessible choice — it does not depend on municipal infrastructure and gives customers a clear, actionable instruction.",
-          "From a material performance perspective, some specifications differ between home and industrial compostable material — thickness, moisture resistance, and seal performance may vary. Discuss the performance trade-offs with your supplier before choosing. Zero Pack can advise on the material options available for your specific product and market. The starting point is the [custom compostable mailers enquiry page](/trend-packaging-funnel/). For a broader compostable packaging guide, see the [packaging guide](/packaging-guide/).",
+          "From a material performance perspective, some specifications differ between home and industrial compostable material — thickness, moisture resistance, and seal performance may vary. Discuss the performance trade-offs with your supplier before choosing. Zero Pack can advise on the material options available for your specific product and market. The starting point is the [custom compostable mailers enquiry page](/custom-compostable-mailers/). For a broader compostable packaging guide, see the [packaging guide](/packaging-guide/).",
         ],
       },
     ],
@@ -616,7 +616,7 @@ export const articlesPartB: Article[] = [
         heading: "What AS5810 certification means for your packaging decisions",
         paragraphs: [
           "For ecommerce brands, AS5810 certification means the home compostable claim is verifiable, documented, and backed by third-party testing. This matters commercially — retailers in sustainable product categories increasingly expect certification documentation. It matters regulatorily — the ACCC applies Australian Consumer Law to packaging claims, and unverified compostable claims are an area of active scrutiny. And it matters for customers — certification is the mechanism through which the environmental benefit is made credible.",
-          "The practical implication: when purchasing compostable packaging, always request the ABAP certification number or certificate. Confirm whether it is AS5810 (home) or AS4736 (industrial). Match your disposal instructions and marketing claims to the specific certification. If a supplier cannot provide documentation, or if documentation is unclear about which standard applies, that is a significant red flag. For custom branded compostable packaging, the [custom mailers enquiry page](/trend-packaging-funnel/) is the starting point.",
+          "The practical implication: when purchasing compostable packaging, always request the ABAP certification number or certificate. Confirm whether it is AS5810 (home) or AS4736 (industrial). Match your disposal instructions and marketing claims to the specific certification. If a supplier cannot provide documentation, or if documentation is unclear about which standard applies, that is a significant red flag. For custom branded compostable packaging, the [custom mailers enquiry page](/custom-compostable-mailers/) is the starting point.",
         ],
       },
     ],

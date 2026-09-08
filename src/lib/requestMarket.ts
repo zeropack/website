@@ -4,7 +4,7 @@ import {
   MARKET_ROUTES,
   buildMarketUrl,
   getMarketFromHost,
-  marketAlternates,
+  launchedMarketAlternates,
 } from "@/lib/marketRouting";
 
 export type LaunchedMarket = "global" | "au" | "uk";
@@ -31,7 +31,7 @@ export function buildMarketPageMetadata({
     description,
     path,
     canonicalUrl: buildMarketUrl(market, path),
-    hreflang: marketAlternates(path),
+    hreflang: launchedMarketAlternates(path),
     locale: MARKET_ROUTES[market].locale,
   });
 }

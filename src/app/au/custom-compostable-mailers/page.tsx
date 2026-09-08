@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { buildMarketCanonical, buildMetadata, mailersHreflang } from "@/lib/metadata";
-import { MailersLanding } from "@/components/page-sections/MailersLanding";
+import { PremiumMailerPage } from "@/components/page-sections/PremiumMailerPage";
 import { getRegionConfig } from "@/lib/regions";
 
 export const metadata: Metadata = buildMetadata({
@@ -15,5 +15,5 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default function Page() {
-  return <MailersLanding variant="au" />;
+  return <PremiumMailerPage market="au" />;
 }

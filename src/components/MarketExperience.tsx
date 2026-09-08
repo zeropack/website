@@ -104,7 +104,8 @@ export function MarketExperience() {
 
   if (!suggestedMarket) return null;
 
-  const suggested = MARKET_DETAILS[suggestedMarket];
+  const activeSuggestedMarket = suggestedMarket;
+  const suggested = MARKET_DETAILS[activeSuggestedMarket];
 
   function stayHere() {
     savePreference(currentMarket);
@@ -112,14 +113,14 @@ export function MarketExperience() {
   }
 
   function visitSuggestedMarket() {
-    savePreference(suggestedMarket);
+    savePreference(activeSuggestedMarket);
     const currentUrl = new URL(window.location.href);
     const target = new URL(currentUrl.pathname, suggested.origin);
 
     for (const [key, value] of currentUrl.searchParams.entries()) {
       if (key !== "market") target.searchParams.append(key, value);
     }
-    target.searchParams.set("market", suggestedMarket);
+    target.searchParams.set("market", activeSuggestedMarket);
     target.hash = currentUrl.hash;
 
     window.location.assign(target.toString());

@@ -12,8 +12,10 @@ export function GET() {
     "/custom-compostable-mailers",
     "/custom-compostable-packaging",
     "/how-it-works",
+    "/customer-showcase",
     "/about",
     "/quote",
+    "/packaging-guide",
     "/contact",
   ];
   const urls = paths.map((path) => buildMarketUrl("uk", path));

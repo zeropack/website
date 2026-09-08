@@ -1,0 +1,41 @@
+name: Narrow CTA remediation
+
+on:
+  push:
+    branches:
+      - fix/article-commercial-mailer-cta
+
+permissions:
+  contents: write
+
+jobs:
+  replace-spoke-cta:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/article-commercial-mailer-cta
+          fetch-depth: 0
+      - name: Replace legacy CTA in spoke guides only
+        shell: bash
+        run: |
+          set -euo pipefail
+          file='src/content/articles/spokeGuides.ts'
+          before=$(grep -oF '/trend-packaging-funnel/' "$file" | wc -l)
+          test "$before" -eq 7
+          sed -i 's#/trend-packaging-funnel/#/custom-compostable-mailers/#g' "$file"
+          after=$(grep -oF '/trend-packaging-funnel/' "$file" | wc -l || true)
+          replacement_count=$(grep -oF '/custom-compostable-mailers/' "$file" | wc -l)
+          test "$after" -eq 0
+          test "$replacement_count" -ge 7
+          git diff --exit-code -- . ':!src/content/articles/spokeGuides.ts'
+      - name: Commit deterministic spoke change
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/content/articles/spokeGuides.ts
+          git commit -m 'Replace legacy article CTA links in spoke guides'
+          git push origin HEAD:fix/article-commercial-mailer-cta

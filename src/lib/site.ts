@@ -6,11 +6,11 @@ export const GA_MEASUREMENT_ID =
 
 export const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "enquiries@zeropack.co";
 
-/** Trend packaging funnel landing page. */
-export const TREND_PACKAGING_FUNNEL_HREF = "/trend-packaging-funnel/";
+/** Canonical custom compostable mailers landing page. */
+export const TREND_PACKAGING_FUNNEL_HREF = "/custom-compostable-mailers/";
 
-/** Primary quote CTA — Typeform on the trend packaging funnel landing page. */
-export const QUOTE_FORM_HREF = "/trend-packaging-funnel#quoteform";
+/** Primary quote CTA — Typeform on the canonical custom mailers page. */
+export const QUOTE_FORM_HREF = "/custom-compostable-mailers/#quoteform";
 
 export function getSiteUrl(): string {
   const base = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");

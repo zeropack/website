@@ -22,13 +22,17 @@ function redirectToOrigin(request: NextRequest, origin: string, pathname: string
   return NextResponse.redirect(target, 308);
 }
 
+function rewriteTo(request: NextRequest, pathname: string) {
+  const target = request.nextUrl.clone();
+  target.pathname = pathname;
+  return NextResponse.rewrite(target);
+}
+
 function rewriteRegionalRoute(request: NextRequest, region: "au" | "uk") {
   const pathname = withoutTrailingSlash(request.nextUrl.pathname);
   if (!REGIONAL_PUBLIC_ROUTES.has(pathname)) return null;
 
-  const target = request.nextUrl.clone();
-  target.pathname = pathname === "/" ? `/${region}/` : `/${region}${pathname}/`;
-  return NextResponse.rewrite(target);
+  return rewriteTo(request, pathname === "/" ? `/${region}/` : `/${region}${pathname}/`);
 }
 
 export function proxy(request: NextRequest) {
@@ -51,12 +55,15 @@ export function proxy(request: NextRequest) {
     return redirectToOrigin(request, "https://www.zeropack.co.uk", destinationPath);
   }
 
-  // Keep the public regional URL clean while reusing the existing internal regional pages.
   if (AU_HOSTS.has(host)) {
+    if (pathname === "/sitemap.xml") return rewriteTo(request, "/market-seo/au/sitemap");
+    if (pathname === "/robots.txt") return rewriteTo(request, "/market-seo/au/robots");
     return rewriteRegionalRoute(request, "au") ?? NextResponse.next();
   }
 
   if (UK_HOSTS.has(host)) {
+    if (pathname === "/sitemap.xml") return rewriteTo(request, "/market-seo/uk/sitemap");
+    if (pathname === "/robots.txt") return rewriteTo(request, "/market-seo/uk/robots");
     return rewriteRegionalRoute(request, "uk") ?? NextResponse.next();
   }
 
@@ -65,6 +72,6 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|css|js|map|woff|woff2)$).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|css|js|map|woff|woff2)$).*)",
   ],
 };

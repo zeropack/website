@@ -15,6 +15,12 @@ function geoMarketFromCountry(country: string | null): LaunchedMarket | null {
   return null;
 }
 
+function marketChoiceUrl(market: LaunchedMarket, path: string): string {
+  const url = new URL(buildMarketUrl(market, path));
+  url.searchParams.set("market", market);
+  return url.toString();
+}
+
 export async function LegalMarketNotice({ path, noun = "terms" }: Props) {
   const requestHeaders = await headers();
   const currentMarket = await getRequestMarket();
@@ -53,7 +59,7 @@ export async function LegalMarketNotice({ path, noun = "terms" }: Props) {
             return (
               <a
                 key={option.code}
-                href={buildMarketUrl(option.code, path)}
+                href={marketChoiceUrl(option.code, path)}
                 className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
                   active
                     ? "border-charcoal bg-charcoal text-white"
@@ -78,7 +84,7 @@ export async function LegalMarketNotice({ path, noun = "terms" }: Props) {
             Location detection can be wrong, including when using a VPN, travelling or connecting through a corporate network. You can always choose the correct market manually above.
           </p>
           <a
-            href={buildMarketUrl(geoMarket, path)}
+            href={marketChoiceUrl(geoMarket, path)}
             className="mt-4 inline-flex rounded-full bg-charcoal px-4 py-2 font-semibold text-white transition hover:bg-charcoal/90"
           >
             View {suggestedLabel} version

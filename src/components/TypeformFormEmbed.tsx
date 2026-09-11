@@ -123,9 +123,16 @@ export function TypeformFormEmbed({ className }: { className?: string }) {
       host.replaceChildren();
 
       const target = document.createElement("div");
+      const market = marketFromHostname(window.location.hostname);
+      const hidden = [
+        `website_market=${encodeURIComponent(market)}`,
+        `source_domain=${encodeURIComponent(window.location.hostname)}`,
+        `source_page=${encodeURIComponent(window.location.pathname)}`,
+      ].join(",");
 
       target.setAttribute("data-tf-live", TYPEFORM_LIVE_ID);
       target.setAttribute("data-tf-auto-resize", "300,750");
+      target.setAttribute("data-tf-hidden", hidden);
 
       // Keep the form inline on mobile instead of opening a fullscreen overlay modal.
       target.setAttribute("data-tf-inline-on-mobile", "");

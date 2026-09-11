@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 type TrackingStage = "ordered" | "in_transit" | "out_for_delivery" | "delivered";
+type TrackingMapKind = "carrier" | "event" | "destination_port" | "destination";
 
 type TrackingEvent = {
   waybill: string | null;
@@ -26,6 +27,14 @@ type ProjectEnrichment = {
   destination: PublicDestination | null;
 };
 
+type TrackingMap = {
+  query: string;
+  display: string;
+  label: string;
+  kind: TrackingMapKind;
+  note: string;
+};
+
 type TrackingResponse = {
   ok: true;
   trackingNumber: string;
@@ -33,6 +42,7 @@ type TrackingResponse = {
   status: { stage: TrackingStage; label: string };
   latestUpdate: string;
   latestLocation: string | null;
+  map: TrackingMap | null;
   project: ProjectEnrichment | null;
   events: TrackingEvent[];
 };
@@ -97,31 +107,21 @@ function prettyEta(value: string): string {
   }).format(date);
 }
 
-function MapPanel({
-  location,
-  destination,
-  events,
-}: {
-  location: string | null;
-  destination: PublicDestination | null;
-  events: TrackingEvent[];
-}) {
-  const currentLocation = location?.trim() || null;
+function MapPanel({ map, destination }: { map: TrackingMap | null; destination: PublicDestination | null }) {
   const destinationLabel = destination?.label?.trim() || null;
-  const query = currentLocation || destinationLabel;
-  const destinationFallback = !currentLocation && Boolean(destinationLabel);
+  const query = map?.query?.trim() || destinationLabel;
+  const display = map?.display?.trim() || destinationLabel;
+  const label = map?.label || (destinationLabel ? "Delivery destination" : "Shipment map");
+  const note = map?.note || null;
   const mapSrc = query
     ? `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`
     : null;
-  const recentLocations = Array.from(
-    new Set(events.map((event) => event.location.trim()).filter(Boolean)),
-  ).slice(0, 4);
 
   return (
     <div className="relative min-h-[430px] overflow-hidden rounded-[1.75rem] border border-black/10 bg-[#e9eee7] shadow-[0_24px_70px_-38px_rgba(17,24,39,0.45)] lg:min-h-[650px]">
       {mapSrc ? (
         <iframe
-          title={`Map showing ${query}`}
+          title={`Map showing ${display || query}`}
           src={mapSrc}
           className="absolute inset-0 h-full w-full border-0 grayscale-[0.08] contrast-[0.92] saturate-[0.72]"
           loading="lazy"
@@ -135,40 +135,21 @@ function MapPanel({
 
       <div className="absolute left-5 top-5 flex items-center gap-2 rounded-full border border-black/5 bg-white/95 px-4 py-2 text-sm font-semibold text-charcoal shadow-lg backdrop-blur">
         <span className="inline-block h-2.5 w-2.5 rounded-full bg-leaf" />
-        {destinationFallback ? "Delivery destination" : "Latest tracking location"}
+        {label}
       </div>
 
-      {query && (
+      {query && display && (
         <div className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/70 bg-white/95 p-4 shadow-xl backdrop-blur sm:right-auto sm:max-w-sm">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal/45">
-            {destinationFallback ? "On its way to" : "Latest location"}
-          </p>
-          <p className="mt-1 font-heading text-xl font-bold text-compost">{query}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal/45">{label}</p>
+          <p className="mt-1 font-heading text-xl font-bold text-compost">{display}</p>
 
-          {!destinationFallback && destinationLabel && (
+          {map?.kind !== "destination" && destinationLabel && (
             <p className="mt-2 text-sm font-medium text-charcoal/65">
-              On its way to <span className="font-bold text-charcoal">{destinationLabel}</span>
+              Delivering to <span className="font-bold text-charcoal">{destinationLabel}</span>
             </p>
           )}
 
-          {!destinationFallback && recentLocations.length > 1 && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {recentLocations.map((item, index) => (
-                <span
-                  key={`${item}-${index}`}
-                  className="rounded-full border border-compost/10 bg-mist px-2.5 py-1 text-xs font-medium text-compost"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {!destinationFallback && (
-            <p className="mt-3 text-xs leading-5 text-charcoal/55">
-              Map position is based on the location text supplied in the tracking feed. It is not a live courier GPS position.
-            </p>
-          )}
+          {note && <p className="mt-3 text-xs leading-5 text-charcoal/55">{note}</p>}
         </div>
       )}
     </div>
@@ -236,7 +217,10 @@ export function TrackingLookup() {
     if (data.status.stage === "delivered") {
       return `Latest update: ${latestEvent.details}`;
     }
-    if (!data.latestLocation && data.project?.destination?.label) {
+    if (data.status.stage === "ordered" && /label created|shipment submitted/i.test(latestEvent.details)) {
+      return "Label created — waiting for the first physical carrier movement.";
+    }
+    if (!data.latestLocation && data.project?.destination?.label && data.map?.kind === "destination") {
       return `On its way to ${data.project.destination.label}`;
     }
     return latestEvent.details;
@@ -305,7 +289,7 @@ export function TrackingLookup() {
                 ))}
               </div>
             </div>
-            <MapPanel location={null} destination={null} events={[]} />
+            <MapPanel map={null} destination={null} />
           </div>
         ) : null}
 
@@ -419,12 +403,12 @@ export function TrackingLookup() {
               </div>
             </div>
 
-            <MapPanel location={data.latestLocation} destination={destination} events={data.events} />
+            <MapPanel map={data.map} destination={destination} />
           </div>
         )}
 
         <p className="mt-6 text-center text-xs leading-5 text-charcoal/45">
-          Tracking events are supplied by Kingtrans. Update timing and location detail can vary during transit.
+          Tracking events are supplied by Kingtrans. Map positions may use carrier locations, places named in tracking updates, an approximate destination-port region, or the delivery destination. They are not live GPS positions.
         </p>
       </div>
     </section>

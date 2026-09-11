@@ -9,6 +9,7 @@ type TrackingEvent = {
 };
 
 type TrackingStage = "ordered" | "in_transit" | "out_for_delivery" | "delivered";
+type TrackingMapKind = "carrier" | "event" | "destination_port" | "destination";
 
 type PublicDestination = {
   label: string;
@@ -24,6 +25,14 @@ type ProjectEnrichment = {
   destination: PublicDestination | null;
 };
 
+type TrackingMap = {
+  query: string;
+  display: string;
+  label: string;
+  kind: TrackingMapKind;
+  note: string;
+};
+
 const KINGTRANS_ORIGIN = "https://ausdirect.kingtrans.net";
 const KINGTRANS_TRACK_PATH = "/WebTrack";
 const MAX_UPSTREAM_BYTES = 1_500_000;
@@ -35,6 +44,16 @@ const MONDAY_ETA_COLUMN_ID = "date_mm5ncqc6";
 const MONDAY_STATUS_COLUMN_ID = "project_status";
 const MONDAY_COMPANY_RELATION_COLUMN_ID = "board_relation_mm6471v8";
 const MONDAY_COMPANY_LOCATION_COLUMN_ID = "location_mm4nwpvd";
+
+const DESTINATION_PORTS: Partial<Record<string, { query: string; display: string }>> = {
+  NSW: { query: "Port Botany NSW Australia", display: "Sydney / Port Botany, NSW" },
+  VIC: { query: "Port of Melbourne VIC Australia", display: "Melbourne port region, VIC" },
+  SA: { query: "Port Adelaide SA Australia", display: "Port Adelaide, SA" },
+  QLD: { query: "Port of Brisbane QLD Australia", display: "Brisbane port region, QLD" },
+  WA: { query: "Fremantle Port WA Australia", display: "Fremantle / Perth port region, WA" },
+  TAS: { query: "Port of Hobart TAS Australia", display: "Hobart port region, TAS" },
+  NT: { query: "Port Darwin NT Australia", display: "Darwin port region, NT" },
+};
 
 function decodeEntities(value: string): string {
   return value
@@ -89,13 +108,120 @@ function statusFromEvents(events: TrackingEvent[]): { stage: TrackingStage; labe
   if (/delivered|signed for|left in (a )?safe place|proof of delivery/.test(text)) {
     return { stage: "delivered", label: "Delivered" };
   }
-  if (/out for delivery|onboard for delivery|with courier|courier for delivery/.test(text)) {
+  if (/out for delivery|onboard for delivery|with courier|courier for delivery|prepare for delivery|picked up for delivery\s*\(destination\)/.test(text)) {
     return { stage: "out_for_delivery", label: "Out for delivery" };
   }
-  if (/ordered|shipping information received|label created|manifested|information received|shipment submitted/.test(text)) {
+  if (/ordered|shipping information received|label created|manifested|shipment submitted/.test(text)) {
     return { stage: "ordered", label: "Ordered" };
   }
   return { stage: "in_transit", label: "In transit" };
+}
+
+function isGenericCarrierLocation(value: string): boolean {
+  const normalised = value.trim().toLowerCase();
+  if (!normalised) return true;
+  if (normalised.includes("ausdirect")) return true;
+  return /^(warehouse|depot|facility|hub|clearance facility|customs|port)$/i.test(normalised);
+}
+
+function eventPlace(details: string): { query: string; display: string } | null {
+  const expectedPort = details.match(/expected to arrive at\s+(.+?\bport)\b/i)?.[1]?.replace(/\s+/g, " ").trim();
+  if (expectedPort) {
+    const australian = /\b(sydney|melbourne|perth|brisbane|adelaide|fremantle|darwin|hobart)\b/i.test(expectedPort);
+    return {
+      query: australian ? `${expectedPort} Australia` : expectedPort,
+      display: expectedPort,
+    };
+  }
+
+  const facility = details.match(/arriv(?:e|ed) at\s+([A-Za-z][A-Za-z .'-]{2,40})\s+facility\b/i)?.[1]?.trim();
+  if (facility) {
+    return { query: `${facility} China`, display: facility };
+  }
+
+  const heading = details.match(/heading towards\s+([A-Za-z][A-Za-z .'-]{2,40})\b/i)?.[1]?.trim();
+  if (heading) {
+    return { query: `${heading} China`, display: heading };
+  }
+
+  return null;
+}
+
+function isDestinationSide(details: string): boolean {
+  return /ship arrived destination port|port of discharge|discharged\s*\(port of discharge\)|consignment (?:information reported to|cleared by|held by) customs|consignment cleared by aqis|clearance facility|container available|carrier released|freight\s*charges\s*settled/i.test(details);
+}
+
+function isLastMile(details: string): boolean {
+  return /last mile delivery|sorting at local depot|prepare for delivery|picked up for delivery\s*\(destination\)|out for delivery|onboard for delivery|with courier|courier for delivery|delivered|signed for/i.test(details);
+}
+
+function isLabelOnly(details: string): boolean {
+  return /label created|shipment submitted|shipping information received|manifested/i.test(details);
+}
+
+function destinationMap(destination: PublicDestination, ordered: boolean): TrackingMap {
+  return {
+    query: destination.label,
+    display: destination.label,
+    label: "Delivery destination",
+    kind: "destination",
+    note: ordered
+      ? "Label created — waiting for the first physical carrier movement."
+      : "Carrier location is not available for this update, so the map is showing the delivery destination.",
+  };
+}
+
+function buildTrackingMap(
+  events: TrackingEvent[],
+  status: { stage: TrackingStage; label: string },
+  project: ProjectEnrichment | null,
+): TrackingMap | null {
+  const latest = events[0];
+  if (!latest) return project?.destination ? destinationMap(project.destination, status.stage === "ordered") : null;
+
+  const rawLocation = latest.location.trim();
+  if (rawLocation && !isGenericCarrierLocation(rawLocation)) {
+    return {
+      query: rawLocation,
+      display: rawLocation,
+      label: "Latest tracking location",
+      kind: "carrier",
+      note: "Location supplied by the carrier tracking feed. This is not a live GPS position.",
+    };
+  }
+
+  const explicitPlace = eventPlace(latest.details);
+  if (explicitPlace) {
+    return {
+      ...explicitPlace,
+      label: "Carrier-reported route",
+      kind: "event",
+      note: "Map position is based on the place named in the latest carrier update. This is not a live GPS position.",
+    };
+  }
+
+  if (status.stage === "delivered" || isLastMile(latest.details)) {
+    return project?.destination ? destinationMap(project.destination, false) : null;
+  }
+
+  if (isDestinationSide(latest.details)) {
+    const state = project?.destination?.state || "";
+    const port = DESTINATION_PORTS[state];
+    if (port) {
+      return {
+        ...port,
+        label: "Destination port region",
+        kind: "destination_port",
+        note: "Approximate destination port region based on the delivery state. This is not a live scan or GPS location.",
+      };
+    }
+  }
+
+  if (project?.destination) {
+    return destinationMap(project.destination, status.stage === "ordered" || isLabelOnly(latest.details));
+  }
+
+  return null;
 }
 
 function cookieHeader(response: Response): string | null {
@@ -311,6 +437,8 @@ export async function GET(request: Request) {
 
     const status = statusFromEvents(events);
     const latest = events[0];
+    const latestLocation = latest.location && !isGenericCarrierLocation(latest.location) ? latest.location : null;
+    const map = buildTrackingMap(events, status, project);
 
     return NextResponse.json(
       {
@@ -319,7 +447,8 @@ export async function GET(request: Request) {
         carrier: "Kingtrans",
         status,
         latestUpdate: latest.dateTime,
-        latestLocation: latest.location || null,
+        latestLocation,
+        map,
         project,
         events,
       },

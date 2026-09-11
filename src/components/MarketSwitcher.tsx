@@ -1,8 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 
 type PublicMarket = "global" | "au" | "uk";
+
+type Props = {
+  variant?: "footer" | "legal";
+  initialMarket?: PublicMarket;
+  pathOverride?: string;
+};
 
 const OPTIONS: Array<{ code: PublicMarket; label: string; origin: string }> = [
   { code: "au", label: "Australia", origin: "https://www.zeropack.au" },
@@ -17,19 +23,20 @@ function marketFromHostname(hostname: string): PublicMarket {
   return "global";
 }
 
-export function MarketSwitcher() {
-  const [current, setCurrent] = useState<PublicMarket>("global");
+export function MarketSwitcher({ variant = "footer", initialMarket, pathOverride }: Props) {
+  const selectId = useId();
+  const [current, setCurrent] = useState<PublicMarket>(initialMarket ?? "global");
 
   useEffect(() => {
-    setCurrent(marketFromHostname(window.location.hostname));
-  }, []);
+    if (!initialMarket) setCurrent(marketFromHostname(window.location.hostname));
+  }, [initialMarket]);
 
   function switchMarket(next: PublicMarket) {
     const option = OPTIONS.find((item) => item.code === next);
     if (!option) return;
 
     const currentUrl = new URL(window.location.href);
-    const target = new URL(currentUrl.pathname, option.origin);
+    const target = new URL(pathOverride ?? currentUrl.pathname, option.origin);
 
     for (const [key, value] of currentUrl.searchParams.entries()) {
       if (key !== "market") target.searchParams.append(key, value);
@@ -40,17 +47,26 @@ export function MarketSwitcher() {
     window.location.assign(target.toString());
   }
 
+  const legal = variant === "legal";
+
   return (
-    <div className="mt-6 max-w-xs">
-      <label htmlFor="market-selector" className="block text-xs font-semibold uppercase tracking-wide text-leaf">
-        Region
+    <div className={legal ? "mt-4 max-w-sm" : "mt-6 max-w-xs"}>
+      <label
+        htmlFor={selectId}
+        className={legal ? "block text-xs font-semibold uppercase tracking-wide text-amber-950/70" : "block text-xs font-semibold uppercase tracking-wide text-leaf"}
+      >
+        {legal ? "Terms market" : "Region"}
       </label>
       <select
-        id="market-selector"
+        id={selectId}
         value={current}
         onChange={(event) => switchMarket(event.target.value as PublicMarket)}
-        className="mt-2 w-full rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm text-white outline-none transition hover:bg-white/15 focus:border-leaf focus:ring-2 focus:ring-leaf/40"
-        aria-label="Choose your Zero Pack region"
+        className={
+          legal
+            ? "mt-2 w-full rounded-md border border-amber-300 bg-white px-3 py-2 text-sm font-semibold text-charcoal outline-none transition hover:border-amber-400 focus:border-charcoal focus:ring-2 focus:ring-charcoal/20"
+            : "mt-2 w-full rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm text-white outline-none transition hover:bg-white/15 focus:border-leaf focus:ring-2 focus:ring-leaf/40"
+        }
+        aria-label={legal ? "Choose the market version for these terms" : "Choose your Zero Pack region"}
       >
         {OPTIONS.map((option) => (
           <option key={option.code} value={option.code} className="text-charcoal">

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { LegalMarketNotice } from "@/components/LegalMarketNotice";
 import { buildMarketPageMetadata, getRequestMarket } from "@/lib/requestMarket";
 
 const updated = "8 September 2026";
@@ -25,6 +26,7 @@ export default async function Page() {
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
         <h1 className="font-heading text-3xl font-semibold text-charcoal sm:text-4xl">Privacy policy</h1>
         <p className="mt-3 text-sm text-charcoal/60">Last updated: {updated}</p>
+        <LegalMarketNotice path="/privacy/" noun="Privacy Policy" />
 
         <div className="mt-8 space-y-8 text-charcoal/80">
           <section>

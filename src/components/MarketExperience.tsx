@@ -75,21 +75,26 @@ export function MarketExperience() {
   const [currentMarket, setCurrentMarket] = useState<PublicMarket>("global");
 
   useEffect(() => {
-    // Legal/policy pages provide their own stronger market-version warning and selector.
-    if (isLegalMarketPage(window.location.pathname)) return;
-
     const current = marketFromHostname(window.location.hostname);
     setCurrentMarket(current);
 
     const url = new URL(window.location.href);
     const explicitMarket = url.searchParams.get("market");
 
+    // Cross-domain selectors use this short-lived query bridge so an explicit
+    // user choice can be persisted independently on the destination domain.
     if (isPublicMarket(explicitMarket)) {
       savePreference(explicitMarket);
       url.searchParams.delete("market");
       window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
-      return;
     }
+
+    // Legal/policy pages provide their own stronger market-version warning.
+    // We still process the explicit market bridge above so a manual legal-page
+    // choice is remembered without showing a second GEO suggestion.
+    if (isLegalMarketPage(window.location.pathname)) return;
+
+    if (isPublicMarket(explicitMarket)) return;
 
     const saved = readPreference();
     if (saved) return;

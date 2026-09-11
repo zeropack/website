@@ -1,6 +1,6 @@
 import { JsonLd } from "./JsonLd";
 import { CONTACT_EMAIL, SITE_NAME } from "@/lib/site";
-import { buildMarketUrl } from "@/lib/marketRouting";
+import { buildMarketUrl, MARKET_ROUTES } from "@/lib/marketRouting";
 import { getRequestMarket } from "@/lib/requestMarket";
 
 export async function SEOWebSite() {
@@ -29,7 +29,7 @@ export function SEOOrganization() {
     "@type": "Organization",
     name: SITE_NAME,
     url: globalUrl,
-    logo: buildMarketUrl("global", "/og/default.png"),
+    logo: `${MARKET_ROUTES.global.canonicalOrigin}/og/default.png`,
     email: CONTACT_EMAIL,
     foundingDate: "2018",
     description:

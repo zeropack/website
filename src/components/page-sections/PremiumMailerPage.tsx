@@ -117,8 +117,8 @@ const marketCopy: Record<
       "Custom branded mailers made to order for planned ecommerce fulfilment — backed by TÜV OK compost HOME and ABA AS 5810 home-compostability certification, with practical custom-production quantities and design support throughout the process.",
     certificationMetric: "TÜV + AS 5810",
     certificationLabel: "Multi-standard home-compostability proof",
-    primaryCta: "Request UK Mailer Pricing",
-    quoteHeading: "Planning your next UK mailer order?",
+    primaryCta: "Request Custom Mailer Pricing",
+    quoteHeading: "Planning your next mailer order?",
     quoteSub:
       "Tell us what you ship, your quantity and your preferred timing. We’ll confirm the specification, production plan and delivery assumptions before anything starts.",
   },

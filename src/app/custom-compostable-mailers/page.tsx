@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { buildMarketCanonical, buildMetadata, mailersHreflang } from "@/lib/metadata";
 import { PremiumMailerPage } from "@/components/page-sections/PremiumMailerPage";
+import { CertificationRequestPanel } from "@/components/CertificationRequestPanel";
 
 export const metadata: Metadata = buildMetadata({
   title: "Custom Compostable Mailers | Premium Unboxing for Ecommerce Brands",
@@ -13,5 +14,10 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default function Page() {
-  return <PremiumMailerPage market="global" />;
+  return (
+    <>
+      <PremiumMailerPage market="global" />
+      <CertificationRequestPanel market="global" />
+    </>
+  );
 }

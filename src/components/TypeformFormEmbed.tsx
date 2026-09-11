@@ -5,6 +5,8 @@ import { useEffect, useRef } from "react";
 const TYPEFORM_LIVE_ID = "01KS44H50J41Y5X1M9QPVS9JB1";
 const TYPEFORM_EMBED_SRC = "https://embed.typeform.com/next/embed.js";
 
+type PublicMarket = "global" | "au" | "uk";
+
 type TypeformSubmitPayload = {
   formId?: string;
   responseId?: string;
@@ -22,6 +24,19 @@ declare global {
 
 let embedScriptPromise: Promise<void> | null = null;
 
+function marketFromHostname(hostname: string): PublicMarket {
+  const host = hostname.toLowerCase();
+  if (host === "zeropack.au" || host === "www.zeropack.au" || host === "zeropack.com.au" || host === "www.zeropack.com.au") return "au";
+  if (host === "zeropack.co.uk" || host === "www.zeropack.co.uk") return "uk";
+  return "global";
+}
+
+function currencyForMarket(market: PublicMarket): "AUD" | "GBP" | "USD" {
+  if (market === "au") return "AUD";
+  if (market === "uk") return "GBP";
+  return "USD";
+}
+
 function registerTypeformSubmitCallback(): void {
   if (typeof window === "undefined") return;
 
@@ -29,6 +44,7 @@ function registerTypeformSubmitCallback(): void {
 
   window.zeroPackTypeformSubmitted = function (payload: TypeformSubmitPayload = {}) {
     window.dataLayer = window.dataLayer || [];
+    const market = marketFromHostname(window.location.hostname);
 
     window.dataLayer.push({
       event: "typeform_quote_submit",
@@ -37,7 +53,10 @@ function registerTypeformSubmitCallback(): void {
       form_name: "Request a Quote",
       conversion_name: "Request quote TF",
       conversion_value: 50,
-      currency: "AUD",
+      currency: currencyForMarket(market),
+      website_market: market,
+      source_domain: window.location.hostname,
+      source_page: window.location.pathname,
     });
   };
 }
@@ -104,9 +123,16 @@ export function TypeformFormEmbed({ className }: { className?: string }) {
       host.replaceChildren();
 
       const target = document.createElement("div");
+      const market = marketFromHostname(window.location.hostname);
+      const hidden = [
+        `website_market=${encodeURIComponent(market)}`,
+        `source_domain=${encodeURIComponent(window.location.hostname)}`,
+        `source_page=${encodeURIComponent(window.location.pathname)}`,
+      ].join(",");
 
       target.setAttribute("data-tf-live", TYPEFORM_LIVE_ID);
       target.setAttribute("data-tf-auto-resize", "300,750");
+      target.setAttribute("data-tf-hidden", hidden);
 
       // Keep the form inline on mobile instead of opening a fullscreen overlay modal.
       target.setAttribute("data-tf-inline-on-mobile", "");

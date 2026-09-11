@@ -149,3 +149,13 @@ export function marketAlternates(path = "/"): Record<string, string> {
     "x-default": buildMarketUrl("global", path),
   };
 }
+
+/** Hreflang set for markets that are actually launched and indexable today. */
+export function launchedMarketAlternates(path = "/"): Record<string, string> {
+  return {
+    "en-AU": buildMarketUrl("au", path),
+    "en-GB": buildMarketUrl("uk", path),
+    en: buildMarketUrl("global", path),
+    "x-default": buildMarketUrl("global", path),
+  };
+}

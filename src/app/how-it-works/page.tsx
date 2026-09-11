@@ -1,16 +1,24 @@
 import type { Metadata } from "next";
-import { buildMetadata } from "@/lib/metadata";
 import { LeadMagnetBlock } from "@/components/LeadMagnetBlock";
 import { PackagingPathFlowchart } from "@/components/PackagingPathFlowchart";
+import { buildMarketPageMetadata, getRequestMarket } from "@/lib/requestMarket";
 
-export const metadata: Metadata = buildMetadata({
-  title: "How It Works | Zero Pack",
-  description:
-    "Eight clear steps from your first custom packaging quote to shipping branded compostable mailers with every order.",
-  path: "/how-it-works/",
-});
+const path = "/how-it-works/";
 
-export default function Page() {
+export async function generateMetadata(): Promise<Metadata> {
+  const market = await getRequestMarket();
+  return buildMarketPageMetadata({
+    market,
+    title: "How It Works | Zero Pack",
+    description:
+      "Eight clear steps from your first custom packaging quote to shipping branded compostable mailers with every order.",
+    path,
+  });
+}
+
+export default async function Page() {
+  const market = await getRequestMarket();
+
   return (
     <>
       <section className="relative overflow-hidden border-b border-slate-200/40 bg-gradient-to-br from-[#f4f7fb] via-white to-[#eef6f3] pb-12 pt-14 sm:pb-16 sm:pt-20">
@@ -32,6 +40,17 @@ export default function Page() {
             each milestone. Sizes, packaging and design are confirmed before your final quote is issued; nothing goes to
             production until that quote is accepted.
           </p>
+          {market === "uk" ? (
+            <p className="mt-5 max-w-3xl rounded-xl border border-slate-200/70 bg-white/75 p-4 text-sm leading-relaxed text-charcoal/70">
+              UK orders are made to order and planned around production plus international freight. Your quote confirms
+              the expected production and delivery assumptions for the specific order before you commit.
+            </p>
+          ) : market === "au" ? (
+            <p className="mt-5 max-w-3xl rounded-xl border border-slate-200/70 bg-white/75 p-4 text-sm leading-relaxed text-charcoal/70">
+              Australian projects are supported directly by the Zero Pack team, with production milestones and delivery
+              assumptions confirmed for the specific order.
+            </p>
+          ) : null}
         </div>
       </section>
 

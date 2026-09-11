@@ -1,18 +1,34 @@
 import type { Metadata } from "next";
-import { buildMetadata } from "@/lib/metadata";
 import { TrackedOutbound } from "@/components/TrackedOutbound";
 import { CTAButton } from "@/components/CTAButton";
 import { CalendlyEmbed } from "@/components/CalendlyEmbed";
 import { KlaviyoEmbed } from "@/components/KlaviyoEmbed";
 import { CONTACT_EMAIL, QUOTE_FORM_HREF } from "@/lib/site";
+import { buildMarketPageMetadata, getRequestMarket } from "@/lib/requestMarket";
 
-export const metadata: Metadata = buildMetadata({
-  title: "Contact Zero Pack",
-  description: "Contact Zero Pack for custom compostable mailers and packaging — global B2B support for ecommerce brands.",
-  path: "/contact/",
-});
+const path = "/contact/";
 
-export default function Page() {
+export async function generateMetadata(): Promise<Metadata> {
+  const market = await getRequestMarket();
+  const description =
+    market === "uk"
+      ? "Contact Zero Pack for custom compostable mailers and packaging for UK ecommerce brands, with Australia-based project support and made-to-order production."
+      : market === "au"
+        ? "Contact Zero Pack for custom compostable mailers and packaging for Australian ecommerce brands."
+        : "Contact Zero Pack for custom compostable mailers and packaging — global B2B support for ecommerce brands.";
+
+  return buildMarketPageMetadata({ market, title: "Contact Zero Pack", description, path });
+}
+
+export default async function Page() {
+  const market = await getRequestMarket();
+  const marketNote =
+    market === "uk"
+      ? "We support UK customers directly from Australia. Share your planned volumes, required delivery timing and packaging goals so we can confirm the production and freight assumptions for your quote."
+      : market === "au"
+        ? "Australian customers work directly with the Zero Pack team. Share your volumes, timing and packaging goals and we will confirm the right next step for your specification."
+        : "We work with ecommerce brands globally. Share your market, volumes and packaging goals — we will confirm what is possible for your specification and freight route.";
+
   return (
     <section className="bg-white py-14 sm:py-24">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
@@ -35,7 +51,7 @@ export default function Page() {
           <CalendlyEmbed className="mt-6" />
         </div>
 
-        <div className="mt-8 rounded-2xl border border-black/5 bg-white p-6">
+        <div className="mt-8 rounded-2xl border border-black/5 bg-stone p-6">
           <h2 className="font-heading text-lg font-semibold text-compost">Get in touch</h2>
           <p className="mt-2 text-sm text-charcoal/75">
             Email:{" "}
@@ -47,10 +63,7 @@ export default function Page() {
               {CONTACT_EMAIL}
             </TrackedOutbound>
           </p>
-          <p className="mt-3 text-sm text-charcoal/70">
-            We work with ecommerce brands globally. Share your market, volumes and packaging goals — we will confirm
-            what is possible for your specification and freight route.
-          </p>
+          <p className="mt-3 text-sm text-charcoal/70">{marketNote}</p>
         </div>
 
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">

@@ -1,4 +1,5 @@
 import { buildMarketUrl } from "@/lib/marketRouting";
+import { getMarketArticleSlugs } from "@/content/articles";
 
 export const dynamic = "force-static";
 
@@ -7,7 +8,20 @@ function xmlEscape(value: string): string {
 }
 
 export function GET() {
-  const urls = [buildMarketUrl("uk", "/"), buildMarketUrl("uk", "/custom-compostable-mailers")];
+  const paths = [
+    "/",
+    "/custom-compostable-mailers",
+    "/custom-compostable-packaging",
+    "/how-it-works",
+    "/customer-showcase",
+    "/about",
+    "/quote",
+    "/packaging-guide",
+    "/contact",
+    "/articles",
+    ...getMarketArticleSlugs("UK").map((slug) => `/articles/${slug}`),
+  ];
+  const urls = paths.map((path) => buildMarketUrl("uk", path));
   const body = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
     .map((url) => `  <url><loc>${xmlEscape(url)}</loc></url>`)
     .join("\n")}\n</urlset>`;

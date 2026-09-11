@@ -71,7 +71,7 @@ const heroByRegion: Record<
 export function RegionalHome({ region }: { region: RegionCode }) {
   const cfg = getRegionConfig(region);
   const hero = heroByRegion[region];
-  const mailersHref = "/trend-packaging-funnel/";
+  const mailersHref = "/custom-compostable-mailers/";
   const quoteHref = QUOTE_FORM_HREF;
 
   return (
@@ -103,10 +103,9 @@ export function RegionalHome({ region }: { region: RegionCode }) {
               </div>
             </div>
             <div className="rounded-2xl border border-black/5 bg-stone p-8">
-              <p className="text-sm font-semibold text-compost">Working in {cfg.regionName}</p>
+              <p className="text-sm font-semibold text-compost">Planning your order</p>
               <p className="mt-3 text-sm text-charcoal/75">
-                Quotes and production notes are tailored to this region — including currency, delivery language, lead
-                times and compliance context where relevant.
+                Quotes and production notes are tailored to your order, including currency, delivery assumptions, lead times and compliance context where relevant.
               </p>
               <ul className="mt-6 space-y-3 text-sm text-charcoal/75">
                 <li>
@@ -124,10 +123,10 @@ export function RegionalHome({ region }: { region: RegionCode }) {
                   className="inline-flex items-center justify-center rounded-lg bg-air px-5 py-3 text-sm font-semibold text-white hover:bg-[#0096d6]"
                   href={mailersHref}
                 >
-                  View regional mailers page
+                  View custom mailers
                 </Link>
                 <Link className="text-sm font-semibold text-air hover:underline" href="/">
-                  Back to global homepage
+                  Back to homepage
                 </Link>
               </div>
             </div>
@@ -150,7 +149,7 @@ export function RegionalHome({ region }: { region: RegionCode }) {
       <section className="bg-white py-14 sm:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <CTASection
-            title="Request a quote for this region"
+            title="Request a custom quote"
             description={cfg.legalDisclaimer}
             primary={{ label: cfg.defaultCTA, href: quoteHref }}
             secondary={{ label: "Download the Guide", href: "/packaging-guide/download/" }}

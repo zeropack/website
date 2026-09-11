@@ -64,7 +64,7 @@ const coreFaqs: FaqItem[] = [
   {
     question: "Do you ship to Australia?",
     answer:
-      "Yes — Zero Pack supports Australian ecommerce brands through the AU route. Ask on your quote if you need AU delivery context.",
+      "Yes — Zero Pack supports Australian ecommerce brands through the AU site. Ask on your quote if you need Australian delivery context.",
   },
   {
     question: "Will you support US and EU orders?",
@@ -88,7 +88,7 @@ export const regionConfig: RegionConfig = {
   countryCode: "GB",
   locale: "en-GB",
   currency: "GBP",
-  defaultCTA: "Get a UK Quote",
+  defaultCTA: "Get a Custom Quote",
   quoteEmail: process.env.NEXT_PUBLIC_QUOTE_EMAIL_UK ?? "quotes@zeropack.com",
   phone: process.env.NEXT_PUBLIC_PHONE_UK,
   certificationNotes: [

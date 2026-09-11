@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Article, HowToStep } from "@/content/articles/types";
-import { getArticleBySlug, getArticleMarket, getArticlePath } from "@/content/articles";
+import { getArticleBySlug, getArticleCanonicalUrl } from "@/content/articles";
 import { CTAButton } from "./CTAButton";
 import { FAQAccordion } from "./FAQAccordion";
 import { FAQSchema } from "./FAQSchema";
@@ -32,14 +32,13 @@ function displaySectionHeading(sectionId: string, heading: string): string {
 
 export function ArticleTemplate({ article }: { article: Article }) {
   const quoteHref = QUOTE_FORM_HREF;
-  const mailersHref = "/trend-packaging-funnel/";
+  const mailersHref = "/custom-compostable-mailers/";
   const faqs = article.faqs.length > 0 ? article.faqs : [];
   const related = (article.relatedSlugs ?? [])
     .map((slug) => getArticleBySlug(slug))
     .filter(Boolean) as Article[];
-  const articlePath = getArticlePath(article);
-  const market = getArticleMarket(article);
-  const articlesHub = market === "AU" ? "/au/articles/" : market === "UK" ? "/uk/articles/" : "/articles/";
+  const articleUrl = getArticleCanonicalUrl(article);
+  const articlesHub = "/articles/";
 
   const howToJsonLd = article.howToSteps && article.howToSteps.length > 0
     ? {
@@ -69,7 +68,7 @@ export function ArticleTemplate({ article }: { article: Article }) {
       name: SITE_NAME,
       url: absoluteUrl("/"),
     },
-    mainEntityOfPage: absoluteUrl(articlePath),
+    mainEntityOfPage: articleUrl,
     image: article.heroImage ? absoluteUrl(article.heroImage) : undefined,
     keywords: [article.primaryKeyword, ...(article.secondaryKeywords ?? []), ...(article.topics ?? [])]
       .filter(Boolean)
@@ -252,7 +251,7 @@ export function ArticleTemplate({ article }: { article: Article }) {
             <ul className="mt-4 space-y-3">
               {related.map((relatedArticle) => (
                 <li key={relatedArticle.slug}>
-                  <Link className="font-medium text-air hover:underline" href={getArticlePath(relatedArticle)}>
+                  <Link className="font-medium text-air hover:underline" href={getArticleCanonicalUrl(relatedArticle)}>
                     {relatedArticle.title}
                   </Link>
                 </li>

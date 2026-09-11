@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { buildMarketCanonical, buildMetadata, regionHomeHreflang } from "@/lib/metadata";
-import { RegionalHome } from "@/components/page-sections/RegionalHome";
+import { GlobalHome } from "@/components/page-sections/GlobalHome";
 import { getRegionConfig } from "@/lib/regions";
 
 export const metadata: Metadata = buildMetadata({
@@ -13,5 +13,5 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default function Page() {
-  return <RegionalHome region="uk" />;
+  return <GlobalHome market="uk" />;
 }

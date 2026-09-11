@@ -3,6 +3,7 @@ import { articlesPartA } from "./partA";
 import { articlesPartB } from "./partB";
 import { spokeGuides } from "./spokeGuides";
 import { generatedArticles } from "./generated";
+import { buildMarketUrl } from "@/lib/marketRouting";
 
 const historical: Article[] = [...articlesPartA, ...articlesPartB, ...spokeGuides];
 const all: Article[] = [...historical, ...generatedArticles];
@@ -56,11 +57,21 @@ export function getArticleBySlug(slug: string): Article | undefined {
   return all.find((a) => a.slug === slug);
 }
 
+/** Legacy/internal route path retained for compatibility with the regional route files. */
 export function getArticlePath(article: Article): string {
   const market = getArticleMarket(article);
   if (market === "AU") return `/au/articles/${article.slug}/`;
   if (market === "UK") return `/uk/articles/${article.slug}/`;
   return `/articles/${article.slug}/`;
+}
+
+/** Public canonical URL. Regional articles live on their canonical domain without /au or /uk prefixes. */
+export function getArticleCanonicalUrl(article: Article): string {
+  const path = `/articles/${article.slug}`;
+  const market = getArticleMarket(article);
+  if (market === "AU") return buildMarketUrl("au", path);
+  if (market === "UK") return buildMarketUrl("uk", path);
+  return buildMarketUrl("global", path);
 }
 
 export function getMarketArticleSlugs(market: Exclude<ArticleMarket, "GLOBAL">): string[] {

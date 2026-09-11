@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BrandLogo } from "./BrandLogo";
 import { NewsletterSignup } from "./NewsletterSignup";
+import { MarketSwitcher } from "./MarketSwitcher";
 import { TREND_PACKAGING_FUNNEL_HREF } from "@/lib/site";
 
 const groups = [
@@ -40,6 +41,7 @@ export function Footer() {
             <p className="mt-3 text-sm text-white/80">
               Custom compostable packaging, made for brands that care what they send out.
             </p>
+            <MarketSwitcher />
           </div>
 
           {groups.map((g) => (
@@ -60,16 +62,11 @@ export function Footer() {
           <div>
             <p className="text-sm font-semibold text-leaf">Legal</p>
             <ul className="mt-3 space-y-2 text-sm text-white/85">
-              <li>
-                <Link className="hover:text-white" href="/privacy/">
-                  Privacy
-                </Link>
-              </li>
-              <li>
-                <Link className="hover:text-white" href="/terms/">
-                  Terms
-                </Link>
-              </li>
+              <li><Link className="hover:text-white" href="/terms/">Terms & policies</Link></li>
+              <li><Link className="hover:text-white" href="/terms-of-sale/">Terms of sale</Link></li>
+              <li><Link className="hover:text-white" href="/shipping/">Shipping</Link></li>
+              <li><Link className="hover:text-white" href="/refunds/">Refunds & returns</Link></li>
+              <li><Link className="hover:text-white" href="/privacy/">Privacy</Link></li>
             </ul>
             <p className="mt-6 text-xs text-white/60">
               B2B custom compostable packaging for ecommerce brands — made to order and sold through custom quotes.

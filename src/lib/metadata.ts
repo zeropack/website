@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { absoluteUrl, getSiteUrl } from "./site";
-import { buildMarketUrl, marketAlternates } from "./marketRouting";
+import { absoluteUrl } from "./site";
+import { buildMarketUrl, launchedMarketAlternates } from "./marketRouting";
 import type { MarketCode } from "./marketRouting";
 import type { RegionCode } from "./types";
 
@@ -22,9 +22,12 @@ export function buildMetadata(opts: {
   const metadataOrigin = new URL(url).origin;
   const ogPath = opts.ogImagePath ?? DEFAULT_OG_IMAGE;
   const og = /^https?:\/\//i.test(ogPath) ? ogPath : `${metadataOrigin}${ogPath.startsWith("/") ? ogPath : `/${ogPath}`}`;
+  // The root layout appends "| Zero Pack" to normal titles. If the supplied title already
+  // names Zero Pack, make it absolute so we do not render "| Zero Pack | Zero Pack".
+  const title = /zero pack/i.test(opts.title) ? { absolute: opts.title } : opts.title;
 
   return {
-    title: opts.title,
+    title,
     description: opts.description,
     metadataBase: new URL(metadataOrigin),
     alternates: {
@@ -53,12 +56,12 @@ export function buildMarketCanonical(market: MarketCode, path = "/"): string {
   return buildMarketUrl(market, path);
 }
 
-/** Hreflang for regional home routes across canonical market origins. */
+/** Hreflang for launched regional home routes across canonical market origins. */
 export function regionHomeHreflang(): HreflangSpec {
-  return marketAlternates("/");
+  return launchedMarketAlternates("/");
 }
 
-/** Common hreflang for mailers landing family across canonical market origins. */
+/** Common hreflang for the launched mailers landing family. */
 export function mailersHreflang(_pathByRegion?: Record<RegionCode, string>): HreflangSpec {
-  return marketAlternates("/custom-compostable-mailers");
+  return launchedMarketAlternates("/custom-compostable-mailers");
 }

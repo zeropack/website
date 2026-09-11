@@ -8,9 +8,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   // Global/default sitemap only. AU and UK have hostname-specific sitemaps;
   // future US/EU/CA routes stay out of discovery until those markets launch.
+  // Legal/privacy pages are deliberately noindex and therefore stay out of the sitemap.
   const staticPaths = [
     "/",
-    "/trend-packaging-funnel/",
     "/custom-compostable-mailers/",
     "/custom-compostable-packaging/",
     "/how-it-works/",
@@ -20,8 +20,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/packaging-guide/",
     "/articles/",
     "/contact/",
-    "/privacy/",
-    "/terms/",
   ];
 
   const articles = getAllArticles()

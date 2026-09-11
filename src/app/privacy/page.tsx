@@ -1,28 +1,45 @@
 import type { Metadata } from "next";
-import { buildMetadata } from "@/lib/metadata";
+import { LegalMarketNotice } from "@/components/LegalMarketNotice";
+import { buildMarketPageMetadata, getRequestMarket } from "@/lib/requestMarket";
 
-export const metadata: Metadata = buildMetadata({
-  title: "Privacy Policy | Zero Pack",
-  description: "How Zero Pack collects, uses, stores and protects personal information.",
-  path: "/privacy/",
-});
+const updated = "8 September 2026";
 
-const updated = "19 August 2026";
+export async function generateMetadata(): Promise<Metadata> {
+  const market = await getRequestMarket();
+  return {
+    ...buildMarketPageMetadata({
+      market,
+      title: "Privacy Policy | Zero Pack",
+      description: "How Zero Pack collects, uses, stores and protects personal information across its websites and services.",
+      path: "/privacy/",
+    }),
+    robots: { index: false, follow: true },
+  };
+}
 
-export default function Page() {
+export default async function Page() {
+  const market = await getRequestMarket();
+  const isUk = market === "uk";
+
   return (
     <section className="bg-white py-14 sm:py-24">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
         <h1 className="font-heading text-3xl font-semibold text-charcoal sm:text-4xl">Privacy policy</h1>
         <p className="mt-3 text-sm text-charcoal/60">Last updated: {updated}</p>
+        <LegalMarketNotice path="/privacy/" noun="Privacy Policy" />
 
         <div className="mt-8 space-y-8 text-charcoal/80">
           <section>
             <h2 className="font-heading text-xl font-semibold text-charcoal">About this policy</h2>
             <p className="mt-3">
-              Zero Pack respects your privacy and aims to handle personal information openly and responsibly. Where the
-              Australian Privacy Principles apply to us, we handle personal information in accordance with those principles
-              and applicable Australian privacy law.
+              Zero Pack respects your privacy and aims to handle personal information openly and responsibly. This policy
+              explains how we handle personal information across Zero Pack websites, enquiries, quote requests, marketing and
+              customer interactions.
+            </p>
+            <p className="mt-3">
+              Where the Australian Privacy Principles apply to us, we handle personal information in accordance with those
+              principles and applicable Australian privacy law. Where UK data protection law applies to an interaction with a
+              person in the United Kingdom, the additional UK information below also applies.
             </p>
           </section>
 
@@ -38,8 +55,8 @@ export default function Page() {
             </ul>
             <p className="mt-3">
               We generally collect information directly from you, for example through website forms, quote requests,
-              newsletter sign-ups, email, phone or other business communications. We may also receive information from service
-              providers that support those interactions.
+              newsletter sign-ups, email, phone or other business communications. We may also receive business contact
+              information from service providers or public professional sources where permitted by applicable law.
             </p>
           </section>
 
@@ -87,7 +104,7 @@ export default function Page() {
             <p className="mt-3">
               These providers may process personal information on our behalf under their own security, privacy and contractual
               arrangements. Some providers operate internationally, so personal information may be processed or stored outside
-              Australia, including in the United States and other countries in which those providers or their sub-processors
+              your country, including in the United States and other countries in which those providers or their sub-processors
               operate.
             </p>
           </section>
@@ -111,20 +128,56 @@ export default function Page() {
             </p>
           </section>
 
+          {isUk ? (
+            <section className="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-6 sm:p-8">
+              <h2 className="font-heading text-xl font-semibold text-charcoal">Additional information for UK individuals</h2>
+              <p className="mt-3">
+                Where UK data protection law applies, Zero Pack processes personal data only where there is an appropriate legal
+                basis. Depending on the interaction, this may include taking steps at your request before entering a contract,
+                performing a contract, pursuing legitimate business interests, complying with a legal obligation, or relying on
+                consent where consent is required.
+              </p>
+              <p className="mt-3">
+                Depending on the circumstances and the legal basis being used, UK individuals may have rights including access,
+                rectification, erasure, restriction, data portability and objection. Where processing is based on consent, you
+                may withdraw that consent at any time without affecting processing that was lawful before withdrawal.
+              </p>
+              <div className="mt-4 rounded-xl border-l-4 border-compost bg-white px-4 py-3">
+                <p className="font-semibold text-charcoal">Your right to object</p>
+                <p className="mt-1 text-sm text-charcoal/75">
+                  You may object at any time to the use of your personal data for direct marketing. If you make that request, we
+                  will stop using your personal data for that purpose, subject to retaining limited suppression information needed
+                  to respect your choice.
+                </p>
+              </div>
+              <p className="mt-4">
+                Some of our service providers process information outside the United Kingdom. Where UK transfer restrictions
+                apply, we use an appropriate transfer mechanism or safeguard as required. You may contact us for more information
+                about the safeguards relevant to your personal data.
+              </p>
+              <p className="mt-3">
+                You may also have the right to complain to the UK Information Commissioner&apos;s Office if you are dissatisfied
+                with how your personal data has been handled.
+              </p>
+            </section>
+          ) : null}
+
           <section>
             <h2 className="font-heading text-xl font-semibold text-charcoal">Access, correction and privacy requests</h2>
             <p className="mt-3">
               You may contact us to ask about personal information we hold about you, request access or correction, update your
-              marketing preferences, or raise a privacy concern. We may need to verify your identity before acting on a request.
+              marketing preferences, exercise applicable privacy rights, or raise a privacy concern. We may need to verify your
+              identity before acting on a request.
             </p>
             <p className="mt-3">
               Email us at{" "}
               <a className="font-medium text-sky-600 underline-offset-2 hover:underline" href="mailto:hello@zeropack.co">
                 hello@zeropack.co
               </a>
-              . We will consider privacy enquiries and complaints and respond within a reasonable period. If you are not satisfied
-              with our response and Australian privacy law applies, you may also contact the Office of the Australian Information
-              Commissioner.
+              . We will consider privacy enquiries and complaints and respond within a reasonable period. If Australian privacy
+              law applies and you are not satisfied with our response, you may also contact the Office of the Australian
+              Information Commissioner. If UK data protection law applies, you may have the right to complain to the UK
+              Information Commissioner&apos;s Office.
             </p>
           </section>
 

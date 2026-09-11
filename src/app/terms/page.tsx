@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { LegalMarketNotice } from "@/components/LegalMarketNotice";
 import { buildMarketPageMetadata, getRequestMarket } from "@/lib/requestMarket";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -53,6 +54,8 @@ export default function Page() {
           <p className="mt-4 text-lg leading-8 text-charcoal/75">These policies explain how the website is used and the general terms that support Zero Pack quotations, custom packaging orders, shipping and issue resolution.</p>
           <p className="mt-3 text-charcoal/70">For a specific order, the accepted quotation, order confirmation and approved specification take precedence where they contain a more specific written term.</p>
         </div>
+
+        <LegalMarketNotice path="/terms/" noun="terms and policies" />
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2">
           {policies.map((policy) => (

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { absoluteUrl, getSiteUrl } from "./site";
+import { absoluteUrl } from "./site";
 import { buildMarketUrl, launchedMarketAlternates } from "./marketRouting";
 import type { MarketCode } from "./marketRouting";
 import type { RegionCode } from "./types";
@@ -22,9 +22,12 @@ export function buildMetadata(opts: {
   const metadataOrigin = new URL(url).origin;
   const ogPath = opts.ogImagePath ?? DEFAULT_OG_IMAGE;
   const og = /^https?:\/\//i.test(ogPath) ? ogPath : `${metadataOrigin}${ogPath.startsWith("/") ? ogPath : `/${ogPath}`}`;
+  // The root layout appends "| Zero Pack" to normal titles. If the supplied title already
+  // names Zero Pack, make it absolute so we do not render "| Zero Pack | Zero Pack".
+  const title = /zero pack/i.test(opts.title) ? { absolute: opts.title } : opts.title;
 
   return {
-    title: opts.title,
+    title,
     description: opts.description,
     metadataBase: new URL(metadataOrigin),
     alternates: {

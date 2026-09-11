@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { permanentRedirect } from "next/navigation";
 
 export default function TrendPackagingFunnelPage() {
-  redirect("/custom-compostable-mailers/");
+  permanentRedirect("/custom-compostable-mailers/");
 }

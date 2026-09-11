@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import {
   getAllArticles,
   getArticleBySlug,
@@ -53,7 +53,7 @@ export default async function Page({ params }: Props) {
 
   const requestMarket = await getRequestMarket();
   if (requestMarket !== canonicalMarket) {
-    redirect(getArticleCanonicalUrl(article));
+    permanentRedirect(getArticleCanonicalUrl(article));
   }
 
   const homeName = canonicalMarket === "au" ? "Australia" : canonicalMarket === "uk" ? "United Kingdom" : "Home";

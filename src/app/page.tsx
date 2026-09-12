@@ -3,9 +3,9 @@ import { buildMarketCanonical, buildMetadata, regionHomeHreflang } from "@/lib/m
 import { GlobalHome } from "@/components/page-sections/GlobalHome";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Custom Compostable Mailers for Ecommerce Brands",
+  title: "Custom compostable packaging, made for your brand | Zero Pack",
   description:
-    "Zero Pack (zeropack.co) supplies made-to-order custom compostable mailers for ecommerce brands worldwide, with clear certification guidance, practical MOQs and quote-based pricing.",
+    "Zero Pack works with businesses to develop custom compostable packaging that combines brand presentation, practical performance and a credible move away from conventional plastic.",
   path: "/",
   canonicalUrl: buildMarketCanonical("global", "/"),
   hreflang: regionHomeHreflang(),

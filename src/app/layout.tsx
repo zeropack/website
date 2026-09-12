@@ -26,18 +26,13 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
   return (
     <html lang="en" data-scroll-behavior="smooth" className={`${inter.variable} ${manrope.variable} ${plusJakarta.variable} h-full`}>
       <body className="min-h-full flex flex-col font-sans">
-        {/* Consentik cookie consent — beforeInteractive so consent is known before any tags fire */}
-        <Script
-          id="consentik-gcm"
-          src="https://cmp.consentik.com/sites/5a5eb279-8e4d-4daa-ad25-277fa627d7a4/b19585841572bc5a891525b33423d9f4/gcm.js"
-          strategy="beforeInteractive"
-        />
+        {/* Consentik CMP banner/preferences. Google Consent Mode defaults and updates are owned by the Consentik GTM template on Consent Initialization - All Pages. */}
         <Script
           id="consentik-init"
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: `!function(e,t,n,s,i,c){const a=t.getElementsByTagName(n)[0],d=t.createElement(n);d.id="cst-package",d.async=!0,d.src="https://cmp.consentik.com/sites/5a5eb279-8e4d-4daa-ad25-277fa627d7a4/b19585841572bc5a891525b33423d9f4/index.js?v="+(new Date().getMinutes()),a.parentNode.insertBefore(d,a)}(window,document,"script");` }}
         />
-        {/* Google Tag Manager is the single Google measurement path. Consentik initializes Google Consent Mode before this tag. */}
+        {/* Google Tag Manager is the single Google measurement path. Consent Mode is initialized in GTM by the Consentik CMP template before Google measurement tags. */}
         <Script
           id="gtm"
           strategy="afterInteractive"

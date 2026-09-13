@@ -4,15 +4,21 @@ import { SiteImage } from "@/components/SiteImage";
 import { FAQSchema } from "@/components/FAQSchema";
 import { JsonLd } from "@/components/JsonLd";
 import { Reveal } from "@/components/Reveal";
+import { CustomMailerCarousel } from "@/components/CustomMailerCarousel";
+import { customMailerCarouselSlides } from "@/content/customMailerCarouselSlides";
 import { QUOTE_FORM_HREF } from "@/lib/site";
 import { buildMarketCanonical } from "@/lib/metadata";
 import oneRoad from "@/content/images/custom/Zero_Pack_-_Custom_Compostable_Packaging_-_OneRoad_-_800_x_800.webp";
 import primasoy from "@/content/images/custom/Zero_Pack_-_Custom_Compostable_Packaging_-_Primasoy.webp";
 import secondSkin from "@/content/images/custom/Zero_Pack_-_Custom_Compostable_Packaging_-_Second_Skin_4cf140a2-e9ad-4e68-9ede-b0a815b58c8a.webp";
-import foodland from "@/content/images/custom/Zero Pack - Custom Compostable Packaging - Foodland-800x800.png";
+import siboTest from "@/content/images/custom/Zero Pack custom compostable packaging eco-friendly shipping bags and mailers Sibo Test.png";
+import dimpleOrange from "@/content/images/custom/Zero_Pack_custom_compostable_packaging_eco-friendly_shipping_bags_and_mailers_dimple_orange.webp";
+import primasoyCloseupBack from "@/content/images/custom/primasoy closup back - 1024 x 1024.png";
 import shoppingBags from "@/content/images/custom/packaging/zero_pack_custom_compostable_packaging (15).png";
 import garmentBags from "@/content/images/custom/packaging/zero_pack_custom_compostable_packaging (17).png";
-import standupPouches from "@/content/images/custom/packaging/zero_pack_custom_compostable_packaging (12).png";
+import protectivePackaging from "@/content/images/custom/packaging/zero_pack_custom_compostable_packaging (3).png";
+import tubingPackaging from "@/content/images/custom/packaging/zero_pack_custom_compostable_packaging (16).png";
+import rigidPackaging from "@/content/images/custom/packaging/zero_pack_custom_compostable_packaging (8).png";
 
 type PublicMarket = "global" | "au" | "uk";
 
@@ -25,11 +31,47 @@ type CategoryCard = {
   featured?: boolean;
 };
 
+function AwardIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} aria-hidden>
+      <circle cx="12" cy="8" r="5" />
+      <path d="m9 13 1.5 8L12 19l1.5 2L15 13" />
+    </svg>
+  );
+}
+
+function PackageIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} aria-hidden>
+      <path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z" />
+      <path d="M12 21V12M3 7.5 12 12m9-4.5L12 12" />
+    </svg>
+  );
+}
+
+function CheckIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className} aria-hidden>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m8.5 12.5 2.5 2.5 4.5-5" />
+    </svg>
+  );
+}
+
+function DocumentIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} aria-hidden>
+      <path d="M7 3h7l4 4v14H7z" />
+      <path d="M14 3v5h5M10 12h5M10 16h5" />
+    </svg>
+  );
+}
+
 const proofItems = [
-  { value: "750,000+", label: "Custom bags produced" },
-  { value: "Made to order", label: "Custom formats, sizing and print" },
-  { value: "Practical custom production", label: "Quantities built around commercial projects" },
-  { value: "Specification & certification support", label: "Clear guidance for the packaging being produced" },
+  { value: "750,000+", label: "Custom bags produced", icon: PackageIcon },
+  { value: "Made to order", label: "Custom formats, sizing and print", icon: CheckIcon },
+  { value: "Practical custom production", label: "Quantities built around commercial projects", icon: AwardIcon },
+  { value: "Specification & certification support", label: "Clear guidance for the packaging being produced", icon: DocumentIcon },
 ];
 
 const categories: CategoryCard[] = [
@@ -38,7 +80,7 @@ const categories: CategoryCard[] = [
     description: "Our most established ecommerce format. Custom printed and made to order for shipping and fulfilment.",
     cta: "Explore Custom Mailers",
     href: "/custom-compostable-mailers/",
-    image: oneRoad,
+    image: dimpleOrange,
     featured: true,
   },
   {
@@ -60,25 +102,28 @@ const categories: CategoryCard[] = [
     description: "Custom compostable packaging developed around the product, intended use and food-packaging requirements of the project.",
     cta: "Explore Food Packaging",
     href: QUOTE_FORM_HREF,
-    image: standupPouches,
+    image: primasoyCloseupBack,
   },
   {
     title: "Protective packaging",
     description: "Padded, cushioning and bubble-wrap-style compostable formats for products that need more protection than a standard flexible bag can provide.",
     cta: "Explore Protective Packaging",
     href: QUOTE_FORM_HREF,
+    image: protectivePackaging,
   },
   {
     title: "Tubing & made-to-order flexible formats",
     description: "Including layflat tubing and other flexible packaging developed around the required dimensions, sealing method and application.",
     cta: "Explore Flexible Packaging",
     href: QUOTE_FORM_HREF,
+    image: tubingPackaging,
   },
   {
     title: "Rigid & bespoke packaging",
     description: "For projects that need more structure, a different form factor or a packaging solution outside the standard formats shown above.",
     cta: "Discuss a Bespoke Project",
     href: QUOTE_FORM_HREF,
+    image: rigidPackaging,
   },
 ];
 
@@ -130,7 +175,7 @@ const processSteps = [
 
 const projectImages = [
   { name: "OneRoad", image: oneRoad },
-  { name: "Foodland", image: foodland },
+  { name: "SIBOtest", image: siboTest },
   { name: "Primasoy", image: primasoy },
   { name: "Second Skin", image: secondSkin },
 ];
@@ -203,7 +248,7 @@ export function GlobalHome({ market = "global" }: { market?: PublicMarket }) {
     <>
       <JsonLd data={serviceJsonLd} />
       <FAQSchema items={faqItems.map(({ question, answer }) => ({ question, answer }))} />
-      <div className="bg-white">
+      <div className="bg-white sm:-mb-6">
         <section className="relative overflow-hidden border-b border-slate-200/50 bg-[linear-gradient(135deg,#f7fbfc_0%,#ffffff_55%,#eef8f3_100%)] py-14 sm:py-20 lg:py-24">
           <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-[radial-gradient(circle,rgba(0,168,243,0.12),transparent_68%)]" aria-hidden />
           <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8">
@@ -234,29 +279,24 @@ export function GlobalHome({ market = "global" }: { market?: PublicMarket }) {
               </p>
             </div>
             <div className="relative mx-auto w-full max-w-2xl">
-              <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                <div className="col-span-2 overflow-hidden rounded-[1.75rem] border border-white/70 bg-white p-2 shadow-xl shadow-slate-300/25">
-                  <SiteImage src={shoppingBags} alt="Custom compostable shopping and carry packaging" width={shoppingBags.width} height={shoppingBags.height} priority className="aspect-[16/8.5] h-auto w-full rounded-[1.35rem] object-cover" sizes="(max-width: 1024px) 100vw, 46vw" />
-                </div>
-                <div className="overflow-hidden rounded-2xl border border-white/70 bg-white p-2 shadow-lg shadow-slate-300/20">
-                  <SiteImage src={garmentBags} alt="Custom compostable garment packaging" width={garmentBags.width} height={garmentBags.height} className="aspect-square h-auto w-full rounded-xl object-cover" sizes="(max-width: 1024px) 50vw, 22vw" />
-                </div>
-                <div className="overflow-hidden rounded-2xl border border-white/70 bg-white p-2 shadow-lg shadow-slate-300/20">
-                  <SiteImage src={oneRoad} alt="OneRoad custom compostable packaging" width={oneRoad.width} height={oneRoad.height} className="aspect-square h-auto w-full rounded-xl object-cover" sizes="(max-width: 1024px) 50vw, 22vw" />
-                </div>
-              </div>
+              <CustomMailerCarousel slides={customMailerCarouselSlides} variant="climate" priorityFirstSlide />
             </div>
           </div>
         </section>
 
-        <section className="border-b border-slate-200/50 bg-charcoal py-8 text-white">
-          <div className="mx-auto grid max-w-7xl gap-6 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
-            {proofItems.map((item) => (
-              <div key={item.value} className="border-white/10 sm:border-l sm:pl-6 first:border-l-0 first:pl-0">
-                <p className="font-heading text-lg font-semibold">{item.value}</p>
-                <p className="mt-1 text-sm leading-relaxed text-white/65">{item.label}</p>
-              </div>
-            ))}
+        <section className="border-y border-slate-800/80 bg-charcoal py-8 text-white sm:py-10">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {proofItems.map((item) => (
+                <div key={item.value} className="zp-hover-lift rounded-2xl border border-white/10 bg-white/5 p-5 text-center transition-colors hover:border-air/30 hover:bg-white/10">
+                  <div className="mx-auto inline-flex rounded-full bg-air/15 p-3 text-air">
+                    <item.icon className="h-6 w-6" />
+                  </div>
+                  <p className="mt-3 font-heading text-sm font-semibold text-white">{item.value}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-white/75">{item.label}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -397,7 +437,7 @@ export function GlobalHome({ market = "global" }: { market?: PublicMarket }) {
         <Reveal>
           <section className="bg-white py-16 sm:py-20">
             <div className="mx-auto max-w-5xl px-4 sm:px-6">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-compost">Homepage FAQ</p>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-compost">FAQ</p>
               <h2 className="mt-3 font-heading text-3xl font-semibold text-charcoal sm:text-4xl">Common questions before you start</h2>
               <div className="mt-8 divide-y divide-slate-200 rounded-2xl border border-slate-200/80 bg-white">
                 {faqItems.map((item, index) => (

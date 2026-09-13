@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { StaticImageData } from "next/image";
 import { CTAButton } from "@/components/CTAButton";
+import { CustomMailerCarousel } from "@/components/CustomMailerCarousel";
 import { FAQAccordion } from "@/components/FAQAccordion";
 import { FAQSchema } from "@/components/FAQSchema";
 import { SiteImage } from "@/components/SiteImage";
@@ -23,11 +24,47 @@ const path = "/custom-compostable-packaging/";
 const QUOTE_HREF = "#quoteform";
 const CONSULTATION_URL = "https://calendly.com/zeropackco/30min";
 
+function PackageIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} aria-hidden>
+      <path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z" />
+      <path d="M12 21V12M3 7.5 12 12m9-4.5L12 12" />
+    </svg>
+  );
+}
+
+function BrandIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} aria-hidden>
+      <path d="M4 20h4l11-11-4-4L4 16z" />
+      <path d="m13.5 6.5 4 4M4 16l4 4" />
+    </svg>
+  );
+}
+
+function CheckIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className} aria-hidden>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m8.5 12.5 2.5 2.5 4.5-5" />
+    </svg>
+  );
+}
+
+function GlobeIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} aria-hidden>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18M12 3c2.4 2.5 3.6 5.5 3.6 9S14.4 18.5 12 21c-2.4-2.5-3.6-5.5-3.6-9S9.6 5.5 12 3Z" />
+    </svg>
+  );
+}
+
 const proofItems = [
-  { value: "750,000+", label: "Custom bags produced" },
-  { value: "Made for your brand", label: "Custom sizing, print and branding" },
-  { value: "Made to order", label: "Packaging developed around your product and brand" },
-  { value: "Worldwide delivery", label: "Working with businesses all over the world" },
+  { value: "750,000+", label: "Custom bags produced", icon: PackageIcon },
+  { value: "Made for your brand", label: "Custom sizing, print and branding", icon: BrandIcon },
+  { value: "Made to order", label: "Packaging developed around your product and brand", icon: CheckIcon },
+  { value: "Worldwide delivery", label: "Working with businesses all over the world", icon: GlobeIcon },
 ] as const;
 
 type Category = {
@@ -142,12 +179,16 @@ const quoteInputs = [
   "or simply an idea",
 ] as const;
 
-const heroImages = [
-  { image: rigidFoodPackaging, alt: "Rigid custom compostable food packaging", label: "Rigid & food packaging" },
-  { image: bubbleWrap, alt: "Compostable bubble-wrap-style protective packaging", label: "Protective packaging" },
-  { image: carryYellow, alt: "Custom printed compostable carry bag", label: "Shopping & carry bags" },
-  { image: garmentBag, alt: "Custom compostable garment bag", label: "Garment bags" },
-] as const;
+const packagingCarouselSlides = [
+  { image: rigidFoodPackaging, heading: "Food packaging", subheading: "Flexible and rigid formats developed around the product and application.", alt: "Rigid custom compostable food packaging" },
+  { image: bubbleWrap, heading: "Protective packaging", subheading: "Cushioning and bubble-wrap-style solutions for products needing extra protection.", alt: "Compostable bubble-wrap-style protective packaging" },
+  { image: carryYellow, heading: "Shopping & carry bags", subheading: "Custom branded bags made around the required size, use and presentation.", alt: "Custom printed compostable shopping and carry bag" },
+  { image: garmentBag, heading: "Garment bags", subheading: "Flexible packaging for apparel protection, presentation and fulfilment.", alt: "Custom compostable garment bag" },
+  { image: standupPouch, heading: "Flexible packaging", subheading: "Custom bags, pouches and other made-to-order flexible formats.", alt: "Custom compostable stand-up pouch" },
+  { image: tubingRoll, heading: "Layflat tubing", subheading: "Made-to-order tubing developed around the required dimensions and application.", alt: "Custom compostable layflat tubing on a roll" },
+  { image: campaignBag, heading: "Campaign & event packaging", subheading: "Custom packaging for launches, activations and branded distribution.", alt: "Custom branded compostable campaign and event bag" },
+  { image: sliderBag, heading: "Resealable packaging", subheading: "Custom flexible packaging for products needing a specific closure or format.", alt: "Custom compostable resealable slider bag" },
+];
 
 const customerImages = [
   { image: rigidFoodPackaging, alt: "Branded rigid compostable packaging" },
@@ -279,37 +320,48 @@ export default async function Page() {
     <div className="bg-white text-charcoal sm:-mb-6">
       <FAQSchema items={faqItems} />
 
-      <section className="relative overflow-hidden border-b border-slate-200/60 bg-gradient-to-br from-[#eef7f1] via-white to-[#e6f3f8] py-14 sm:py-20 lg:py-24">
-        <div className="pointer-events-none absolute -left-24 top-20 h-72 w-72 rounded-full bg-air/10 blur-3xl" aria-hidden />
-        <div className="pointer-events-none absolute -right-20 bottom-0 h-80 w-80 rounded-full bg-leaf/15 blur-3xl" aria-hidden />
+      <section className="relative isolate overflow-hidden border-b border-white/10 bg-[#070b12] py-14 text-slate-100 sm:py-20 lg:py-24">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_26%_52%,rgba(131,185,37,0.26),transparent_46%),radial-gradient(circle_at_78%_50%,rgba(0,168,243,0.3),transparent_44%),linear-gradient(160deg,#0a1713_0%,#102a21_42%,#08111d_74%,#04070d_100%)]" aria-hidden />
         <div className="relative mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.96fr_1.04fr] lg:items-center lg:px-8">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-compost sm:text-sm">Custom printed · Made to order · B2B</p>
-            <h1 className="mt-4 max-w-3xl font-heading text-4xl font-semibold leading-[1.02] text-charcoal sm:text-5xl lg:text-6xl">Custom compostable packaging, made around what you need</h1>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-charcoal/80">Zero Pack helps businesses develop custom compostable packaging that works for their product, brand and application.</p>
-            <p className="mt-4 max-w-2xl text-base leading-relaxed text-charcoal/70 sm:text-lg">Whether you are replacing conventional plastic packaging, developing something new or starting with an idea, we can help turn what you need into custom packaging made for your business.</p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row"><QuoteButton /><ConsultationButton /></div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#79d6a7] sm:text-sm">Custom printed · Made to order · B2B</p>
+            <h1 className="mt-4 max-w-3xl font-heading text-4xl font-semibold leading-[1.02] text-white sm:text-5xl lg:text-6xl">Custom compostable packaging, made around what you need</h1>
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-200/90">Zero Pack helps businesses develop custom compostable packaging that works for their product, brand and application.</p>
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-200/75 sm:text-lg">Whether you are replacing conventional plastic packaging, developing something new or starting with an idea, we can help turn what you need into custom packaging made for your business.</p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row"><QuoteButton /><ConsultationButton dark /></div>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:gap-4" aria-label="Examples of Zero Pack custom compostable packaging">
-            {heroImages.map((item, index) => (
-              <div key={item.label} className={`relative overflow-hidden rounded-2xl border border-white/80 bg-white shadow-lg shadow-slate-400/15 ${index === 0 || index === 3 ? "translate-y-3" : ""}`}>
-                <PackagingImage image={item.image} alt={item.alt} className="aspect-square h-full w-full object-contain p-3 sm:p-5" priority={index === 0} />
-                <p className="absolute inset-x-2 bottom-2 rounded-lg bg-charcoal/80 px-3 py-2 text-center text-xs font-semibold text-white backdrop-blur-sm sm:inset-x-3 sm:bottom-3 sm:text-sm">{item.label}</p>
-              </div>
-            ))}
+          <div className="mx-auto w-full max-w-2xl">
+            <CustomMailerCarousel slides={packagingCarouselSlides} priorityFirstSlide permanentCaption />
           </div>
         </div>
       </section>
 
-      <section className="bg-[#07150f] py-8 sm:py-10">
-        <div className="mx-auto grid max-w-7xl gap-4 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
-          {proofItems.map((item, index) => (
-            <div key={item.value} className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-air text-lg font-bold text-white" aria-hidden>{index + 1}</div>
-              <p className="mt-4 font-heading text-xl font-semibold text-white">{item.value}</p>
-              <p className="mt-2 text-sm leading-relaxed text-slate-300">{item.label}</p>
-            </div>
-          ))}
+      <section className="border-y border-slate-200/50 bg-stone py-14 sm:py-20 lg:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-air">How custom packaging works</p>
+          <h2 className="mt-3 max-w-3xl font-heading text-3xl font-semibold text-charcoal sm:text-4xl">From an idea to finished packaging</h2>
+          <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {processSteps.map((step, index) => (
+              <article key={step.title} className="relative rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm"><span className="font-heading text-4xl font-semibold text-air/30">0{index + 1}</span><h3 className="mt-4 font-heading text-xl font-semibold text-charcoal">{step.title}</h3><p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-charcoal/70">{step.body}</p></article>
+            ))}
+          </div>
+          <div className="mt-8"><QuoteButton /></div>
+        </div>
+      </section>
+
+      <section className="border-y border-slate-800/80 bg-charcoal py-8 text-white sm:py-10">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {proofItems.map((item) => (
+              <div key={item.value} className="zp-hover-lift rounded-2xl border border-white/10 bg-white/5 p-5 text-center transition-colors hover:border-air/30 hover:bg-white/10">
+                <div className="mx-auto inline-flex rounded-full bg-air/15 p-3 text-air">
+                  <item.icon className="h-6 w-6" />
+                </div>
+                <p className="mt-3 font-heading text-sm font-semibold text-white">{item.value}</p>
+                <p className="mt-1 text-xs leading-relaxed text-white/75">{item.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -388,19 +440,6 @@ export default async function Page() {
               <div className="mt-7"><CTAButton href="/custom-compostable-mailers/" variant="secondary">Explore Custom Mailers</CTAButton></div>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className="border-y border-slate-200/50 bg-stone py-14 sm:py-20 lg:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-air">How custom packaging works</p>
-          <h2 className="mt-3 max-w-3xl font-heading text-3xl font-semibold text-charcoal sm:text-4xl">From an idea to finished packaging</h2>
-          <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-            {processSteps.map((step, index) => (
-              <article key={step.title} className="relative rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm"><span className="font-heading text-4xl font-semibold text-air/30">0{index + 1}</span><h3 className="mt-4 font-heading text-xl font-semibold text-charcoal">{step.title}</h3><p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-charcoal/70">{step.body}</p></article>
-            ))}
-          </div>
-          <div className="mt-8"><QuoteButton /></div>
         </div>
       </section>
 

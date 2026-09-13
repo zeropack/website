@@ -130,19 +130,19 @@ const categories: CategoryCard[] = [
 const reasons = [
   {
     title: "Compostable packaging expertise",
-    body: "We focus on custom compostable packaging rather than treating it as one option in a broad catalogue of conventional packaging.",
+    body: "We help businesses develop custom compostable packaging that works for their product, brand and application.",
   },
   {
-    title: "Made-to-order production",
-    body: "Packaging is developed around your required format, dimensions, artwork, quantity and application rather than selected from generic stock.",
+    title: "Made-to-order packaging",
+    body: "Your packaging is created to suit your brand, product and requirements — from the format and size through to print and finish.",
   },
   {
     title: "Brand & artwork support",
-    body: "We help turn your brand assets into production-ready packaging and work through the details that affect the finished result.",
+    body: "We help turn your brand assets into production-ready packaging and make sure the final result feels considered, consistent and on-brand.",
   },
   {
-    title: "Practical specification guidance",
-    body: "Material, construction, performance, quantity and application all matter. We help work through those decisions before production begins.",
+    title: "Packaging guidance",
+    body: "We help you work through the right format, material and specification for your product, so you can move forward with confidence.",
   },
   {
     title: "Certification & claims guidance",

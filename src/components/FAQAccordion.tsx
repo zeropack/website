@@ -36,7 +36,17 @@ export function FAQAccordion({ items }: { items: FaqItem[] }) {
               hidden={!expanded}
               className={expanded ? "pb-5 text-sm leading-relaxed text-charcoal/75 sm:text-base" : "hidden"}
             >
-              {item.answer}
+              <p className="whitespace-pre-line">{item.answer}</p>
+              {item.ctaLabel && item.ctaHref ? (
+                <a
+                  href={item.ctaHref}
+                  className="mt-4 inline-flex items-center justify-center rounded-lg border border-compost/25 bg-white px-4 py-2.5 text-sm font-semibold text-compost transition hover:border-compost hover:bg-mist"
+                  target={item.ctaExternal ? "_blank" : undefined}
+                  rel={item.ctaExternal ? "noopener noreferrer" : undefined}
+                >
+                  {item.ctaLabel}
+                </a>
+              ) : null}
             </div>
           </div>
         );

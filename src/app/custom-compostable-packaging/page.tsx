@@ -180,14 +180,14 @@ const quoteInputs = [
 ] as const;
 
 const packagingCarouselSlides = [
-  { image: rigidFoodPackaging, heading: "Food packaging", subheading: "Flexible and rigid formats developed around the product and application.", alt: "Rigid custom compostable food packaging" },
+  { image: rigidFoodPackaging, heading: "Food packaging", subheading: "Flexible and rigid packaging developed around the product and application.", alt: "Rigid custom compostable food packaging" },
   { image: bubbleWrap, heading: "Protective packaging", subheading: "Cushioning and bubble-wrap-style solutions for products needing extra protection.", alt: "Compostable bubble-wrap-style protective packaging" },
   { image: carryYellow, heading: "Shopping & carry bags", subheading: "Custom branded bags made around the required size, use and presentation.", alt: "Custom printed compostable shopping and carry bag" },
   { image: garmentBag, heading: "Garment bags", subheading: "Flexible packaging for apparel protection, presentation and fulfilment.", alt: "Custom compostable garment bag" },
-  { image: standupPouch, heading: "Flexible packaging", subheading: "Custom bags, pouches and other made-to-order flexible formats.", alt: "Custom compostable stand-up pouch" },
+  { image: standupPouch, heading: "Flexible packaging", subheading: "Custom bags, pouches and other made-to-order flexible packaging.", alt: "Custom compostable stand-up pouch" },
   { image: tubingRoll, heading: "Layflat tubing", subheading: "Made-to-order tubing developed around the required dimensions and application.", alt: "Custom compostable layflat tubing on a roll" },
   { image: campaignBag, heading: "Campaign & event packaging", subheading: "Custom packaging for launches, activations and branded distribution.", alt: "Custom branded compostable campaign and event bag" },
-  { image: sliderBag, heading: "Resealable packaging", subheading: "Custom flexible packaging for products needing a specific closure or format.", alt: "Custom compostable resealable slider bag" },
+  { image: sliderBag, heading: "Resealable packaging", subheading: "Custom flexible packaging for products needing a specific closure or packaging style.", alt: "Custom compostable resealable slider bag" },
 ];
 
 const customerImages = [

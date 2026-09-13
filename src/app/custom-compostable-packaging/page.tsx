@@ -325,7 +325,7 @@ export default async function Page() {
         <div className="relative mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.96fr_1.04fr] lg:items-center lg:px-8">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#79d6a7] sm:text-sm">Custom printed · Made to order · B2B</p>
-            <h1 className="mt-4 max-w-3xl font-heading text-4xl font-semibold leading-[1.02] text-white sm:text-5xl lg:text-6xl">Custom compostable packaging, made around what you need</h1>
+            <h1 className="mt-4 max-w-3xl font-heading text-4xl font-semibold leading-[1.02] text-white sm:text-5xl lg:text-6xl">Custom compostable packaging, made for your business</h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-200/90">Zero Pack helps businesses develop custom compostable packaging that works for their product, brand and application.</p>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-200/75 sm:text-lg">Whether you are replacing conventional plastic packaging, developing something new or starting with an idea, we can help turn what you need into custom packaging made for your business.</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row"><QuoteButton /><ConsultationButton dark /></div>

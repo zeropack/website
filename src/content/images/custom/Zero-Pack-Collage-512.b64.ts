@@ -1,1 +1,1 @@
-export const zeroPackCollageDataUrl = "/images/zero-pack-collage.webp";
+export const zeroPackCollageDataUrl = "/images/zero-pack-collage.png";

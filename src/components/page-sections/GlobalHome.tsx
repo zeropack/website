@@ -13,6 +13,7 @@ import primasoy from "@/content/images/custom/Zero_Pack_-_Custom_Compostable_Pac
 import secondSkin from "@/content/images/custom/Zero_Pack_-_Custom_Compostable_Packaging_-_Second_Skin_4cf140a2-e9ad-4e68-9ede-b0a815b58c8a.webp";
 import siboTest from "@/content/images/custom/Zero Pack custom compostable packaging eco-friendly shipping bags and mailers Sibo Test.png";
 import dimpleOrange from "@/content/images/custom/Zero_Pack_custom_compostable_packaging_eco-friendly_shipping_bags_and_mailers_dimple_orange.webp";
+import cartridgesDirect from "@/content/images/custom/Custom Compostable Packaging - Cartridges Direct 1.png";
 import primasoyCloseupBack from "@/content/images/custom/primasoy closup back - 1024 x 1024.png";
 import shoppingBags from "@/content/images/custom/packaging/zero_pack_custom_compostable_packaging (15).png";
 import garmentBags from "@/content/images/custom/packaging/zero_pack_custom_compostable_packaging (17).png";
@@ -28,6 +29,7 @@ type CategoryCard = {
   cta: string;
   href: string;
   image?: StaticImageData;
+  secondaryImage?: StaticImageData;
   featured?: boolean;
 };
 
@@ -81,6 +83,7 @@ const categories: CategoryCard[] = [
     cta: "Explore Custom Mailers",
     href: "/custom-compostable-mailers/",
     image: dimpleOrange,
+    secondaryImage: cartridgesDirect,
     featured: true,
   },
   {
@@ -313,7 +316,7 @@ export function GlobalHome({ market = "global" }: { market?: PublicMarket }) {
               </div>
               <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                 {categories.map((item) => (
-                  <article key={item.title} className={`group overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl ${item.featured ? "md:col-span-2 lg:col-span-1 lg:row-span-2" : ""}`}>
+                  <article key={item.title} className={`group flex flex-col overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl ${item.featured ? "md:col-span-2 lg:col-span-1 lg:row-span-2" : ""}`}>
                     {item.image ? (
                       <div className={`overflow-hidden bg-mist ${item.featured ? "aspect-[4/3]" : "aspect-[16/9]"}`}>
                         <SiteImage src={item.image} alt={item.title} width={item.image.width} height={item.image.height} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]" sizes="(max-width: 768px) 100vw, 33vw" />
@@ -328,6 +331,11 @@ export function GlobalHome({ market = "global" }: { market?: PublicMarket }) {
                       <p className="mt-3 text-sm leading-relaxed text-charcoal/70">{item.description}</p>
                       <Link className="mt-5 inline-flex font-semibold text-air hover:underline" href={item.href}>{item.cta} →</Link>
                     </div>
+                    {item.secondaryImage ? (
+                      <div className="mt-auto aspect-square overflow-hidden border-t border-slate-200/70 bg-mist">
+                        <SiteImage src={item.secondaryImage} alt={`${item.title} customer example`} width={item.secondaryImage.width} height={item.secondaryImage.height} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]" sizes="(max-width: 768px) 100vw, 33vw" />
+                      </div>
+                    ) : null}
                   </article>
                 ))}
               </div>

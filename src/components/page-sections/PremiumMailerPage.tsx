@@ -11,19 +11,74 @@ import infectiousGrey from "@/content/images/custom/Zero_Pack_custom_compostable
 import lahanaBlue from "@/content/images/custom/Zero_Pack_custom_compostable_packaging_eco-friendly_shipping_bags_and_mailers_lahana_pale_blue_20cd995e-2861-4d4d-a2e8-fe431b710abc.webp";
 import provincialRed from "@/content/images/custom/Zero_Pack_custom_compostable_packaging_eco-friendly_shipping_bags_and_mailers_provincial_red.webp";
 import vinniesLime from "@/content/images/custom/Zero_Pack_custom_compostable_packaging_eco-friendly_shipping_bags_and_mailers_vinnies_lime_efa69a99-61aa-4654-9bad-61365a0827bf.webp";
+import { zeroPackCollageDataUrl } from "@/content/images/custom/Zero-Pack-Collage-512.b64";
 
 type PublicMarket = "global" | "au" | "uk";
 
 const CONSULTATION_URL = "https://calendly.com/zeropackco/30min";
 const QUOTE_HREF = "#quoteform";
 
-const proofItems = [
-  ["750,000+", "Custom bags produced"],
-  ["Built for growing brands", "Custom production from 2,000 units*"],
-  ["Strong, durable & waterproof", "Made for everyday ecommerce shipping"],
-  ["Custom made", "Your sizing, print and branding"],
-  ["Certification evidence", "Available on request"],
-] as const;
+function AwardIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} aria-hidden>
+      <circle cx="12" cy="8" r="5" />
+      <path d="m9 13 1.5 8L12 19l1.5 2L15 13" />
+    </svg>
+  );
+}
+
+function PackageIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} aria-hidden>
+      <path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z" />
+      <path d="M12 21V12M3 7.5 12 12m9-4.5L12 12" />
+    </svg>
+  );
+}
+
+function CheckIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className} aria-hidden>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m8.5 12.5 2.5 2.5 4.5-5" />
+    </svg>
+  );
+}
+
+function ShieldIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} aria-hidden>
+      <path d="M12 3 5 6v5c0 4.7 2.8 8 7 10 4.2-2 7-5.3 7-10V6z" />
+      <path d="m9 12 2 2 4-5" />
+    </svg>
+  );
+}
+
+function DocumentIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} aria-hidden>
+      <path d="M7 3h7l4 4v14H7z" />
+      <path d="M14 3v5h5M10 12h5M10 16h5" />
+    </svg>
+  );
+}
+
+function getProofItems(market: PublicMarket) {
+  const certification =
+    market === "au"
+      ? ["AS 4736", "AS 5810"]
+      : market === "uk"
+        ? ["OK compost INDUSTRIAL", "OK compost HOME"]
+        : ["Available on request"];
+
+  return [
+    { value: "750,000+", label: ["Custom bags produced"], icon: PackageIcon },
+    { value: "Built for growing brands", label: ["Custom production from 2,000 units*"], icon: AwardIcon },
+    { value: "Strong, durable & waterproof", label: ["Made for everyday ecommerce shipping"], icon: ShieldIcon },
+    { value: "Custom made", label: ["Your sizing, print and branding"], icon: CheckIcon },
+    { value: market === "global" ? "Certification evidence" : "Certification", label: certification, icon: DocumentIcon },
+  ] as const;
+}
 
 const performanceItems = [
   {
@@ -163,9 +218,16 @@ function QuoteButton({ children = "Get a Custom Quote" }: { children?: string })
   );
 }
 
-function ConsultationButton() {
+function ConsultationButton({ dark = false }: { dark?: boolean }) {
   return (
-    <a href={CONSULTATION_URL} className="inline-flex items-center justify-center rounded-lg border border-compost/25 bg-white px-6 py-3.5 text-sm font-semibold text-compost transition hover:bg-mist">
+    <a
+      href={CONSULTATION_URL}
+      className={
+        dark
+          ? "inline-flex items-center justify-center rounded-lg border border-white/25 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white transition hover:border-air/50 hover:bg-white/10"
+          : "inline-flex items-center justify-center rounded-lg border border-compost/25 bg-white px-6 py-3.5 text-sm font-semibold text-compost transition hover:bg-mist"
+      }
+    >
       Book a Packaging Consultation
     </a>
   );
@@ -173,21 +235,26 @@ function ConsultationButton() {
 
 export function PremiumMailerPage({ market = "global" }: { market?: PublicMarket }) {
   const faqItems = market === "uk" ? [...masterFaqs.slice(0, -2), ukDeliveryFaq, masterFaqs[masterFaqs.length - 1]] : masterFaqs;
+  const proofItems = getProofItems(market);
 
   return (
-    <div className="bg-white text-charcoal">
+    <div className="bg-white text-charcoal sm:-mb-6">
       <FAQSchema items={faqItems} />
 
-      <section className="overflow-hidden border-b border-slate-200/60 bg-[linear-gradient(135deg,#f7fbfc_0%,#ffffff_55%,#eef8f3_100%)] py-14 sm:py-20 lg:py-24">
-        <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[1.02fr_0.98fr] lg:items-center lg:px-8">
+      <section className="relative isolate overflow-hidden border-b border-white/10 bg-[#070b12] py-14 text-slate-100 sm:py-20 lg:py-24">
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_26%_52%,rgba(0,168,243,0.28),transparent_46%),radial-gradient(circle_at_78%_50%,rgba(131,185,37,0.22),transparent_44%),linear-gradient(160deg,#04070d_0%,#08111d_26%,#102a21_58%,#0a1713_100%)]"
+          aria-hidden
+        />
+        <div className="relative mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[1.02fr_0.98fr] lg:items-center lg:px-8">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-compost sm:text-sm">Custom printed · Made to order · B2B</p>
-            <h1 className="mt-4 max-w-3xl font-heading text-4xl font-semibold leading-[1.02] text-charcoal sm:text-5xl lg:text-6xl">Custom compostable mailers, made for your brand</h1>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-charcoal/80">Custom printed mailers designed around your products and your brand.</p>
-            <p className="mt-4 max-w-2xl text-base leading-relaxed text-charcoal/70 sm:text-lg">Strong, durable and waterproof, with custom sizing, standout branding and certified compostable material options, they give ecommerce brands a practical alternative to conventional plastic mailers.</p>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-air sm:text-sm">Custom printed · Made to order · B2B</p>
+            <h1 className="mt-4 max-w-3xl font-heading text-4xl font-semibold leading-[1.02] text-white sm:text-5xl lg:text-6xl">Custom compostable mailers, made for your brand</h1>
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-200/90">Custom printed mailers designed around your products and your brand.</p>
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-200/75 sm:text-lg">Strong, durable and waterproof, with custom sizing, standout branding and certified compostable material options, they give ecommerce brands a practical alternative to conventional plastic mailers.</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <QuoteButton />
-              <ConsultationButton />
+              <ConsultationButton dark />
             </div>
           </div>
           <div className="mx-auto w-full max-w-2xl">
@@ -196,17 +263,19 @@ export function PremiumMailerPage({ market = "global" }: { market?: PublicMarket
         </div>
       </section>
 
-      <section className="border-y border-slate-800/80 bg-charcoal py-8 text-white sm:py-10">
+      <section className="border-b border-slate-200/60 bg-slate-50/80 py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            {proofItems.map(([value, label]) => (
-              <div key={value} className="rounded-2xl border border-white/10 bg-white/5 p-5 text-center">
-                <p className="font-heading text-base font-semibold text-white">{value}</p>
-                <p className="mt-2 text-xs leading-relaxed text-white/75">{label}</p>
-              </div>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-compost">Performance</p>
+          <h2 className="mt-3 font-heading text-3xl font-semibold text-charcoal sm:text-4xl">Made to look good. Made to do the job.</h2>
+          <p className="mt-4 max-w-3xl text-base leading-relaxed text-charcoal/70 sm:text-lg">Packaging still needs to perform once it leaves your hands.</p>
+          <div className="mt-9 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {performanceItems.map((item) => (
+              <article key={item.title} className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm">
+                <h3 className="font-heading text-xl font-semibold text-charcoal">{item.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-charcoal/70">{item.body}</p>
+              </article>
             ))}
           </div>
-          <p className="mt-4 text-center text-xs text-white/60">*Final MOQ depends on size, print, material and specification.</p>
         </div>
       </section>
 
@@ -226,19 +295,22 @@ export function PremiumMailerPage({ market = "global" }: { market?: PublicMarket
         </div>
       </section>
 
-      <section className="border-y border-slate-200/60 bg-slate-50/80 py-16 sm:py-20">
+      <section className="border-y border-slate-800/80 bg-charcoal py-8 text-white sm:py-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-compost">Performance</p>
-          <h2 className="mt-3 font-heading text-3xl font-semibold text-charcoal sm:text-4xl">Made to look good. Made to do the job.</h2>
-          <p className="mt-4 max-w-3xl text-base leading-relaxed text-charcoal/70 sm:text-lg">Packaging still needs to perform once it leaves your hands.</p>
-          <div className="mt-9 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-            {performanceItems.map((item) => (
-              <article key={item.title} className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm">
-                <h3 className="font-heading text-xl font-semibold text-charcoal">{item.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-charcoal/70">{item.body}</p>
-              </article>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+            {proofItems.map((item) => (
+              <div key={item.value} className="zp-hover-lift rounded-2xl border border-white/10 bg-white/5 p-5 text-center transition-colors hover:border-air/30 hover:bg-white/10">
+                <div className="mx-auto inline-flex rounded-full bg-air/15 p-3 text-air">
+                  <item.icon className="h-6 w-6" />
+                </div>
+                <p className="mt-3 font-heading text-sm font-semibold text-white">{item.value}</p>
+                <div className="mt-1 space-y-0.5 text-xs leading-relaxed text-white/75">
+                  {item.label.map((line) => <p key={line}>{line}</p>)}
+                </div>
+              </div>
             ))}
           </div>
+          <p className="mt-4 text-center text-xs text-white/60">*Final MOQ depends on size, print, material and specification.</p>
         </div>
       </section>
 
@@ -373,9 +445,12 @@ export function PremiumMailerPage({ market = "global" }: { market?: PublicMarket
               <p className="mt-3 text-base leading-relaxed text-charcoal/70">Even if you only have an idea, we can work through it with you.</p>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row"><QuoteButton /><ConsultationButton /></div>
             </div>
-            <div className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm sm:p-8">
-              <h3 className="font-heading text-2xl font-semibold text-charcoal">Want to see the material first?</h3>
-              <p className="mt-4 text-base leading-relaxed text-charcoal/70">Ask us about samples when you enquire and we can advise on the best option for the mailer you are considering.</p>
+            <div className="overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-sm">
+              <SiteImage src={zeroPackCollageDataUrl} alt="Collage of Zero Pack custom compostable packaging examples" width={512} height={512} className="aspect-square w-full object-cover" sizes="(max-width: 1024px) 100vw, 45vw" />
+              <div className="p-6 sm:p-8">
+                <h3 className="font-heading text-2xl font-semibold text-charcoal">Want to see the material first?</h3>
+                <p className="mt-4 text-base leading-relaxed text-charcoal/70">Ask us about samples when you enquire and we can advise on the best option for the mailer you are considering.</p>
+              </div>
             </div>
           </div>
         </div>

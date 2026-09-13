@@ -11,6 +11,9 @@ export type SeoConfig = {
 export type FaqItem = {
   question: string;
   answer: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+  ctaExternal?: boolean;
 };
 
 export type CaseStudyCard = {

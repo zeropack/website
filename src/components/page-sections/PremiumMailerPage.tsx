@@ -11,7 +11,7 @@ import infectiousGrey from "@/content/images/custom/Zero_Pack_custom_compostable
 import lahanaBlue from "@/content/images/custom/Zero_Pack_custom_compostable_packaging_eco-friendly_shipping_bags_and_mailers_lahana_pale_blue_20cd995e-2861-4d4d-a2e8-fe431b710abc.webp";
 import provincialRed from "@/content/images/custom/Zero_Pack_custom_compostable_packaging_eco-friendly_shipping_bags_and_mailers_provincial_red.webp";
 import vinniesLime from "@/content/images/custom/Zero_Pack_custom_compostable_packaging_eco-friendly_shipping_bags_and_mailers_vinnies_lime_efa69a99-61aa-4654-9bad-61365a0827bf.webp";
-import { zeroPackCollageDataUrl } from "@/content/images/custom/Zero-Pack-Collage-512.b64";
+import zeroPackCollage from "@/content/images/custom/Zero Pack Collage - 1024 x 1024.png";
 
 type PublicMarket = "global" | "au" | "uk";
 
@@ -462,7 +462,7 @@ export function PremiumMailerPage({ market = "global" }: { market?: PublicMarket
                 <h3 className="font-heading text-2xl font-semibold text-charcoal">Want to see the material first?</h3>
                 <p className="mt-4 text-base leading-relaxed text-charcoal/70">Ask us about samples when you enquire and we can advise on the best option for the mailer you are considering.</p>
               </div>
-              <img src={zeroPackCollageDataUrl} alt="Collage of Zero Pack custom compostable packaging examples" width={512} height={512} className="block aspect-square w-full object-cover" />
+              <SiteImage src={zeroPackCollage} alt="Collage of Zero Pack custom compostable packaging examples" width={zeroPackCollage.width} height={zeroPackCollage.height} className="block aspect-square w-full object-cover" sizes="(max-width: 1024px) 100vw, 45vw" />
             </div>
           </div>
         </div>

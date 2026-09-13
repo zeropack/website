@@ -205,6 +205,11 @@ const masterFaqs = [
   },
 ];
 
+const ukCertificationFaq = {
+  question: "Are the mailers certified compostable?",
+  answer: "Certified compostable material options are available for Zero Pack custom mailers. For certified home-compostable mailer material, OK compost HOME certification is available.",
+};
+
 const ukDeliveryFaq = {
   question: "Do you deliver to the UK?",
   answer: "Yes. Zero Pack supplies custom compostable mailers to UK customers. Freight, shipping method and expected delivery timing are confirmed during quoting based on the order and destination.",
@@ -234,7 +239,13 @@ function ConsultationButton({ dark = false }: { dark?: boolean }) {
 }
 
 export function PremiumMailerPage({ market = "global" }: { market?: PublicMarket }) {
-  const faqItems = market === "uk" ? [...masterFaqs.slice(0, -2), ukDeliveryFaq, masterFaqs[masterFaqs.length - 1]] : masterFaqs;
+  const faqItems = market === "uk"
+    ? masterFaqs.map((item) => {
+        if (item.question === "Are the mailers certified compostable?") return ukCertificationFaq;
+        if (item.question === "Where do you deliver?") return ukDeliveryFaq;
+        return item;
+      })
+    : masterFaqs;
   const proofItems = getProofItems(market);
 
   return (
@@ -370,7 +381,7 @@ export function PremiumMailerPage({ market = "global" }: { market?: PublicMarket
           <h2 className="mt-3 font-heading text-3xl font-semibold text-charcoal sm:text-4xl">Compostability backed by certification</h2>
           <div className="mt-5 max-w-4xl space-y-4 text-base leading-relaxed text-charcoal/70 sm:text-lg">
             <p>Zero Pack custom compostable mailers are available with certified compostable material options, giving your business clear evidence behind the compostability claims you make about your packaging.</p>
-            <p>For certified home-compostable mailer material, <strong className="text-charcoal">AS 5810 certification</strong> is available.</p>
+            <p>For certified home-compostable mailer material, <strong className="text-charcoal">{market === "uk" ? "OK compost HOME certification" : "AS 5810 certification"}</strong> is available.</p>
             <p>This gives brands clear certification behind the compostability claims they make about their mailers.</p>
           </div>
           <div className="mt-9 grid gap-5 md:grid-cols-2">

@@ -70,7 +70,7 @@ function DocumentIcon({ className }: { className?: string }) {
 const proofItems = [
   { value: "750,000+", label: "Custom bags produced", icon: PackageIcon },
   { value: "Made to order", label: "Custom formats, sizing and print", icon: CheckIcon },
-  { value: "Practical custom production", label: "Quantities built around commercial projects", icon: AwardIcon },
+  { value: "Built for growing brands", label: "Custom production from 2,000 units*", icon: AwardIcon },
   { value: "Specification & certification support", label: "Clear guidance for the packaging being produced", icon: DocumentIcon },
 ];
 

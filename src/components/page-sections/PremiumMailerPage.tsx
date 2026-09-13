@@ -132,9 +132,9 @@ const processSteps = [
 const quoteInputs = [
   "what you are shipping",
   "product dimensions",
-  "your current mailer or approximate required size",
   "approximate order quantity",
   "your logo, artwork or print idea",
+  "your current mailer or approximate required size",
   "delivery destination",
   "preferred timing",
 ] as const;
@@ -382,7 +382,7 @@ export function PremiumMailerPage({ market = "global" }: { market?: PublicMarket
           <h2 className="mt-3 font-heading text-3xl font-semibold text-charcoal sm:text-4xl">Compostability backed by certification</h2>
           <div className="mt-5 max-w-4xl space-y-4 text-base leading-relaxed text-charcoal/70 sm:text-lg">
             <p>Zero Pack custom compostable mailers are available with certified compostable material options, giving your business clear evidence behind the compostability claims you make about your packaging.</p>
-            <p>For certified home-compostable mailer material, <strong className="text-charcoal">{market === "uk" ? "OK compost HOME certification" : market === "global" ? "AS 5810 certification and TUV OK Compostable HOME" : "AS 5810 certification"}</strong> {market === "global" ? "are" : "is"} available.</p>
+            <p>For certified home-compostable mailer material, <strong className="text-charcoal">{market === "uk" ? "OK compost HOME certification" : market === "global" ? "AS 5810 certification and OK Compostable HOME" : "AS 5810 certification"}</strong> {market === "global" ? "are" : "is"} available.</p>
             <p>This gives brands clear certification behind the compostability claims they make about their mailers.</p>
           </div>
           <div className="mt-9 grid gap-5 md:grid-cols-2">

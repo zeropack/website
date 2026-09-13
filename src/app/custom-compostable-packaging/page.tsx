@@ -365,6 +365,26 @@ export default async function Page() {
         </div>
       </section>
 
+      <section className="bg-mist/60 py-14 sm:py-20 lg:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:px-8">
+          <div className="overflow-hidden rounded-3xl border border-slate-200/70 bg-white p-5 shadow-lg shadow-slate-300/20"><PackagingImage image={rigidFoodPackaging} alt="Branded custom compostable packaging made around the product" className="h-auto w-full rounded-2xl object-contain" /></div>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-air">Packaging made for your product and your brand</p>
+            <h2 className="mt-3 font-heading text-3xl font-semibold text-charcoal sm:text-4xl">Custom means more than adding a logo</h2>
+            <p className="mt-5 text-lg leading-relaxed text-charcoal/75">Your packaging is created to suit your product, brand and requirements.</p>
+            <p className="mt-4 text-charcoal/70">Depending on the project, that can include:</p>
+            <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+              {["type of packaging", "size and dimensions", "branding and colours", "artwork and print", "finish", "closures and other product features"].map((item) => (
+                <li key={item} className="flex items-center gap-3 rounded-xl border border-compost/10 bg-white px-4 py-3 text-sm font-semibold text-charcoal/80"><span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-leaf/20 text-compost" aria-hidden>✓</span>{item}</li>
+              ))}
+            </ul>
+            <p className="mt-6 leading-relaxed text-charcoal/75">You do not need finished artwork or a complete packaging specification before you enquire.</p>
+            <p className="mt-3 leading-relaxed text-charcoal/75">If you already have packaging you want to replace, we can start there. If you are building something new, an idea is enough to begin the conversation.</p>
+            <div className="mt-8"><QuoteButton>Tell Us What You Need</QuoteButton></div>
+          </div>
+        </div>
+      </section>
+
       <section className="bg-white py-14 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
@@ -407,26 +427,6 @@ export default async function Page() {
             <p>If you are currently buying that packaging in conventional plastic, talk to us. There is a good chance a compostable alternative is worth exploring.</p>
           </div>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row"><QuoteButton /><ConsultationButton dark /></div>
-        </div>
-      </section>
-
-      <section className="bg-mist/60 py-14 sm:py-20 lg:py-24">
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:px-8">
-          <div className="overflow-hidden rounded-3xl border border-slate-200/70 bg-white p-5 shadow-lg shadow-slate-300/20"><PackagingImage image={rigidFoodPackaging} alt="Branded custom compostable packaging made around the product" className="h-auto w-full rounded-2xl object-contain" /></div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-air">Packaging made for your product and your brand</p>
-            <h2 className="mt-3 font-heading text-3xl font-semibold text-charcoal sm:text-4xl">Custom means more than adding a logo</h2>
-            <p className="mt-5 text-lg leading-relaxed text-charcoal/75">Your packaging is created to suit your product, brand and requirements.</p>
-            <p className="mt-4 text-charcoal/70">Depending on the project, that can include:</p>
-            <ul className="mt-5 grid gap-3 sm:grid-cols-2">
-              {["type of packaging", "size and dimensions", "branding and colours", "artwork and print", "finish", "closures and other product features"].map((item) => (
-                <li key={item} className="flex items-center gap-3 rounded-xl border border-compost/10 bg-white px-4 py-3 text-sm font-semibold text-charcoal/80"><span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-leaf/20 text-compost" aria-hidden>✓</span>{item}</li>
-              ))}
-            </ul>
-            <p className="mt-6 leading-relaxed text-charcoal/75">You do not need finished artwork or a complete packaging specification before you enquire.</p>
-            <p className="mt-3 leading-relaxed text-charcoal/75">If you already have packaging you want to replace, we can start there. If you are building something new, an idea is enough to begin the conversation.</p>
-            <div className="mt-8"><QuoteButton>Tell Us What You Need</QuoteButton></div>
-          </div>
         </div>
       </section>
 

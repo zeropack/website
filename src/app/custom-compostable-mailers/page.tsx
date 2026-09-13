@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import { buildMarketCanonical, buildMetadata, mailersHreflang } from "@/lib/metadata";
 import { PremiumMailerPage } from "@/components/page-sections/PremiumMailerPage";
-import { CertificationRequestPanel } from "@/components/CertificationRequestPanel";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Custom Compostable Mailers | Premium Unboxing for Ecommerce Brands",
+  title: "Custom Compostable Mailers, Made for Your Brand | Zero Pack",
   description:
-    "Custom compostable mailers for ecommerce brands that want premium unboxing, credible certification and a made-to-order quote process.",
+    "Custom printed compostable mailers made to order with custom sizing, branding and certified compostable material options for ecommerce shipping.",
   path: "/custom-compostable-mailers/",
   canonicalUrl: buildMarketCanonical("global", "/custom-compostable-mailers"),
   hreflang: mailersHreflang(),
@@ -14,10 +13,5 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default function Page() {
-  return (
-    <>
-      <PremiumMailerPage market="global" />
-      <CertificationRequestPanel market="global" />
-    </>
-  );
+  return <PremiumMailerPage market="global" />;
 }

@@ -69,14 +69,14 @@ function getProofItems(market: PublicMarket) {
       ? ["AS 4736", "AS 5810"]
       : market === "uk"
         ? ["OK compost INDUSTRIAL", "OK compost HOME"]
-        : ["Available on request"];
+        : ["Enquire for more details"];
 
   return [
     { value: "750,000+", label: ["Custom bags produced"], icon: PackageIcon },
     { value: "Built for growing brands", label: ["Custom production from 2,000 units*"], icon: AwardIcon },
     { value: "Strong, durable & waterproof", label: ["Made for everyday ecommerce shipping"], icon: ShieldIcon },
     { value: "Custom made", label: ["Your sizing, print and branding"], icon: CheckIcon },
-    { value: market === "global" ? "Certification evidence" : "Certification", label: certification, icon: DocumentIcon },
+    { value: "Certification", label: certification, icon: DocumentIcon },
   ] as const;
 }
 
@@ -106,6 +106,7 @@ const productFit = [
   "textiles",
   "gifts",
   "beauty and wellness products",
+  "homewares",
   "other lightweight, non-fragile goods",
 ] as const;
 
@@ -130,8 +131,8 @@ const processSteps = [
 
 const quoteInputs = [
   "what you are shipping",
-  "your current mailer or approximate required size",
   "product dimensions",
+  "your current mailer or approximate required size",
   "approximate order quantity",
   "your logo, artwork or print idea",
   "delivery destination",
@@ -153,7 +154,7 @@ const masterFaqs = [
   },
   {
     question: "What products are compostable mailers good for?",
-    answer: "They work well for a wide range of lightweight and non-fragile products, including apparel, accessories, books, stationery, textiles, gifts and beauty and wellness products. If your product needs more protection or a different packaging format, talk to us and we can help you explore the right solution.",
+    answer: "They work well for a wide range of lightweight and non-fragile products, including apparel, accessories, books, stationery, textiles, gifts, homewares and beauty and wellness products. If your product needs more protection or a different packaging format, talk to us and we can help you explore the right solution.",
   },
   {
     question: "What is the minimum order quantity?",
@@ -297,7 +298,7 @@ export function PremiumMailerPage({ market = "global" }: { market?: PublicMarket
             <h2 className="mt-3 font-heading text-3xl font-semibold text-charcoal sm:text-4xl">A better mailer starts with what you’re shipping</h2>
             <div className="mt-5 space-y-4 text-base leading-relaxed text-charcoal/70 sm:text-lg">
               <p>Custom compostable mailers are made-to-order flexible shipping bags for businesses that want their packaging to stand out, perform reliably and help reduce reliance on conventional plastic.</p>
-              <p>They are a great fit for many ecommerce products, including apparel, accessories, books, stationery, textiles, gifts and many non-fragile beauty and wellness products.</p>
+              <p>They are a great fit for many ecommerce products, including apparel, accessories, books, stationery, textiles, gifts, homewares and many non-fragile beauty and wellness products.</p>
               <p>Rather than choosing from generic stock sizes and designs, we work with you to create a mailer that suits your products and matches your brand.</p>
             </div>
             <div className="mt-7"><QuoteButton /></div>
@@ -381,7 +382,7 @@ export function PremiumMailerPage({ market = "global" }: { market?: PublicMarket
           <h2 className="mt-3 font-heading text-3xl font-semibold text-charcoal sm:text-4xl">Compostability backed by certification</h2>
           <div className="mt-5 max-w-4xl space-y-4 text-base leading-relaxed text-charcoal/70 sm:text-lg">
             <p>Zero Pack custom compostable mailers are available with certified compostable material options, giving your business clear evidence behind the compostability claims you make about your packaging.</p>
-            <p>For certified home-compostable mailer material, <strong className="text-charcoal">{market === "uk" ? "OK compost HOME certification" : "AS 5810 certification"}</strong> is available.</p>
+            <p>For certified home-compostable mailer material, <strong className="text-charcoal">{market === "uk" ? "OK compost HOME certification" : market === "global" ? "AS 5810 certification and TUV OK Compostable HOME" : "AS 5810 certification"}</strong> {market === "global" ? "are" : "is"} available.</p>
             <p>This gives brands clear certification behind the compostability claims they make about their mailers.</p>
           </div>
           <div className="mt-9 grid gap-5 md:grid-cols-2">
@@ -457,11 +458,11 @@ export function PremiumMailerPage({ market = "global" }: { market?: PublicMarket
               <div className="mt-7 flex flex-col gap-3 sm:flex-row"><QuoteButton /><ConsultationButton /></div>
             </div>
             <div className="overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-sm">
-              <SiteImage src={zeroPackCollageDataUrl} alt="Collage of Zero Pack custom compostable packaging examples" width={512} height={512} className="aspect-square w-full object-cover" sizes="(max-width: 1024px) 100vw, 45vw" />
               <div className="p-6 sm:p-8">
                 <h3 className="font-heading text-2xl font-semibold text-charcoal">Want to see the material first?</h3>
                 <p className="mt-4 text-base leading-relaxed text-charcoal/70">Ask us about samples when you enquire and we can advise on the best option for the mailer you are considering.</p>
               </div>
+              <img src={zeroPackCollageDataUrl} alt="Collage of Zero Pack custom compostable packaging examples" width={512} height={512} className="block aspect-square w-full object-cover" />
             </div>
           </div>
         </div>

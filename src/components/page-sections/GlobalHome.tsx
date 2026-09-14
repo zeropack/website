@@ -465,7 +465,7 @@ export function GlobalHome({ market = "global" }: { market?: PublicMarket }) {
                       <span className="text-air transition group-open:rotate-45" aria-hidden>+</span>
                     </summary>
                     <div className="pb-6 pr-8 text-sm leading-relaxed text-charcoal/70 sm:text-base">
-                      <p>{item.answer}</p>
+                      <p className="whitespace-pre-line">{item.answer}</p>
                       {"consultation" in item && item.consultation ? (
                         <Link className="mt-4 inline-flex font-semibold text-air hover:underline" href="https://calendly.com/zeropackco/30min">
                           Book a Packaging Consultation →

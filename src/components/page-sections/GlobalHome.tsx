@@ -6,6 +6,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { Reveal } from "@/components/Reveal";
 import { CustomMailerCarousel } from "@/components/CustomMailerCarousel";
 import { customMailerCarouselSlides } from "@/content/customMailerCarouselSlides";
+import { CERTIFICATION_FAQ_ANSWERS, PFAS_BPA_FAQ_ANSWER } from "@/content/certificationFaqs";
 import { QUOTE_FORM_HREF } from "@/lib/site";
 import { buildMarketCanonical } from "@/lib/metadata";
 import oneRoad from "@/content/images/custom/Zero_Pack_-_Custom_Compostable_Packaging_-_OneRoad_-_800_x_800.webp";
@@ -213,8 +214,11 @@ const baseFaqs = [
   },
   {
     question: "Can you provide certification information?",
-    answer:
-      "Yes. All Zero Pack compostable packaging is certified.\n\nThe exact certification depends on the material and type of packaging being produced, and we’ll confirm the relevant certification for your project.",
+    answer: CERTIFICATION_FAQ_ANSWERS.global,
+  },
+  {
+    question: "Is Zero Pack compostable packaging PFAS-free and BPA-free?",
+    answer: PFAS_BPA_FAQ_ANSWER,
   },
   {
     question: "How long does custom packaging take?",
@@ -235,7 +239,13 @@ const ukDeliveryFaq = {
 };
 
 export function GlobalHome({ market = "global" }: { market?: PublicMarket }) {
-  const faqItems = market === "uk" ? [...baseFaqs.slice(0, -1), ukDeliveryFaq] : baseFaqs;
+  const faqItems = baseFaqs.map((item) => {
+    if (item.question === "Can you provide certification information?") {
+      return { ...item, answer: CERTIFICATION_FAQ_ANSWERS[market] };
+    }
+    if (market === "uk" && item.question === "Where do you deliver?") return ukDeliveryFaq;
+    return item;
+  });
   const providerUrl = buildMarketCanonical(market, "/");
   const serviceJsonLd = {
     "@context": "https://schema.org",

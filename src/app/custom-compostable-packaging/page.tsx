@@ -33,11 +33,11 @@ function PackageIcon({ className }: { className?: string }) {
   );
 }
 
-function BrandIcon({ className }: { className?: string }) {
+function DocumentIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} aria-hidden>
-      <path d="M4 20h4l11-11-4-4L4 16z" />
-      <path d="m13.5 6.5 4 4M4 16l4 4" />
+      <path d="M7 3h7l4 4v14H7z" />
+      <path d="M14 3v5h5M10 12h5M10 16h5" />
     </svg>
   );
 }
@@ -62,7 +62,7 @@ function GlobeIcon({ className }: { className?: string }) {
 
 const proofItems = [
   { value: "750,000+", label: "Custom bags produced", icon: PackageIcon },
-  { value: "Made for your brand", label: "Custom sizing, print and branding", icon: BrandIcon },
+  { value: "Certification", label: "Certified compostable packaging", icon: DocumentIcon },
   { value: "Made to order", label: "Packaging developed around your product and brand", icon: CheckIcon },
   { value: "Worldwide delivery", label: "Working with businesses all over the world", icon: GlobeIcon },
 ] as const;
@@ -228,7 +228,7 @@ const masterFaqs: FaqItem[] = [
   },
   {
     question: "Can you provide certification information?",
-    answer: "Yes.\n\nCertification varies by material and type of packaging. We’ll confirm the relevant compostability certification for your project.",
+    answer: "Yes. All Zero Pack compostable packaging is certified.\n\nThe exact certification depends on the material and type of packaging being produced, and we’ll confirm the relevant certification for your project.",
   },
   {
     question: "Can you develop food packaging?",
@@ -326,7 +326,7 @@ export default async function Page() {
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#79d6a7] sm:text-sm">Custom printed · Made to order · B2B</p>
             <h1 className="mt-4 max-w-3xl font-heading text-4xl font-semibold leading-[1.02] text-white sm:text-5xl lg:text-6xl">Custom compostable packaging, made for your business</h1>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-200/90">Zero Pack helps businesses develop custom compostable packaging that works for their product, brand and application.</p>
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-200/90">Zero Pack helps businesses develop certified compostable packaging that works for their product, brand and application.</p>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-200/75 sm:text-lg">Whether you are replacing conventional plastic packaging, developing something new or starting with an idea, we can help turn what you need into custom packaging made for your business.</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row"><QuoteButton /><ConsultationButton dark /></div>
           </div>

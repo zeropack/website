@@ -212,9 +212,9 @@ const baseFaqs = [
       "Yes. We can help prepare or adapt artwork for production and work through print placement, sizing and other practical requirements as part of the development and approval process. You do not need finished production artwork before contacting us.",
   },
   {
-    question: "Can you provide certification evidence?",
+    question: "Can you provide certification information?",
     answer:
-      "Yes. Certification evidence is available on request once the relevant product and material specification are confirmed. We match certification evidence to the packaging being supplied rather than making blanket certification claims across every format.",
+      "Yes. All Zero Pack compostable packaging is certified.\n\nThe exact certification depends on the material and type of packaging being produced, and we’ll confirm the relevant certification for your project.",
   },
   {
     question: "How long does custom packaging take?",

@@ -178,7 +178,7 @@ const masterFaqs = [
   },
   {
     question: "Are the mailers certified compostable?",
-    answer: "Certified compostable material options are available for Zero Pack custom mailers. For certified home-compostable mailer material, AS 5810 certification is available.",
+    answer: "Yes. All Zero Pack compostable packaging is certified.\n\nThe exact certification depends on the material and type of packaging being produced, and we’ll confirm the relevant certification for your project.",
   },
   {
     question: "Are the mailers PFAS-free and BPA-free?",
@@ -205,11 +205,6 @@ const masterFaqs = [
     answer: "We review what you are shipping and the information you have provided, then work with you to confirm the mailer, sizing, print and other details needed for pricing. From there, we move through artwork approval and production with you.",
   },
 ];
-
-const ukCertificationFaq = {
-  question: "Are the mailers certified compostable?",
-  answer: "Certified compostable material options are available for Zero Pack custom mailers. For certified home-compostable mailer material, OK compost HOME certification is available.",
-};
 
 const ukDeliveryFaq = {
   question: "Do you deliver to the UK?",
@@ -242,7 +237,6 @@ function ConsultationButton({ dark = false }: { dark?: boolean }) {
 export function PremiumMailerPage({ market = "global" }: { market?: PublicMarket }) {
   const faqItems = market === "uk"
     ? masterFaqs.map((item) => {
-        if (item.question === "Are the mailers certified compostable?") return ukCertificationFaq;
         if (item.question === "Where do you deliver?") return ukDeliveryFaq;
         return item;
       })

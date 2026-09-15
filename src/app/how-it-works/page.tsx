@@ -46,12 +46,14 @@ function PackagingImage({
   alt,
   className,
   priority = false,
+  unoptimized = false,
   sizes,
 }: {
   image: StaticImageData;
   alt: string;
   className: string;
   priority?: boolean;
+  unoptimized?: boolean;
   sizes: string;
 }) {
   return (
@@ -62,6 +64,7 @@ function PackagingImage({
       height={image.height}
       className={className}
       priority={priority}
+      unoptimized={unoptimized}
       sizes={sizes}
     />
   );
@@ -255,7 +258,7 @@ export default function Page() {
           </div>
           <div className="mx-auto grid w-full max-w-2xl grid-cols-2 gap-3 sm:gap-4">
             <div className="col-span-2 overflow-hidden rounded-3xl border border-white/15 bg-white p-5 shadow-2xl shadow-black/25 sm:p-7">
-              <PackagingImage image={rigidFoodPackaging} alt="Custom rigid compostable food packaging" className="aspect-[16/9] h-auto w-full object-contain" sizes="(max-width: 1024px) 90vw, 45vw" priority />
+              <PackagingImage image={rigidFoodPackaging} alt="Custom rigid compostable food packaging" className="aspect-[16/9] h-auto w-full object-contain" sizes="(max-width: 1024px) 90vw, 45vw" priority unoptimized />
             </div>
             <div className="overflow-hidden rounded-2xl border border-white/15 bg-white p-3 shadow-xl shadow-black/20 sm:p-4">
               <PackagingImage image={bubbleWrap} alt="Compostable bubble-wrap-style protective packaging" className="aspect-square h-auto w-full object-contain" sizes="(max-width: 1024px) 45vw, 22vw" priority />
@@ -342,7 +345,7 @@ export default function Page() {
       <section className="bg-mist/60 py-14 sm:py-20 lg:py-24">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[0.88fr_1.12fr] lg:items-center lg:px-8">
           <div className="overflow-hidden rounded-3xl border border-slate-200/70 bg-white p-5 shadow-lg shadow-slate-300/20">
-            <PackagingImage image={garmentBag} alt="Custom compostable packaging ready for repeat production" className="aspect-square h-auto w-full object-contain" sizes="(max-width: 1024px) 90vw, 42vw" />
+            <PackagingImage image={garmentBag} alt="Custom compostable packaging ready for repeat production" className="aspect-square h-auto w-full object-contain" sizes="(max-width: 1024px) 90vw, 42vw" unoptimized />
           </div>
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-air">After your first order</p>

@@ -4,6 +4,7 @@ import { FAQAccordion } from "@/components/FAQAccordion";
 import { FAQSchema } from "@/components/FAQSchema";
 import { SiteImage } from "@/components/SiteImage";
 import { TypeformFormEmbed } from "@/components/TypeformFormEmbed";
+import { CERTIFICATION_FAQ_ANSWERS, PFAS_BPA_FAQ_ANSWER } from "@/content/certificationFaqs";
 import campaignBag from "@/content/images/custom/packaging/zero_pack_custom_compostable_packaging (2).png";
 import bubbleWrap from "@/content/images/custom/packaging/zero_pack_custom_compostable_packaging (3).png";
 import rigidFoodPackaging from "@/content/images/custom/packaging/zero_pack_custom_compostable_packaging (5).png";
@@ -26,15 +27,17 @@ function QuoteButton({ className = "" }: { className?: string }) {
   );
 }
 
-function ConsultationButton({ dark = false }: { dark?: boolean }) {
+function ConsultationButton({ dark = false, primary = false }: { dark?: boolean; primary?: boolean }) {
   return (
     <a
       href={CONSULTATION_URL}
       target="_blank"
       rel="noopener noreferrer"
-      className={dark
-        ? "inline-flex min-h-12 items-center justify-center rounded-lg border border-white/25 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white transition hover:border-air/50 hover:bg-white/10"
-        : "inline-flex min-h-12 items-center justify-center rounded-lg border border-compost/25 bg-white px-6 py-3.5 text-sm font-semibold text-compost transition hover:border-compost hover:bg-mist"}
+      className={primary
+        ? "inline-flex min-h-12 items-center justify-center rounded-lg bg-air px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[#0096d6]"
+        : dark
+          ? "inline-flex min-h-12 items-center justify-center rounded-lg border border-white/25 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white transition hover:border-air/50 hover:bg-white/10"
+          : "inline-flex min-h-12 items-center justify-center rounded-lg border border-compost/25 bg-white px-6 py-3.5 text-sm font-semibold text-compost transition hover:border-compost hover:bg-mist"}
     >
       Book a Packaging Consultation
     </a>
@@ -125,7 +128,6 @@ const processSteps = [
       "If you already know the size, quantity or branding you need, include it. If you don’t, that is fine too.",
       "The important part is giving us a clear picture of what you need the packaging to do.",
     ],
-    cta: true,
   },
   {
     title: "We explore the right solution",
@@ -188,7 +190,7 @@ const supportItems = [
   },
 ] as const;
 
-const faqItems: FaqItem[] = [
+const masterFaqs: FaqItem[] = [
   {
     question: "What do I need before requesting a quote?",
     answer: "You can start with as much or as little as you have.\n\nThe product, your current packaging, a photo, sample, rough dimensions, expected quantity or an early idea can all be enough to start the conversation.\n\nYou do not need a finished technical brief.",
@@ -213,8 +215,12 @@ const faqItems: FaqItem[] = [
     answer: "You approve the agreed project details before production begins.\n\nDepending on the project, that can include artwork, sizing, quantity, packaging specification and commercial details.",
   },
   {
-    question: "Is all Zero Pack compostable packaging certified?",
-    answer: "Yes. All Zero Pack compostable packaging is certified.\n\nThe exact certification depends on the material and type of packaging being produced, and we’ll confirm the relevant certification for your project.",
+    question: "Are the mailers certified compostable?",
+    answer: CERTIFICATION_FAQ_ANSWERS.global,
+  },
+  {
+    question: "Are the mailers PFAS-free and BPA-free?",
+    answer: PFAS_BPA_FAQ_ANSWER,
   },
   {
     question: "How long does custom production take?",
@@ -241,7 +247,15 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export default function Page() {
+export default async function Page() {
+  const market = await getRequestMarket();
+  const faqItems = masterFaqs.map((item) => {
+    if (item.question === "Are the mailers certified compostable?") {
+      return { ...item, answer: CERTIFICATION_FAQ_ANSWERS[market] };
+    }
+    return item;
+  });
+
   return (
     <div className="bg-white text-charcoal sm:-mb-6">
       <FAQSchema items={faqItems} />
@@ -276,15 +290,17 @@ export default function Page() {
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-air">Start with whatever you have</p>
             <h2 className="mt-3 max-w-2xl font-heading text-3xl font-semibold text-charcoal sm:text-4xl">You don’t need to have everything worked out</h2>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-charcoal/75">You do not need to know the right material, type of packaging or final specification before you contact us.</p>
-            <p className="mt-4 text-base font-semibold text-charcoal/80">A useful starting point could be:</p>
           </div>
-          <ul className="grid gap-3 sm:grid-cols-2">
-            {startingPoints.map((item) => (
-              <li key={item} className="flex min-h-20 items-center gap-3 rounded-2xl border border-white bg-white/90 p-4 text-sm font-semibold leading-snug text-charcoal shadow-sm sm:text-base">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-leaf/20 text-compost" aria-hidden>✓</span>{item}
-              </li>
-            ))}
-          </ul>
+          <div>
+            <p className="mb-4 text-base font-semibold text-charcoal/80">A useful starting point could be:</p>
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {startingPoints.map((item) => (
+                <li key={item} className="flex min-h-20 items-center gap-3 rounded-2xl border border-white bg-white/90 p-4 text-sm font-semibold leading-snug text-charcoal shadow-sm sm:text-base">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-leaf/20 text-compost" aria-hidden>✓</span>{item}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
         <p className="mx-auto mt-8 max-w-7xl px-4 text-lg leading-relaxed text-charcoal/75 sm:px-6 lg:px-8">Bring us what you have and we’ll work through the next step with you.</p>
       </section>
@@ -301,12 +317,12 @@ export default function Page() {
                   <div>
                     <h3 className="font-heading text-2xl font-semibold text-charcoal">{step.title}</h3>
                     <div className="mt-4 space-y-3 text-base leading-relaxed text-charcoal/70">{step.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div>
-                    {"cta" in step && step.cta ? <QuoteButton className="mt-6" /> : null}
                   </div>
                 </div>
               </article>
             ))}
           </div>
+          <div className="mt-8 flex justify-center"><QuoteButton /></div>
         </div>
       </section>
 
@@ -326,6 +342,7 @@ export default function Page() {
               </article>
             ))}
           </div>
+          <div className="mt-8 flex justify-center"><ConsultationButton primary /></div>
         </div>
       </section>
 

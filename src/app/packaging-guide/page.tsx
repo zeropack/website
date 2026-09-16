@@ -7,19 +7,20 @@ export async function generateMetadata(): Promise<Metadata> {
   const market = await getRequestMarket();
   const description =
     market === "uk"
-      ? "The Zero Pack branded packaging guide for UK ecommerce brands — custom compostable mailers, certification, MOQ, artwork and quote-ready planning."
+      ? "Download Zero Pack's free guide to choosing, planning and briefing custom compostable packaging for UK brands, retailers and organisations."
       : market === "au"
-        ? "The Zero Pack branded packaging guide for Australian ecommerce brands — custom compostable mailers, certification, MOQ, artwork and quote-ready planning."
-        : "The 2026 Branded & Eco Friendly Packaging Guide for ecommerce brands — custom compostable mailers, certification, MOQ, artwork and quote-ready checklists by Zero Pack.";
+        ? "Download Zero Pack's free guide to choosing, planning and briefing custom compostable packaging for Australian brands, retailers and organisations."
+        : "Download Zero Pack's free guide to choosing, planning and briefing custom compostable packaging for brands, retailers and organisations.";
 
   return buildMarketPageMetadata({
     market,
-    title: "Branded Packaging Guide | Eco Friendly Packaging",
+    title: "Custom Compostable Packaging Guide | Free Download",
     description,
     path: brandGuide.path,
   });
 }
 
-export default function Page() {
-  return <GuideTemplate />;
+export default async function Page() {
+  const market = await getRequestMarket();
+  return <GuideTemplate market={market} />;
 }

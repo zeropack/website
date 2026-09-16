@@ -3,8 +3,8 @@ import type { BrandGuide } from "./types";
 export const brandGuide: BrandGuide = {
   slug: "packaging-guide",
   path: "/packaging-guide/",
-  title: "The 2026 Branded & Eco Friendly Packaging Guide",
-  subtitle: "By Zero Pack — for ecommerce brands switching to custom compostable packaging",
+  title: "The Brand's Guide to Custom Compostable Packaging",
+  subtitle: "By Zero Pack — for brands planning better custom packaging",
   tagline: "A practical guide for ecommerce brands, retailers and organisations ready to replace conventional plastic packaging.",
   answerBox: "Custom compostable packaging is made-to-order packaging designed to replace conventional plastic while improving brand presentation.",
   primaryKeyword: "branded packaging",
@@ -18,7 +18,7 @@ export const brandGuide: BrandGuide = {
     "ecommerce mailers",
     "eco friendly mailers",
   ],
-  pdfFilename: "2026-branded-packaging-eco-friendly-packaging-guide-by-zero-pack.pdf",
+  pdfFilename: "2026-Zero-Pack-Brand-Guide-Custom-Compostable-Packaging.pdf",
   publishedAt: "2026-03-01",
   dateModified: "2026-06-01",
   whatsInside: [

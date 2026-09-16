@@ -1,456 +1,348 @@
 import Link from "next/link";
-import React from "react";
-import { brandGuide } from "@/content/guides/brandGuide";
-import type { GuideSubsection, SectionTable } from "@/content/articles/types";
 import { CTAButton } from "./CTAButton";
+import { CustomPackagingProofBar } from "./CustomPackagingProofBar";
 import { FAQAccordion } from "./FAQAccordion";
 import { FAQSchema } from "./FAQSchema";
 import { JsonLd } from "./JsonLd";
-import { absoluteUrl, QUOTE_FORM_HREF, SITE_NAME } from "@/lib/site";
+import { SiteImage } from "./SiteImage";
+import { CERTIFICATION_FAQ_ANSWERS } from "@/content/certificationFaqs";
+import { brandGuide } from "@/content/guides/brandGuide";
+import { buildMarketUrl } from "@/lib/marketRouting";
+import type { LaunchedMarket } from "@/lib/requestMarket";
+import type { FaqItem } from "@/lib/types";
 
-// ---------------------------------------------------------------------------
-// Inline link parser — converts [text](/path/) markdown to <Link> elements
-// ---------------------------------------------------------------------------
-function renderParagraph(text: string): React.ReactNode {
-  const parts = text.split(/(\[[^\]]+\]\([^)]+\))/g);
-  if (parts.length === 1) return text;
-  return parts.map((part, i) => {
-    const match = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
-    if (match) {
-      return (
-        <Link key={i} href={match[2]} className="font-medium text-air hover:underline">
-          {match[1]}
-        </Link>
-      );
-    }
-    return part;
-  });
+const downloadPath = "/packaging-guide/download/";
+
+const guideBenefits = [
+  {
+    number: "01",
+    title: "Choose packaging that fits the job",
+    description:
+      "Compare the practical strengths and trade-offs of mailers, flexible bags, carry bags and more before you commit.",
+  },
+  {
+    number: "02",
+    title: "Know what to prepare",
+    description:
+      "Get clear on size, quantity, artwork, colours, delivery country and timing so your first conversation goes somewhere useful.",
+  },
+  {
+    number: "03",
+    title: "Make claims you can stand behind",
+    description:
+      "Understand certification, disposal guidance and the difference between specific compostability claims and vague green language.",
+  },
+  {
+    number: "04",
+    title: "Decide whether the timing is right",
+    description:
+      "Use the commercial questions and decision checklist to work out whether custom packaging makes sense for your business now.",
+  },
+] as const;
+
+const included = [
+  {
+    title: "The complete 28-page guide",
+    description:
+      "A practical walk-through of custom compostable packaging, from material choices to first-order planning.",
+  },
+  {
+    title: "Decision checklist",
+    description:
+      "Ten clear questions to help you assess whether your brand is ready to move into custom packaging.",
+  },
+  {
+    title: "Quote-ready planning prompt",
+    description:
+      "A simple list of the details worth gathering before you ask a supplier to price your project.",
+  },
+  {
+    title: "Artwork brief",
+    description:
+      "The essentials your designer will need to consider before packaging artwork is prepared for production.",
+  },
+] as const;
+
+function getGuideFaqs(market: LaunchedMarket): FaqItem[] {
+  return [
+    {
+      question: "What is covered in the custom compostable packaging guide?",
+      answer:
+        "The guide covers how custom compostable packaging works, how to compare packaging types, when custom packaging makes commercial sense, what certification and disposal claims mean, and what to prepare before requesting a quote. It also includes a decision checklist, quote-ready planning prompt and artwork brief.",
+    },
+    {
+      question: "Who is the guide for?",
+      answer:
+        "It is written for ecommerce brands, retailers and organisations considering custom compostable packaging. It is especially useful if you are comparing packaging options, planning a first order or trying to work out whether your volumes and brand are ready for a custom solution.",
+    },
+    {
+      question: "Is the guide free?",
+      answer:
+        "Yes. Complete the download form and Zero Pack will email you the guide. The form also explains the marketing-email consent that applies, and you can unsubscribe at any time.",
+    },
+    {
+      question: "Is Zero Pack compostable packaging certified?",
+      answer: CERTIFICATION_FAQ_ANSWERS[market],
+    },
+    {
+      question: "Do I need to know exactly what packaging I want before I read it?",
+      answer:
+        "No. The guide is designed to help you narrow the options and identify the questions that matter. If you already know your product dimensions, likely order quantity and delivery country, those details will make the planning sections even more useful.",
+    },
+  ];
 }
 
-// ---------------------------------------------------------------------------
-// Sub-section content block (H3 + paragraphs / bullets / table)
-// ---------------------------------------------------------------------------
-function SubsectionBlock({ sub }: { sub: GuideSubsection }) {
-  return (
-    <div className="mt-8">
-      <h3 className="font-heading text-lg font-semibold text-charcoal">{sub.heading}</h3>
-      {sub.paragraphs?.length ? (
-        <div className="mt-3 space-y-3 text-charcoal/75">
-          {sub.paragraphs.map((p, i) => (
-            <p key={i}>{renderParagraph(p)}</p>
-          ))}
-        </div>
-      ) : null}
-      {sub.bullets?.length ? (
-        <ul className="mt-3 list-disc space-y-1.5 pl-5 text-charcoal/75">
-          {sub.bullets.map((b, i) => (
-            <li key={i}>{b}</li>
-          ))}
-        </ul>
-      ) : null}
-      {sub.numberedList?.length ? (
-        <ol className="mt-3 list-decimal space-y-2 pl-5 text-charcoal/75">
-          {sub.numberedList.map((item, i) => (
-            <li key={i}>{item}</li>
-          ))}
-        </ol>
-      ) : null}
-      {sub.table ? <TableBlock table={sub.table} /> : null}
-      {sub.table2 ? <TableBlock table={sub.table2} /> : null}
-      {sub.note ? <NoteBlock text={sub.note} /> : null}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Callout note block (dark green, rendered after tables)
-// ---------------------------------------------------------------------------
-function NoteBlock({ text }: { text: string }) {
-  const lines = text.split("\n").filter(Boolean);
-  const [title, ...body] = lines;
-  return (
-    <div className="mt-4 rounded-xl bg-compost px-5 py-4">
-      {title ? (
-        <p className="text-sm font-bold leading-snug text-white">{title}</p>
-      ) : null}
-      {body.length > 0 ? (
-        <p className="mt-1 text-sm leading-relaxed text-white/90">{body.join(" ")}</p>
-      ) : null}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Responsive table renderer
-// ---------------------------------------------------------------------------
-function TableBlock({ table }: { table: SectionTable }) {
-  if (table.gated) return <GatedTableBlock table={table} />;
-  return (
-    <>
-      <div className="mt-4 overflow-x-auto rounded-xl border border-black/8">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-compost/8">
-              {table.headers.map((h, i) => (
-                <th
-                  key={i}
-                  className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-charcoal/70"
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {table.rows.map((row, ri) => (
-              <tr key={ri} className={ri % 2 === 0 ? "bg-white" : "bg-stone/40"}>
-                {row.map((cell, ci) => (
-                  <td
-                    key={ci}
-                    className={`px-4 py-2.5 text-charcoal/75 ${ci === 0 ? "font-medium" : ""}`}
-                  >
-                    {renderParagraph(cell)}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {table.footnote ? (
-        <p className="mt-2 text-right text-xs text-charcoal/50">{renderParagraph(table.footnote)}</p>
-      ) : null}
-    </>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Gated table — header visible, data rows blurred with download CTA overlay
-// ---------------------------------------------------------------------------
-function GatedTableBlock({ table }: { table: SectionTable }) {
-  return (
-    <div className="mt-4 overflow-x-auto rounded-xl border border-black/8">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="bg-compost/8">
-            {table.headers.map((h, i) => (
-              <th
-                key={i}
-                className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-charcoal/70"
-              >
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-      </table>
-      {/* Blurred data rows with CTA overlay */}
-      <div className="relative">
-        <div
-          className="overflow-hidden"
-          style={{ filter: "blur(5px)", userSelect: "none", pointerEvents: "none" }}
-          aria-hidden="true"
-        >
-          <table className="w-full text-sm">
-            <tbody>
-              {table.rows.map((row, ri) => (
-                <tr key={ri} className={ri % 2 === 0 ? "bg-white" : "bg-stone/40"}>
-                  {row.map((cell, ci) => (
-                    <td
-                      key={ci}
-                      className={`px-4 py-2.5 text-charcoal/75 ${ci === 0 ? "font-medium" : ""}`}
-                    >
-                      {cell}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {/* Gradient fade + CTA */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-stone/60 to-stone">
-          <div className="mx-auto max-w-sm rounded-2xl border border-black/8 bg-white px-6 py-5 text-center shadow-sm">
-            <p className="font-heading text-base font-semibold text-charcoal">
-              The full table is in the free guide
-            </p>
-            <p className="mt-1.5 text-sm text-charcoal/65">
-              Download below to compare every option — takes under a minute.
-            </p>
-            <div className="mt-4">
-              <CTAButton href="/packaging-guide/download/" variant="primary">
-                Download the Guide
-              </CTAButton>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Download CTA card (reused in two places)
-// ---------------------------------------------------------------------------
-function DownloadCTA({ compact = false }: { compact?: boolean }) {
-  if (compact) {
-    return (
-      <div className="my-10 rounded-2xl border border-leaf/30 bg-white p-6">
-        <p className="font-heading text-lg font-semibold text-charcoal">
-          Want this as a formatted PDF?
-        </p>
-        <p className="mt-2 text-sm text-charcoal/70">
-          Download the full guide and toolkit — includes the decision checklist,
-          quote-ready planning prompt, and artwork brief template.
-        </p>
-        <div className="mt-4">
-          <CTAButton href="/packaging-guide/download/" variant="secondary">
-            Download the Guide
-          </CTAButton>
-        </div>
-      </div>
-    );
-  }
-  return (
-    <div className="mt-8 rounded-2xl border border-leaf/30 bg-white p-6">
-      <p className="font-heading text-lg font-semibold text-charcoal">
-        Want this checklist formatted for print?
-      </p>
-      <p className="mt-2 text-sm text-charcoal/70">
-        Download the full guide and toolkit — includes the decision checklist,
-        quote-ready planning prompt, and artwork brief template, all formatted to
-        share with your team or use offline.
-      </p>
-      <div className="mt-4">
-        <CTAButton href="/packaging-guide/download/" variant="secondary">
-          Download the Guide
-        </CTAButton>
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Main component
-// ---------------------------------------------------------------------------
-export function GuideTemplate() {
-  const pdfUrl = `/${brandGuide.pdfFilename}`;
+export function GuideTemplate({ market }: { market: LaunchedMarket }) {
+  const pdfUrl = buildMarketUrl(market, `/${brandGuide.pdfFilename}`);
+  const pageUrl = buildMarketUrl(market, brandGuide.path);
+  const guideFaqs = getGuideFaqs(market);
 
   const guideJsonLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
-    headline: brandGuide.title,
-    alternativeHeadline: "Branded packaging and eco friendly packaging guide for ecommerce",
-    description: brandGuide.tagline,
-    datePublished: brandGuide.publishedAt,
-    dateModified: brandGuide.dateModified,
-    author: { "@type": "Organization", name: SITE_NAME },
-    publisher: { "@type": "Organization", name: SITE_NAME, url: absoluteUrl("/") },
-    mainEntityOfPage: absoluteUrl(brandGuide.path),
-    keywords: [brandGuide.primaryKeyword, ...brandGuide.secondaryKeywords].join(", "),
-    encoding: {
-      "@type": "MediaObject",
-      contentUrl: absoluteUrl(pdfUrl),
-      encodingFormat: "application/pdf",
+    "@type": "WebPage",
+    name: "The Brand's Guide to Custom Compostable Packaging",
+    description:
+      "A practical guide to choosing, planning and briefing custom compostable packaging.",
+    url: pageUrl,
+    mainEntity: {
+      "@type": "CreativeWork",
+      name: "The Brand's Guide to Custom Compostable Packaging",
+      author: { "@type": "Organization", name: "Zero Pack" },
+      encoding: {
+        "@type": "MediaObject",
+        contentUrl: pdfUrl,
+        encodingFormat: "application/pdf",
+      },
     },
   };
 
   return (
-    <article className="bg-stone pb-16 pt-8 sm:pb-24">
+    <main>
       <JsonLd data={guideJsonLd} />
-      <FAQSchema items={[...brandGuide.faqs]} />
+      <FAQSchema items={guideFaqs} />
 
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)] lg:items-start lg:gap-12">
-          <div className="min-w-0">
-            {/* Header */}
-            <p className="text-xs font-semibold uppercase tracking-wide text-compost">Official guide</p>
-            <h1 className="mt-2 font-heading text-3xl font-semibold leading-tight text-charcoal sm:text-4xl lg:text-5xl">
-              {brandGuide.title}
-            </h1>
-            <p className="mt-3 text-lg font-medium text-air">{brandGuide.subtitle}</p>
-            <p className="mt-4 text-lg text-charcoal/75">{brandGuide.tagline}</p>
-            <p className="mt-4 text-sm text-charcoal/60">
-              Updated {brandGuide.dateModified} · Branded packaging · Eco friendly packaging · Custom compostable
-              packaging
+      <section className="relative overflow-hidden bg-charcoal py-14 text-white sm:py-20 lg:py-24">
+        <div
+          className="pointer-events-none absolute -left-24 top-10 h-80 w-80 rounded-full bg-[radial-gradient(closest-side,rgba(0,168,243,0.18),transparent_72%)]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute -right-20 bottom-0 h-96 w-96 rounded-full bg-[radial-gradient(closest-side,rgba(86,166,67,0.18),transparent_72%)]"
+          aria-hidden
+        />
+        <div className="relative mx-auto grid max-w-6xl gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(20rem,0.92fr)] lg:items-center">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-air">
+              Free packaging guide
             </p>
-
-            {/* Quick answer box */}
-            {brandGuide.answerBox ? (
-              <div className="mt-6 rounded-xl border-l-4 border-leaf bg-white px-5 py-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-leaf">Quick answer</p>
-                <p className="mt-2 text-sm text-charcoal/80">{brandGuide.answerBox}</p>
-              </div>
-            ) : null}
-
-            {/* Download CTA — early placement */}
-            <div className="mt-6">
-              <CTAButton href="/packaging-guide/download/" variant="secondary">
-                Download the Guide (PDF)
+            <h1 className="mt-3 max-w-3xl font-heading text-4xl font-semibold leading-[1.08] text-white sm:text-5xl lg:text-6xl">
+              The Brand&apos;s Guide to Custom Compostable Packaging
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/80 sm:text-xl">
+              Before you order a single bag, get clear on what will suit your
+              products, support your brand and make commercial sense. This is
+              the practical guide we wish every packaging project started with.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <CTAButton href={downloadPath} variant="primary" className="px-6 py-3.5">
+                Download the Free Guide
               </CTAButton>
-            </div>
-
-            {/* What's inside */}
-            <div className="mt-8 rounded-2xl border border-compost/20 bg-white p-6">
-              <p className="text-sm font-semibold text-compost">What you will find in this guide</p>
-              <ul className="mt-3 space-y-2 text-sm text-charcoal/75">
-                {brandGuide.whatsInside.map((item) => (
-                  <li key={item} className="flex gap-2">
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-leaf" aria-hidden />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Table of contents */}
-            <nav aria-label="Table of contents" className="mt-10 rounded-2xl border border-black/5 bg-white p-6">
-              <p className="text-sm font-semibold text-compost">On this page</p>
-              <ol className="mt-3 max-h-80 space-y-2 overflow-y-auto text-sm lg:max-h-none">
-                {brandGuide.sections.map((s) => (
-                  <li key={s.id}>
-                    <a className="text-air hover:underline" href={`#${s.id}`}>
-                      {s.heading}
-                    </a>
-                  </li>
-                ))}
-              </ol>
-            </nav>
-
-            {/* Sections */}
-            <div className="mt-12 max-w-none">
-              {brandGuide.sections.map((s) => {
-                const isCertification = s.id.startsWith("certification");
-                const isDecisionChecklist = s.id.startsWith("decision-checklist");
-
-                return (
-                  <section key={s.id} id={s.id} className="mb-14 scroll-mt-28">
-                    {/* H2 */}
-                    <h2 className="font-heading text-2xl font-semibold text-compost">{s.heading}</h2>
-
-                    {/* Answer box */}
-                    {s.answerBox ? (
-                      <div className="mt-4 rounded-xl border-l-4 border-leaf bg-white px-5 py-4">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-leaf">Quick answer</p>
-                        <p className="mt-2 text-sm text-charcoal/80">{s.answerBox}</p>
-                      </div>
-                    ) : null}
-
-                    {/* Section-level paragraphs */}
-                    {s.paragraphs?.length ? (
-                      <div className="mt-4 space-y-4 text-charcoal/75">
-                        {s.paragraphs.map((p, i) => (
-                          <p key={i}>{renderParagraph(p)}</p>
-                        ))}
-                      </div>
-                    ) : null}
-
-                    {/* Section-level bullets */}
-                    {s.bullets?.length ? (
-                      <ul className="mt-4 list-disc space-y-2 pl-5 text-charcoal/75">
-                        {s.bullets.map((b, i) => (
-                          <li key={i}>{b}</li>
-                        ))}
-                      </ul>
-                    ) : null}
-
-                    {/* Section-level numbered list */}
-                    {s.numberedList?.length ? (
-                      <ol className="mt-4 list-decimal space-y-3 pl-5 text-charcoal/75">
-                        {s.numberedList.map((item, i) => (
-                          <li key={i}>{item}</li>
-                        ))}
-                      </ol>
-                    ) : null}
-
-                    {/* Section-level table */}
-                    {s.table ? <TableBlock table={s.table} /> : null}
-                    {s.table2 ? <TableBlock table={s.table2} /> : null}
-                    {s.note ? <NoteBlock text={s.note} /> : null}
-
-                    {/* Subsections (H3) */}
-                    {s.subsections?.map((sub, i) => (
-                      <SubsectionBlock key={i} sub={sub} />
-                    ))}
-
-                    {/* Second download CTA — after the certification section */}
-                    {isCertification ? <DownloadCTA compact /> : null}
-
-                    {/* Print checklist CTA — after decision checklist */}
-                    {isDecisionChecklist ? <DownloadCTA /> : null}
-                  </section>
-                );
-              })}
-            </div>
-
-            {/* FAQs */}
-            <div className="mt-14">
-              <h2 className="font-heading text-2xl font-semibold text-charcoal">Frequently asked questions</h2>
-              <div className="mt-4">
-                <FAQAccordion items={[...brandGuide.faqs]} />
-              </div>
-            </div>
-
-            {/* Final CTA */}
-            <div className="mt-14 rounded-2xl border border-black/5 bg-mist p-6">
-              <p className="font-heading text-lg font-semibold text-charcoal">Ready for a quote?</p>
-              <p className="mt-2 text-sm text-charcoal/70">
-                Tell us what you ship and we will help you work through size, specification, and pricing.
-              </p>
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <CTAButton href={QUOTE_FORM_HREF} variant="primary">
-                  Get a Custom Quote
-                </CTAButton>
-                <CTAButton href="/customer-showcase/" variant="secondary">
-                  Customer Showcase
-                </CTAButton>
-              </div>
-            </div>
-
-            <p className="mt-10 text-sm text-charcoal/60">
-              Deep dives:{" "}
-              <Link className="font-medium text-air hover:underline" href="/articles/">
-                Packaging guides in Articles
+              <Link
+                href="/custom-compostable-packaging/"
+                className="inline-flex items-center justify-center px-3 py-3 text-sm font-semibold text-white/85 underline decoration-white/30 underline-offset-4 transition hover:text-white"
+              >
+                Explore custom packaging
               </Link>
+            </div>
+            <p className="mt-4 text-sm text-white/55">
+              28 pages · Practical checklists · Built for real packaging decisions
             </p>
           </div>
 
-          {/* Sticky sidebar */}
-          <aside className="mt-10 lg:sticky lg:top-[calc(var(--site-header-height)+1.5rem)] lg:mt-0">
-            <div className="rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
-              <h2 className="font-heading text-xl font-semibold text-charcoal">
-                Download the 2026 Guide + Toolkit
-              </h2>
-              <p className="mt-3 text-sm text-charcoal/70">
-                Get the full guide as a formatted PDF — plus the print-ready decision checklist,
-                quote-ready planning prompt, and artwork brief template.
-              </p>
-              <ul className="mt-4 space-y-1.5 text-xs text-charcoal/60">
-                {[
-                  "Full guide PDF",
-                  "Print-ready decision checklist",
-                  "Quote-ready planning prompt",
-                  "Artwork brief template",
-                ].map((item) => (
-                  <li key={item} className="flex gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-leaf" aria-hidden />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-3 text-xs text-charcoal/50">
-                Updated annually — subscribers notified first.
-              </p>
-              <div className="mt-5">
-                <CTAButton href="/packaging-guide/download/" variant="primary" className="w-full justify-center">
-                  Download the Guide
-                </CTAButton>
-              </div>
-              <p className="mt-4 text-center text-xs text-charcoal/50">Free · Takes under a minute</p>
+          <div className="relative mx-auto w-full max-w-md px-8 py-5 sm:px-12">
+            <div
+              className="absolute inset-x-0 bottom-2 top-12 rotate-6 rounded-[2rem] border border-white/10 bg-air/15"
+              aria-hidden
+            />
+            <div className="relative -rotate-2 overflow-hidden rounded-2xl border border-white/15 bg-white p-2 shadow-2xl shadow-black/35 transition-transform duration-300 hover:rotate-0 hover:scale-[1.02]">
+              <SiteImage
+                src="/images/guides/custom-compostable-packaging-guide-cover.webp"
+                alt="Cover of The Brand's Guide to Custom Compostable Packaging by Zero Pack"
+                width={910}
+                height={1287}
+                sizes="(max-width: 1024px) 80vw, 34vw"
+                priority
+                className="h-auto w-full rounded-xl"
+              />
             </div>
-          </aside>
+            <div className="absolute -bottom-2 right-0 rounded-2xl border border-white/10 bg-compost px-5 py-4 shadow-xl">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-air">Inside</p>
+              <p className="mt-1 font-heading text-sm font-semibold text-white">
+                Checklist + planning tools
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
-    </article>
+      </section>
+
+      <CustomPackagingProofBar />
+
+      <section className="bg-white py-14 sm:py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="max-w-3xl">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-air">
+              Start smarter
+            </p>
+            <h2 className="mt-3 font-heading text-3xl font-semibold leading-tight text-charcoal sm:text-4xl">
+              Less guesswork. Better questions. A smoother first order.
+            </h2>
+            <p className="mt-5 text-lg leading-relaxed text-charcoal/70">
+              Custom packaging brings decisions about material, protection,
+              print, quantities, certification and timing. The guide turns
+              those moving parts into a clear place to start.
+            </p>
+          </div>
+
+          <div className="mt-10 grid gap-5 md:grid-cols-2">
+            {guideBenefits.map((benefit) => (
+              <article
+                key={benefit.number}
+                className="rounded-2xl border border-slate-200/80 bg-stone p-6 transition hover:-translate-y-1 hover:border-air/40 hover:shadow-lg hover:shadow-slate-200/50"
+              >
+                <p className="font-heading text-sm font-semibold text-air">{benefit.number}</p>
+                <h3 className="mt-3 font-heading text-xl font-semibold text-charcoal">
+                  {benefit.title}
+                </h3>
+                <p className="mt-3 leading-relaxed text-charcoal/70">{benefit.description}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-mist py-14 sm:py-20">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-start lg:gap-14">
+          <div className="lg:sticky lg:top-[calc(var(--site-header-height)+2rem)]">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-air">
+              One useful download
+            </p>
+            <h2 className="mt-3 font-heading text-3xl font-semibold text-charcoal sm:text-4xl">
+              Everything you need to move from “maybe” to a workable brief
+            </h2>
+            <p className="mt-5 text-lg leading-relaxed text-charcoal/70">
+              Read it cover to cover or jump straight to the checklist. Either
+              way, you will finish with a clearer idea of what your project
+              needs—and what to ask next.
+            </p>
+            <div className="mt-7">
+              <CTAButton href={downloadPath} variant="primary">
+                Download the Free Guide
+              </CTAButton>
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            {included.map((item, index) => (
+              <article
+                key={item.title}
+                className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-200/40"
+              >
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-leaf/15 text-sm font-bold text-compost">
+                  {index + 1}
+                </span>
+                <h3 className="mt-5 font-heading text-lg font-semibold text-charcoal">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-charcoal/70">
+                  {item.description}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-14 sm:py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="grid overflow-hidden rounded-3xl bg-compost text-white lg:grid-cols-2">
+            <div className="p-7 sm:p-10 lg:p-12">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-air">
+                Useful before you are quote-ready
+              </p>
+              <h2 className="mt-3 font-heading text-3xl font-semibold leading-tight sm:text-4xl">
+                You do not need all the answers yet
+              </h2>
+              <p className="mt-5 leading-relaxed text-white/80">
+                The guide is for the thinking stage: when you are comparing
+                options, checking whether the numbers work or trying to turn a
+                rough idea into a useful packaging brief.
+              </p>
+              <p className="mt-4 leading-relaxed text-white/80">
+                When you are ready to talk specifics, Zero Pack can help shape
+                the packaging around your product, brand and delivery needs.
+              </p>
+            </div>
+            <div className="grid gap-px bg-white/10 sm:grid-cols-2 lg:grid-cols-1">
+              <div className="bg-white/5 p-7 sm:p-9">
+                <p className="font-heading text-xl font-semibold">Still exploring?</p>
+                <p className="mt-2 text-sm leading-relaxed text-white/70">
+                  Download the guide and use the checklist to find your next question.
+                </p>
+                <Link
+                  href={downloadPath}
+                  className="mt-5 inline-flex text-sm font-semibold text-air underline underline-offset-4"
+                >
+                  Get the guide
+                </Link>
+              </div>
+              <div className="bg-white/5 p-7 sm:p-9">
+                <p className="font-heading text-xl font-semibold">Already planning?</p>
+                <p className="mt-2 text-sm leading-relaxed text-white/70">
+                  See the packaging Zero Pack can develop, then request a custom quote.
+                </p>
+                <Link
+                  href="/custom-compostable-packaging/"
+                  className="mt-5 inline-flex text-sm font-semibold text-air underline underline-offset-4"
+                >
+                  Explore custom packaging
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-stone py-14 sm:py-20">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-air">FAQ</p>
+          <h2 className="mt-3 font-heading text-3xl font-semibold text-charcoal sm:text-4xl">
+            About the guide
+          </h2>
+          <div className="mt-8">
+            <FAQAccordion items={guideFaqs} />
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-charcoal py-14 text-white sm:py-20">
+        <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-air">
+            Start with the right questions
+          </p>
+          <h2 className="mt-3 font-heading text-3xl font-semibold sm:text-4xl">
+            Make your next packaging decision with confidence
+          </h2>
+          <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-white/75">
+            Get the practical guide to choosing, planning and briefing custom
+            compostable packaging for your brand.
+          </p>
+          <div className="mt-8">
+            <CTAButton href={downloadPath} variant="primary" className="px-7 py-3.5">
+              Download the Free Guide
+            </CTAButton>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }

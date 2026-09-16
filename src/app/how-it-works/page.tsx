@@ -4,7 +4,7 @@ import { FAQAccordion } from "@/components/FAQAccordion";
 import { FAQSchema } from "@/components/FAQSchema";
 import { SiteImage } from "@/components/SiteImage";
 import { TypeformFormEmbed } from "@/components/TypeformFormEmbed";
-import { CERTIFICATION_FAQ_ANSWERS, PFAS_BPA_FAQ_ANSWER } from "@/content/certificationFaqs";
+import { PFAS_BPA_FAQ_ANSWER } from "@/content/certificationFaqs";
 import campaignBag from "@/content/images/custom/packaging/zero_pack_custom_compostable_packaging (2).png";
 import bubbleWrap from "@/content/images/custom/packaging/zero_pack_custom_compostable_packaging (3).png";
 import rigidFoodPackaging from "@/content/images/custom/packaging/zero_pack_custom_compostable_packaging (5).png";
@@ -215,11 +215,11 @@ const masterFaqs: FaqItem[] = [
     answer: "You approve the agreed project details before production begins.\n\nDepending on the project, that can include artwork, sizing, quantity, packaging specification and commercial details.",
   },
   {
-    question: "Are the mailers certified compostable?",
-    answer: CERTIFICATION_FAQ_ANSWERS.global,
+    question: "Is all Zero Pack compostable packaging certified?",
+    answer: "Yes. All Zero Pack compostable packaging is certified.\n\nThe exact certification depends on the material and type of packaging being produced, and we’ll confirm the relevant certification for your project.",
   },
   {
-    question: "Are the mailers PFAS-free and BPA-free?",
+    question: "Is Zero Pack compostable packaging PFAS-free and BPA-free?",
     answer: PFAS_BPA_FAQ_ANSWER,
   },
   {
@@ -247,14 +247,8 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export default async function Page() {
-  const market = await getRequestMarket();
-  const faqItems = masterFaqs.map((item) => {
-    if (item.question === "Are the mailers certified compostable?") {
-      return { ...item, answer: CERTIFICATION_FAQ_ANSWERS[market] };
-    }
-    return item;
-  });
+export default function Page() {
+  const faqItems = masterFaqs;
 
   return (
     <div className="bg-white text-charcoal sm:-mb-6">

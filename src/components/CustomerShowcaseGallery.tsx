@@ -30,12 +30,12 @@ export function CustomerShowcaseGallery({
                 </span>
               </div>
             )}
-            <div className="absolute inset-x-0 bottom-0 border-t border-white/40 bg-white/80 p-4 text-center backdrop-blur-md sm:p-5">
+            <div className="absolute inset-x-0 bottom-0 border-t border-white/40 bg-white/90 p-4 text-center backdrop-blur-md sm:p-5">
               <h3 className="font-heading text-lg font-semibold text-charcoal sm:text-xl">
                 {brand.name}
               </h3>
-              <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-compost">
-                {brand.sector} · {brand.packagingType}
+              <p className="mt-2 text-sm leading-relaxed text-charcoal/70">
+                {brand.description}
               </p>
             </div>
           </div>

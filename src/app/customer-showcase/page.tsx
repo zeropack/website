@@ -7,8 +7,8 @@ import { FAQAccordion } from "@/components/FAQAccordion";
 import { FAQSchema } from "@/components/FAQSchema";
 import { SiteImage } from "@/components/SiteImage";
 import {
-  customerShowcaseFaqs,
   featuredShowcaseProjects,
+  getCustomerShowcaseFaqs,
   portfolioShowcaseProjects,
 } from "@/content/customerShowcase";
 import { QUOTE_FORM_HREF } from "@/lib/site";
@@ -35,6 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page() {
   const market = await getRequestMarket();
+  const customerShowcaseFaqs = getCustomerShowcaseFaqs(market);
 
   return (
     <>
@@ -133,15 +134,9 @@ export default async function Page() {
                     ) : null}
                   </div>
                   <div className="flex flex-col justify-center p-6 sm:p-7">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-compost">
-                      {project.sector}
-                    </p>
-                    <h3 className="mt-2 font-heading text-xl font-semibold text-charcoal">
+                    <h3 className="font-heading text-xl font-semibold text-charcoal">
                       {project.name}
                     </h3>
-                    <p className="mt-2 text-sm font-semibold text-charcoal/65">
-                      {project.packagingType}
-                    </p>
                     <p className="mt-4 text-sm leading-relaxed text-charcoal/75">
                       {project.description}
                     </p>

@@ -11,7 +11,8 @@ export function CustomerShowcaseGallery({
       {brands.map((brand) => (
         <article
           key={brand.name}
-          className="group zp-hover-lift overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-sm shadow-slate-300/20"
+          tabIndex={0}
+          className="group zp-hover-lift overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-sm shadow-slate-300/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-air focus-visible:ring-offset-2"
         >
           <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-[#f4f7fb] via-white to-[#e8f3f8]">
             {brand.image ? (
@@ -30,13 +31,17 @@ export function CustomerShowcaseGallery({
                 </span>
               </div>
             )}
-            <div className="absolute inset-x-0 bottom-0 border-t border-white/40 bg-white/90 p-4 text-center backdrop-blur-md sm:p-5">
+            <div className="absolute inset-x-0 bottom-0 border-t border-white/40 bg-white/80 p-4 text-center backdrop-blur-sm sm:p-5">
               <h3 className="font-heading text-lg font-semibold text-charcoal sm:text-xl">
                 {brand.name}
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-charcoal/70">
-                {brand.description}
-              </p>
+              <div className="grid grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none [@media(hover:hover)]:grid-rows-[0fr] [@media(hover:hover)]:group-focus-within:grid-rows-[1fr] [@media(hover:hover)]:group-hover:grid-rows-[1fr]">
+                <div className="overflow-hidden">
+                  <p className="mt-2 text-sm leading-relaxed text-charcoal/70">
+                    {brand.description}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </article>

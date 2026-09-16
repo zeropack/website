@@ -1,7 +1,11 @@
 import { SiteImage } from "@/components/SiteImage";
 import type { CustomerShowcaseBrand } from "@/content/customerShowcase";
 
-export function CustomerShowcaseGallery({ brands }: { brands: CustomerShowcaseBrand[] }) {
+export function CustomerShowcaseGallery({
+  brands,
+}: {
+  brands: CustomerShowcaseBrand[];
+}) {
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {brands.map((brand) => (
@@ -26,10 +30,13 @@ export function CustomerShowcaseGallery({ brands }: { brands: CustomerShowcaseBr
                 </span>
               </div>
             )}
-            <div className="absolute inset-x-0 bottom-0 border-t border-slate-200/40 bg-white/50 p-4 text-center backdrop-blur-sm sm:p-5">
-              <h3 className="font-heading text-lg font-semibold text-charcoal sm:text-xl">{brand.name}</h3>
-              <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-compost">{brand.packagingType}</p>
-              <p className="mt-2 text-sm leading-relaxed text-charcoal/75">{brand.description}</p>
+            <div className="absolute inset-x-0 bottom-0 border-t border-white/40 bg-white/80 p-4 text-center backdrop-blur-md sm:p-5">
+              <h3 className="font-heading text-lg font-semibold text-charcoal sm:text-xl">
+                {brand.name}
+              </h3>
+              <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-compost">
+                {brand.sector} · {brand.packagingType}
+              </p>
             </div>
           </div>
         </article>

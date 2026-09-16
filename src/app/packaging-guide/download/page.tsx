@@ -82,18 +82,12 @@ export default function Page() {
 
           <section
             id="guideform"
-            aria-labelledby="guide-form-heading"
+            aria-label="Guide download form"
             className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-xl shadow-slate-200/40 sm:p-8"
           >
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-air">
               Send me the guide
             </p>
-            <h2
-              id="guide-form-heading"
-              className="mt-3 font-heading text-2xl font-semibold text-charcoal sm:text-3xl"
-            >
-              Where should we send it?
-            </h2>
             <p className="mt-3 text-sm leading-relaxed text-charcoal/65">
               Complete the form below. We will use your answers to send the guide
               and understand which packaging information may be most relevant to you.

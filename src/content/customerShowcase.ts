@@ -1,4 +1,8 @@
 import type { StaticImageData } from "next/image";
+import {
+  CERTIFICATION_FAQ_ANSWERS,
+  type CertificationFaqMarket,
+} from "@/content/certificationFaqs";
 import { customMailerCarouselSlides } from "@/content/customMailerCarouselSlides";
 
 export type CustomerShowcaseBrand = {
@@ -6,6 +10,7 @@ export type CustomerShowcaseBrand = {
   description: string;
   image?: StaticImageData;
   alt: string;
+  featured?: boolean;
 };
 
 const showcaseCopy: Record<string, string> = {
@@ -85,36 +90,60 @@ const showcaseOrder = [
   "Foodland",
 ] as const;
 
+const featuredNames = new Set([
+  "SIBOtest",
+  "Fiona Stanley Hospital",
+  "OneRoad",
+  "Primasoy",
+  "THE SKIN LAB",
+  "Foodland",
+]);
+
 function slideForName(name: string) {
   return customMailerCarouselSlides.find((slide) => slide.heading === name);
 }
 
-export const customerShowcaseBrands: CustomerShowcaseBrand[] = showcaseOrder.map((name) => {
-  const slide = slideForName(name);
-  return {
+export const customerShowcaseBrands: CustomerShowcaseBrand[] =
+  showcaseOrder.map((name) => ({
     name,
-    description: showcaseCopy[name] ?? slide?.subheading ?? "",
-    image: slide?.image,
-    alt: slide?.alt ?? `${name} custom compostable packaging`,
-  };
-});
+    description: showcaseCopy[name],
+    image: slideForName(name)?.image,
+    alt: `${name} custom compostable packaging produced by Zero Pack`,
+    featured: featuredNames.has(name),
+  }));
 
-export const customerShowcaseWhy = {
-  heading: "Why custom compostable packaging?",
-  intro:
-    "Did you know that 83% of consumers have considered sustainability when making a purchase? As a business owner, it is essential to recognise this trend and adapt accordingly.",
-  benefits: [
+export const featuredShowcaseProjects = customerShowcaseBrands.filter(
+  (project) => project.featured,
+);
+export const portfolioShowcaseProjects = customerShowcaseBrands.filter(
+  (project) => !project.featured,
+);
+
+export function getCustomerShowcaseFaqs(market: CertificationFaqMarket) {
+  return [
     {
-      title: "Environmental responsibility",
-      body: "By using compostable materials, businesses demonstrate their commitment to sustainability and environmental stewardship.",
+      question: "Can you create packaging inspired by one of these projects?",
+      answer:
+        "Absolutely. Tell us which project caught your eye, what you need to package and what matters most to your brand. We will use that as a starting point and help you create packaging that feels unmistakably yours — not a copy of someone else's.",
     },
     {
-      title: "Consumer appeal",
-      body: "Compostable packaging can appeal to environmentally conscious consumers, potentially increasing brand loyalty and sales.",
+      question: "How much can I customise?",
+      answer:
+        "Your packaging can be developed around the product, size, branding, artwork, colours, print and the way it will be used. Depending on the project, we can also work through finishes, closures and other product features with you.",
     },
     {
-      title: "Innovative marketing opportunity",
-      body: "Utilising compostable packaging and mailers provides a unique marketing angle that can set a business apart in a crowded marketplace.",
+      question: "Do I need finished artwork before I get in touch?",
+      answer:
+        "No. Start with whatever you have — a logo, brand colours, an idea, a photo or a sample of your current packaging. We can help prepare the artwork for production once the packaging and print requirements are clear.",
     },
-  ],
-};
+    {
+      question: "Is all Zero Pack compostable packaging certified?",
+      answer: CERTIFICATION_FAQ_ANSWERS[market],
+    },
+    {
+      question: "What should I send you for a quote?",
+      answer:
+        "Tell us what you need to package, the approximate size and quantity, where it needs to be delivered and any branding or performance requirements you already know. If you do not have every detail yet, that is fine — start with what you have and we will help with the next step.",
+    },
+  ];
+}

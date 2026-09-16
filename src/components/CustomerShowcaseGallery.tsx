@@ -28,6 +28,7 @@ export function CustomerShowcaseGallery({ brands }: { brands: CustomerShowcaseBr
             )}
             <div className="absolute inset-x-0 bottom-0 border-t border-slate-200/40 bg-white/50 p-4 text-center backdrop-blur-sm sm:p-5">
               <h3 className="font-heading text-lg font-semibold text-charcoal sm:text-xl">{brand.name}</h3>
+              <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-compost">{brand.packagingType}</p>
               <p className="mt-2 text-sm leading-relaxed text-charcoal/75">{brand.description}</p>
             </div>
           </div>

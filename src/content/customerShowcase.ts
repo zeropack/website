@@ -3,57 +3,158 @@ import { customMailerCarouselSlides } from "@/content/customMailerCarouselSlides
 
 export type CustomerShowcaseBrand = {
   name: string;
+  sector: string;
+  packagingType: string;
   description: string;
   image?: StaticImageData;
   alt: string;
+  featured?: boolean;
 };
 
-const showcaseCopy: Record<string, string> = {
-  OneRoad:
-    "OneRoad is an advanced telematics solutions provider enhancing safety, compliance, and efficiency for heavy vehicles.",
-  Primasoy:
-    "Primasoy is a family owned company producing organic tempeh since 2005. Our tempeh is made in Melbourne and distributed throughout Australia.",
-  "Second Skin":
-    "Our Second Skin team consults with families, therapists and medical practitioners to prescribe, manufacture and supply custom made compression garments and dynamic splints.",
-  "Snoweys Closet":
-    "We believe that every pet deserves to feel comfortable, stylish, and, above all, loved.",
-  "Infectious Clothing Company":
-    "When you work hard to help people feel good or look good, what you wear matters.",
-  "The Love Training Wear":
-    "Creating a brand that supports girls of all ages and fitness levels. Our collection is all about comfort, style and quality.",
-  "THE SKIN LAB":
-    "Established by specialist doctors, dermatologists and pharmacists.",
-  "Nana Huchy": "Purveyors of sweet memories and unconditional love.",
-  "Bye Bambi":
-    "We strive to become a global leader in championing freedom and fashion for the youth of tomorrow.",
-  Dimple: "Affordable, high-quality daily contacts, delivered to you.",
-  "Code Black Coffee": "Good coffee for everyone.",
-  "Australian Parliament House":
-    "Custom compostable mailers that carry your brand with authority and clarity.",
-  Quayclean:
-    "Since 2002, we have been committed to providing exceptional cleaning and waste management services to our clients.",
-  "Escape Tabletop Games": "A challenge for all types.",
-  "Dohertys Gym": "A home away from home.",
-  Lahana:
-    "Lahana is the synergetic force of sisters, of womanly energy cultivated into a brand that breaks hearts and turns heads. Unapologetically bold, with values that are reinforced with both word and action.",
-  "Provincial Home Living":
-    "At Provincial Home Living, we have crafted an inspiring collection of homewares and furniture to transform your home into an escape from the everyday hustle and bustle.",
-  "St Vincent de Paul Society (WA)":
-    "The Society is made up of dedicated men and women of all backgrounds and ages who have made a commitment to the mission of the Society.",
-  "Flipside Distribution":
-    "The company's line of business includes the wholesale distribution of women's, children's, and infants' clothing and accessories.",
-  "Cartridges Direct": "100% Australian owned.",
-  Wittner:
-    "Established 1912. Australia's most beloved fashion footwear brand, Wittner has been creating women's shoes for over 100 years.",
-  "Yakeen Safety":
-    "Custom compostable mailers designed around strong, practical brand presentation.",
-  "Kingfisher Mobile":
-    "Custom compostable mailers created to reflect a modern, premium brand identity.",
-  Foodland: "The mighty South Aussie.",
-  SIBOtest:
-    "SIBOtest specialises in diagnostic testing for functional digestive disorders. We are Australia's leader in SIBO breath testing.",
-  "Fiona Stanley Hospital":
-    "Transfusion Medicine Unit, providing critical pathology services for blood typing, pre-transfusion testing, and patient blood management.",
+type ProjectCopy = Pick<CustomerShowcaseBrand, "sector" | "packagingType" | "description" | "featured">;
+
+const showcaseCopy: Record<string, ProjectCopy> = {
+  SIBOtest: {
+    sector: "Healthcare",
+    packagingType: "Custom compostable mailer",
+    description: "A clean white mailer with high-contrast blue branding and customer-facing packaging information.",
+    featured: true,
+  },
+  "Fiona Stanley Hospital": {
+    sector: "Healthcare",
+    packagingType: "Custom compostable mailer",
+    description: "A functional mailer design combining institutional branding with clear service information.",
+    featured: true,
+  },
+  OneRoad: {
+    sector: "Technology & transport",
+    packagingType: "Custom compostable mailer",
+    description:
+      "A restrained white mailer that uses a centred logo and minimal print treatment for a precise, professional finish.",
+    featured: true,
+  },
+  Primasoy: {
+    sector: "Food",
+    packagingType: "Custom compostable packaging",
+    description: "Bold green and yellow artwork turns the packaging into an unmistakable extension of the Primasoy brand.",
+    featured: true,
+  },
+  "Second Skin": {
+    sector: "Healthcare & garments",
+    packagingType: "Custom compostable bag",
+    description: "A tall custom bag with full-front artwork developed around a specialist garment application.",
+  },
+  "Snoweys Closet": {
+    sector: "Pet retail",
+    packagingType: "Custom compostable mailer",
+    description: "A vivid pink mailer with oversized paw graphics and a playful, highly recognisable brand treatment.",
+  },
+  "Infectious Clothing Company": {
+    sector: "Workwear",
+    packagingType: "Custom compostable mailer",
+    description: "A monochrome mailer using repeated typography to create a distinctive all-over brand pattern.",
+  },
+  "The Love Training Wear": {
+    sector: "Activewear",
+    packagingType: "Custom compostable mailer",
+    description: "Bright colour and front-and-back messaging make the packaging work as a strong brand touchpoint.",
+  },
+  "THE SKIN LAB": {
+    sector: "Beauty & skincare",
+    packagingType: "Custom compostable mailer",
+    description: "A bold, full-colour mailer that carries the brand's graphic identity across the whole pack.",
+    featured: true,
+  },
+  "Nana Huchy": {
+    sector: "Gifts & toys",
+    packagingType: "Custom compostable mailer",
+    description: "A light, understated mailer with a refined wordmark and carefully placed front-and-back details.",
+  },
+  "Bye Bambi": {
+    sector: "Fashion",
+    packagingType: "Custom compostable mailer",
+    description: "A tonal pink mailer with repeating graphics that keeps the fashion brand visible from every angle.",
+  },
+  Dimple: {
+    sector: "Health & personal care",
+    packagingType: "Custom compostable mailer",
+    description: "A saturated blue mailer with a simple oversized wordmark for immediate brand recognition.",
+  },
+  "Code Black Coffee": {
+    sector: "Coffee",
+    packagingType: "Custom compostable mailer",
+    description:
+      "A black mailer with bold white typography that translates the brand's visual language into delivery packaging.",
+  },
+  "Australian Parliament House": {
+    sector: "Government",
+    packagingType: "Custom compostable mailer",
+    description: "A clear, formal print treatment designed to carry an established institutional identity.",
+  },
+  Quayclean: {
+    sector: "Facilities services",
+    packagingType: "Custom compostable mailer",
+    description: "A light neutral mailer with a crisp multicolour logo and uncluttered front-facing brand mark.",
+  },
+  "Escape Tabletop Games": {
+    sector: "Games & entertainment",
+    packagingType: "Custom compostable mailer",
+    description: "A dark mailer with bold edge-to-edge typography that gives the pack a playful, graphic finish.",
+  },
+  "Dohertys Gym": {
+    sector: "Fitness",
+    packagingType: "Custom compostable mailer",
+    description: "A high-contrast black and magenta mailer built around strong logo visibility.",
+  },
+  Lahana: {
+    sector: "Swimwear",
+    packagingType: "Custom compostable mailer",
+    description:
+      "A warm neutral mailer with an all-over wordmark pattern that complements the brand's fashion positioning.",
+  },
+  "Provincial Home Living": {
+    sector: "Homewares",
+    packagingType: "Custom compostable mailer",
+    description:
+      "A black mailer with a large white wordmark for a premium, immediately recognisable delivery presentation.",
+  },
+  "St Vincent de Paul Society (WA)": {
+    sector: "Charity",
+    packagingType: "Custom compostable mailer",
+    description: "A branded mailer that combines the organisation's identity with clear customer-facing messaging.",
+  },
+  "Flipside Distribution": {
+    sector: "Wholesale distribution",
+    packagingType: "Custom compostable mailer",
+    description: "A neutral custom mailer with restrained branding suited to a professional distribution application.",
+  },
+  "Cartridges Direct": {
+    sector: "Office supplies",
+    packagingType: "Custom compostable mailer",
+    description: "A branded mailer using front-and-back print to carry both identity and customer messaging.",
+  },
+  Wittner: {
+    sector: "Fashion footwear",
+    packagingType: "Custom compostable mailer",
+    description: "A bright green mailer with oversized white typography designed to stand out in transit and on arrival.",
+  },
+  "Yakeen Safety": {
+    sector: "Workplace safety",
+    packagingType: "Custom compostable mailer",
+    description:
+      "A warm brown mailer with a repeated wordmark that gives practical shipping packaging a distinctive brand finish.",
+  },
+  "Kingfisher Mobile": {
+    sector: "Technology",
+    packagingType: "Custom compostable mailer",
+    description: "A purple-toned mailer with a clean, minimal layout developed for a modern consumer brand.",
+  },
+  Foodland: {
+    sector: "Food retail",
+    packagingType: "Custom compostable carry bag",
+    description: "High-visibility handled bags use bold colour, branding and on-pack messaging for a retail application.",
+    featured: true,
+  },
 };
 
 const showcaseOrder = [
@@ -91,30 +192,58 @@ function slideForName(name: string) {
 
 export const customerShowcaseBrands: CustomerShowcaseBrand[] = showcaseOrder.map((name) => {
   const slide = slideForName(name);
+  const project = showcaseCopy[name];
+
   return {
     name,
-    description: showcaseCopy[name] ?? slide?.subheading ?? "",
+    ...project,
     image: slide?.image,
-    alt: slide?.alt ?? `${name} custom compostable packaging`,
+    alt: `${name} ${project.packagingType.toLowerCase()} produced by Zero Pack`,
   };
 });
 
-export const customerShowcaseWhy = {
-  heading: "Why custom compostable packaging?",
-  intro:
-    "Did you know that 83% of consumers have considered sustainability when making a purchase? As a business owner, it is essential to recognise this trend and adapt accordingly.",
-  benefits: [
-    {
-      title: "Environmental responsibility",
-      body: "By using compostable materials, businesses demonstrate their commitment to sustainability and environmental stewardship.",
-    },
-    {
-      title: "Consumer appeal",
-      body: "Compostable packaging can appeal to environmentally conscious consumers, potentially increasing brand loyalty and sales.",
-    },
-    {
-      title: "Innovative marketing opportunity",
-      body: "Utilising compostable packaging and mailers provides a unique marketing angle that can set a business apart in a crowded marketplace.",
-    },
-  ],
-};
+export const featuredShowcaseProjects = customerShowcaseBrands.filter((project) => project.featured);
+export const portfolioShowcaseProjects = customerShowcaseBrands.filter((project) => !project.featured);
+
+export const customerShowcaseProof = [
+  {
+    title: "Packaging that looks like your brand",
+    body: "Use colour, typography, artwork and on-pack messaging to turn delivery or retail packaging into a recognisable brand touchpoint.",
+  },
+  {
+    title: "Made around the application",
+    body: "The right packaging depends on what it needs to hold, how it will be used and the experience you want to create.",
+  },
+  {
+    title: "A specification you can stand behind",
+    body: "We help work through size, print, material and certification so the finished packaging fits the project and its claims.",
+  },
+];
+
+export const customerShowcaseFaqs = [
+  {
+    question: "Are these real Zero Pack customer projects?",
+    answer:
+      "Yes. Every image in this showcase is packaging produced by Zero Pack for the organisation named with it. We describe the visible project and do not add customer results or testimonials unless they have been approved and supported.",
+  },
+  {
+    question: "What types of custom compostable packaging are shown?",
+    answer:
+      "The current portfolio includes custom compostable mailers, flexible bags and handled carry bags across ecommerce, retail, healthcare, food, fashion, government and other applications.",
+  },
+  {
+    question: "Can Zero Pack create packaging similar to an example here?",
+    answer:
+      "Yes. Use the examples as inspiration, then share your product, required size, expected quantity, artwork and intended use. We will help explore the right packaging and confirm what is practical for your project.",
+  },
+  {
+    question: "Is the compostable packaging shown certified?",
+    answer:
+      "Zero Pack's compostable packaging is certified compostable. The exact certification depends on the product, material and specification. Certification evidence is available on request after the relevant packaging has been confirmed.",
+  },
+  {
+    question: "Do I need a finished packaging brief before I enquire?",
+    answer:
+      "No. You can start with an idea, a photo, a sample of your current packaging or the product you need to pack. We can help you work through the packaging type, size, print and next step.",
+  },
+];

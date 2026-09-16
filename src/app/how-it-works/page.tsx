@@ -4,7 +4,7 @@ import { FAQAccordion } from "@/components/FAQAccordion";
 import { FAQSchema } from "@/components/FAQSchema";
 import { SiteImage } from "@/components/SiteImage";
 import { TypeformFormEmbed } from "@/components/TypeformFormEmbed";
-import { PFAS_BPA_FAQ_ANSWER } from "@/content/certificationFaqs";
+import { CERTIFICATION_FAQ_ANSWERS, PFAS_BPA_FAQ_ANSWER } from "@/content/certificationFaqs";
 import campaignBag from "@/content/images/custom/packaging/zero_pack_custom_compostable_packaging (2).png";
 import bubbleWrap from "@/content/images/custom/packaging/zero_pack_custom_compostable_packaging (3).png";
 import rigidFoodPackaging from "@/content/images/custom/packaging/zero_pack_custom_compostable_packaging (5).png";
@@ -216,11 +216,15 @@ const masterFaqs: FaqItem[] = [
   },
   {
     question: "Is all Zero Pack compostable packaging certified?",
-    answer: "Yes. All Zero Pack compostable packaging is certified.\n\nThe exact certification depends on the material and type of packaging being produced, and we’ll confirm the relevant certification for your project.",
+    answer: CERTIFICATION_FAQ_ANSWERS.global,
   },
   {
     question: "Is Zero Pack compostable packaging PFAS-free and BPA-free?",
     answer: PFAS_BPA_FAQ_ANSWER,
+  },
+  {
+    question: "Can you develop food packaging?",
+    answer: "Yes. Zero Pack can develop custom compostable packaging for food applications, including flexible and rigid packaging depending on what the product requires.\n\nTell us about the food product, how the packaging will be used and what it needs to do, and we’ll develop the packaging around those requirements.\n\nIf food-safe packaging is required, we’ll make sure those requirements are addressed as part of the project.",
   },
   {
     question: "How long does custom production take?",
@@ -247,8 +251,14 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export default function Page() {
-  const faqItems = masterFaqs;
+export default async function Page() {
+  const market = await getRequestMarket();
+  const faqItems = masterFaqs.map((item) => {
+    if (item.question === "Is all Zero Pack compostable packaging certified?") {
+      return { ...item, answer: CERTIFICATION_FAQ_ANSWERS[market] };
+    }
+    return item;
+  });
 
   return (
     <div className="bg-white text-charcoal sm:-mb-6">

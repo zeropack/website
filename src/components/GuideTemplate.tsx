@@ -7,6 +7,7 @@ import { JsonLd } from "./JsonLd";
 import { SiteImage } from "./SiteImage";
 import { CERTIFICATION_FAQ_ANSWERS } from "@/content/certificationFaqs";
 import { brandGuide } from "@/content/guides/brandGuide";
+import { getGuidePdfBrowserHref, isGuidePreviewBuild } from "@/lib/guidePdf";
 import { buildMarketUrl } from "@/lib/marketRouting";
 import type { LaunchedMarket } from "@/lib/requestMarket";
 import type { FaqItem } from "@/lib/types";
@@ -94,6 +95,8 @@ function getGuideFaqs(market: LaunchedMarket): FaqItem[] {
 
 export function GuideTemplate({ market }: { market: LaunchedMarket }) {
   const pdfUrl = buildMarketUrl(market, `/${brandGuide.pdfFilename}`);
+  const previewPdfUrl = getGuidePdfBrowserHref(brandGuide.pdfFilename);
+  const isPreview = isGuidePreviewBuild();
   const pageUrl = buildMarketUrl(market, brandGuide.path);
   const guideFaqs = getGuideFaqs(market);
 
@@ -157,6 +160,16 @@ export function GuideTemplate({ market }: { market: LaunchedMarket }) {
             <p className="mt-4 text-sm text-white/55">
               14 pages · Practical checklists · Built for real packaging decisions
             </p>
+            {isPreview ? (
+              <a
+                href={previewPdfUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 inline-flex text-sm font-semibold text-air underline decoration-air/40 underline-offset-4 hover:decoration-air"
+              >
+                Open the review PDF
+              </a>
+            ) : null}
           </div>
 
           <div className="relative mx-auto w-full max-w-md px-8 py-5 sm:px-12">

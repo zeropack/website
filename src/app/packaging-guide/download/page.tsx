@@ -3,6 +3,8 @@ import Link from "next/link";
 import { CTAButton } from "@/components/CTAButton";
 import { KlaviyoEmbed } from "@/components/KlaviyoEmbed";
 import { SiteImage } from "@/components/SiteImage";
+import { brandGuide } from "@/content/guides/brandGuide";
+import { getGuidePdfBrowserHref, isGuidePreviewBuild } from "@/lib/guidePdf";
 import { QUOTE_FORM_HREF } from "@/lib/site";
 import { buildMarketPageMetadata, getRequestMarket } from "@/lib/requestMarket";
 
@@ -29,6 +31,9 @@ const included = [
 ] as const;
 
 export default function Page() {
+  const isPreview = isGuidePreviewBuild();
+  const previewPdfUrl = getGuidePdfBrowserHref(brandGuide.pdfFilename);
+
   return (
     <main className="bg-stone py-12 sm:py-16 lg:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -78,6 +83,18 @@ export default function Page() {
               The checklist and planning tools are included in the 14-page PDF,
               so there is only one file to keep and share with your team.
             </p>
+            {isPreview ? (
+              <p className="mt-4">
+                <a
+                  href={previewPdfUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-sm font-semibold text-air underline decoration-air/30 underline-offset-4 hover:decoration-air"
+                >
+                  Open the review PDF without submitting the form
+                </a>
+              </p>
+            ) : null}
           </div>
 
           <section

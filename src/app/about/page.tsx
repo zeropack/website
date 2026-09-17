@@ -24,17 +24,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function Page() {
   return (
     <>
-      <section className="relative overflow-hidden bg-charcoal py-16 text-white sm:py-24 lg:py-28">
-        <div
-          className="pointer-events-none absolute -left-24 top-0 h-96 w-96 rounded-full bg-[radial-gradient(closest-side,rgba(0,168,243,0.18),transparent_72%)]"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute -right-16 bottom-0 h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(closest-side,rgba(131,185,37,0.16),transparent_72%)]"
-          aria-hidden
-        />
-
-        <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(24rem,0.95fr)] lg:gap-16 lg:px-8">
+      <section className="overflow-hidden bg-white py-16 sm:py-24 lg:py-28">
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(24rem,0.95fr)] lg:gap-16 lg:px-8">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.22em] text-air sm:text-sm">
               {aboutZeroPack.hero.eyebrow}
@@ -42,7 +33,7 @@ export default function Page() {
             <h1 className="mt-5 max-w-4xl font-heading text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
               {aboutZeroPack.hero.heading}
             </h1>
-            <p className="mt-7 max-w-3xl text-lg leading-relaxed text-white/75 sm:text-xl">
+            <p className="mt-7 max-w-3xl text-lg leading-relaxed text-charcoal/70 sm:text-xl">
               {aboutZeroPack.hero.body}
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
@@ -52,7 +43,6 @@ export default function Page() {
               <CTAButton
                 href="/custom-compostable-packaging/"
                 variant="secondary"
-                className="border-white/35 bg-white/5 text-white hover:bg-white/10"
               >
                 Explore Custom Packaging
               </CTAButton>
@@ -60,8 +50,8 @@ export default function Page() {
           </div>
 
           <div className="relative mx-auto w-full max-w-xl">
-            <div className="absolute -inset-4 rotate-3 rounded-[2rem] border border-air/25 bg-air/10" aria-hidden />
-            <div className="relative overflow-hidden rounded-[2rem] border border-white/15 bg-white p-5 shadow-[0_28px_80px_rgba(0,0,0,0.28)] sm:p-7">
+            <div className="absolute -inset-4 rotate-3 rounded-[2rem] border border-air/20 bg-air/5" aria-hidden />
+            <div className="relative overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white p-5 shadow-[0_24px_70px_rgba(17,24,39,0.14)] sm:p-7">
               <Image
                 src={packagingCollage}
                 alt="A selection of custom compostable packaging produced for Zero Pack customers"

@@ -4,7 +4,7 @@
   "title": "Zero Pack's Guide to Custom Compostable Packaging",
   "subtitle": "Choose the right packaging. Build a better brief. Make claims you can support.",
   "tagline": "A practical guide to choosing, planning and briefing custom compostable packaging that fits your products, brand and operation.",
-  "answerBox": "The right custom compostable packaging should protect the product, work with your packing process, present your brand well and carry only the claims supported by its certification.",
+  "answerBox": "The right custom compostable packaging should protect the product, work with your packing process, present your brand well and carry only the claims supported by the evidence for that packaging.",
   "primaryKeyword": "custom compostable packaging guide",
   "secondaryKeywords": [
     "compostable packaging",
@@ -32,7 +32,7 @@
       "paragraphs": [
         "Good custom packaging begins with a clear job, not a product name. Before comparing materials or artwork, define what the packaging needs to protect, contain, carry or present.",
         "Consider the entire journey: packing, storage, freight, handling, opening and disposal. Packaging that looks excellent but slows fulfilment, adds unnecessary space or fails in transit is not the right solution.",
-        "Zero Pack works across custom compostable packaging, with custom mailers as an important hero product rather than the limit of the range. Bring us the packaging problem, or a finished brief, and we can explore the right solution with you."
+        "Zero Pack works across custom compostable packaging. Mailers are one of our most established products, but the range extends well beyond them. Bring us the packaging problem, or a finished brief, and we can explore the right solution with you."
       ],
       "bullets": [
         "What is being packed, including weight, dimensions and any fragile, sharp, liquid or heat-sensitive features",
@@ -83,7 +83,7 @@
       "paragraphs": [
         "Compostable, biodegradable, recyclable and plastic-free are not interchangeable terms. Each claim needs its own evidence, scope and customer guidance.",
         "Recognised certification helps establish whether a product meets defined compostability requirements. Home-compostable and industrial-compostable certification relate to different conditions and should not be presented as the same thing.",
-        "All Zero Pack compostable packaging is certified compostable. Depending on the confirmed packaging and material, relevant schemes can include AS 5810, AS 4736, OK compost HOME and OK compost INDUSTRIAL. We confirm the certification that applies to each project.",
+        "The exact certification depends on the confirmed packaging and material. Relevant standards and certification schemes can include AS 5810, AS 4736, OK compost HOME and OK compost INDUSTRIAL. We confirm the certification that applies to each project.",
         "Certification evidence should stay connected to the packaging it covers. A certificate for one material or product should not be treated as evidence for a different construction."
       ],
       "bullets": [
@@ -115,7 +115,7 @@
       "heading": "6. Design packaging that looks like your brand",
       "paragraphs": [
         "Custom packaging is a visible part of the customer experience. It should feel connected to the product and brand rather than like a generic item with a logo added at the end.",
-        "Start with a clear hierarchy: what should the customer notice first, what information must be easy to find and what can stay secondary? Leave enough space for required certification, disposal and production information.",
+        "Start with a clear hierarchy: what should the customer notice first, what information must be easy to find and what can stay secondary? Leave enough space for relevant certification, disposal and production information.",
         "Artwork requirements depend on the packaging, print method and production setup. Confirm the dieline, colour requirements, print limits, safe areas and file requirements before final artwork is prepared."
       ],
       "bullets": [
@@ -123,7 +123,7 @@
         "Keep logos and important copy within the approved safe area",
         "Confirm colour references and understand that printed material can differ from a screen",
         "Check small text, fine lines, reverses and barcodes at production size",
-        "Approve certification marks and disposal wording as part of the artwork review"
+        "Confirm any approved certification marks and disposal wording as part of the artwork review"
       ]
     },
     {
@@ -131,7 +131,7 @@
       "heading": "7. Plan quantities, budget and timing",
       "paragraphs": [
         "Custom packaging is made for your order, so quantities, setup and freight are different from buying stock packaging. The right quantity balances unit economics with storage, cash flow, demand and the risk of artwork or product changes.",
-        "Custom compostable mailer orders start from 2,000 units, with the final minimum depending on size, print, material and specification. Other packaging types can have different minimums and should be confirmed for the project.",
+        "Custom compostable mailers are available from 2,000 units, with the final MOQ depending on size, print, material and specification. Other packaging types can have different minimums and should be confirmed for the project.",
         "Production and delivery timing also depend on the approved packaging and freight plan. Work backwards from the date the packaging needs to be available and allow time for scoping, pricing, artwork, approval, production and delivery."
       ],
       "bullets": [
@@ -140,7 +140,8 @@
         "Allow for storage space and stock-management costs",
         "Discuss destination, delivery method and required date early",
         "Set a reorder point that reflects your actual production and freight plan"
-      ]
+      ],
+      "footnote": "* Mailer MOQ only. Final MOQ depends on size, print, material and specification."
     },
     {
       "id": "supplier-brief",
@@ -154,7 +155,7 @@
         "Product description, dimensions, weight and protection needs",
         "Current packaging and what you want to improve",
         "Preferred packaging type, if known",
-        "Estimated quantity and likely reorder pattern",
+        "Estimated quantity and likely reorder pattern, if applicable",
         "Brand colours, print expectations and artwork status",
         "Certification or disposal requirements",
         "Required delivery location and target date",
@@ -165,13 +166,13 @@
       "id": "decision-checklist",
       "heading": "9. Decision checklist",
       "paragraphs": [
-        "Custom compostable packaging is likely to be worth exploring when you can define the packaging job, have repeat demand and want the finished result to support both practical and brand goals.",
+        "Custom compostable packaging is likely to be worth exploring when you can define the packaging job, have a realistic quantity requirement and want the finished result to support both practical and brand goals.",
         "A 'not yet' answer is useful. It may mean testing a simpler packaging setup, reducing the number of sizes or waiting until demand is more predictable."
       ],
       "bullets": [
         "We understand what the packaging needs to do",
-        "We can estimate repeat demand with reasonable confidence",
-        "We have space and cash flow for custom-production quantities",
+        "We can estimate the quantity we need with reasonable confidence",
+        "The order quantity works with our storage and purchasing plan",
         "We know which products and sizes need to fit",
         "We can allow time for artwork, approval, production and delivery",
         "We are prepared to use accurate certification and disposal wording",
@@ -183,7 +184,7 @@
       "id": "quote-ready-workbook",
       "heading": "10. Quote-ready planning worksheet",
       "paragraphs": [
-        "Use the worksheet in the downloadable guide to turn what you know into a clear first conversation. Complete what you can and leave genuinely open decisions for discussion.",
+        "Use the worksheet on the next page to turn what you know into a clear first conversation. Complete what you can and leave genuinely open decisions for discussion.",
         "The aim is not to arrive with every answer. It is to give Zero Pack enough context to explore the right packaging and identify what must be confirmed next."
       ],
       "bullets": [
@@ -207,7 +208,7 @@
     },
     {
       "question": "What is the minimum order quantity?",
-      "answer": "Custom compostable mailer orders start from 2,000 units. The final minimum depends on size, print, material and specification. Minimums for other packaging types vary and are confirmed for the project."
+      "answer": "Custom compostable mailers are available from 2,000 units, with the final MOQ depending on size, print, material and specification. Minimums for other packaging types vary and are confirmed for the project."
     },
     {
       "question": "Can Zero Pack help with packaging beyond mailers?",

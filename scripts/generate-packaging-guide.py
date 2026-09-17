@@ -60,6 +60,10 @@ def esc(value: str) -> str:
     )
 
 
+def link(label: str, url: str, colour: str = "#006FAF") -> str:
+    return f'<link href="{url}" color="{colour}"><u>{esc(label)}</u></link>'
+
+
 def draw_cover(canvas, doc) -> None:
     canvas.saveState()
     canvas.setFillColor(CHARCOAL)
@@ -147,8 +151,8 @@ def make_styles():
     }
 
 
-def callout(text: str, styles):
-    table = Table([[Paragraph(esc(text), styles["callout"])]], colWidths=[PAGE_W - 2 * MARGIN_X])
+def callout(text: str, styles, rich: bool = False):
+    table = Table([[Paragraph(text if rich else esc(text), styles["callout"])]], colWidths=[PAGE_W - 2 * MARGIN_X])
     table.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), MIST),
         ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#BFD9C4")),
@@ -176,6 +180,8 @@ def section_page(section, styles):
         items.append(Paragraph(esc(paragraph), styles["body"]))
     items.extend([Spacer(1, 2 * mm), Paragraph("What to check", styles["h2"])])
     items.extend(bullet_list(section["bullets"], styles))
+    if section.get("footnote"):
+        items.extend([Spacer(1, 2 * mm), Paragraph(esc(section["footnote"]), styles["small"])])
     return items
 
 
@@ -210,7 +216,7 @@ def build() -> None:
             "cover_bottom", parent=styles["body"], fontName="ZPSansBold", fontSize=11,
             leading=15, textColor=WHITE,
         )),
-        Paragraph("2026 EDITION", ParagraphStyle(
+        Paragraph("2026 GLOBAL EDITION", ParagraphStyle(
             "cover_year", parent=styles["small"], fontName="ZPSansBold", fontSize=8,
             leading=11, textColor=AIR, spaceBefore=5,
         )),
@@ -221,6 +227,10 @@ def build() -> None:
         Paragraph("HOW TO USE THIS GUIDE", styles["eyebrow"]),
         Paragraph("Start with the packaging job, not a preselected solution", styles["h1"]),
         Paragraph(esc(guide["tagline"]), styles["body"]),
+        Paragraph(
+            "This is a global planning guide. Australian references and international certification schemes are clearly labelled; project-specific requirements should always be confirmed for the market where the packaging will be used.",
+            styles["small"],
+        ),
         Spacer(1, 3 * mm),
         callout(guide["answerBox"], styles),
         Spacer(1, 8 * mm),
@@ -278,27 +288,48 @@ def build() -> None:
     ]))
     story.extend([worksheet, PageBreak()])
 
-    source_rows = [
-        ["Standards Australia", "AS 5810:2010 - Biodegradable plastics suitable for home composting", "store.standards.org.au/product/as-5810-2010"],
-        ["Australasian Bioplastics Association", "Home- and industrial-compostable certification information", "bioplastics.org.au/certification/"],
-        ["Australian Competition and Consumer Commission", "A guide to making environmental claims for business", "accc.gov.au/about-us/publications/a-guide-to-making-environmental-claims-for-business"],
+    source_data = [
+        [Paragraph("AUSTRALIAN REFERENCES", styles["table_head"]), ""],
+        [
+            Paragraph(link("View AS 5810 information", "https://store.standards.org.au/product/as-5810-2010"), styles["table"]),
+            Paragraph("Standards Australia - home-compostable plastics standard", styles["table"]),
+        ],
+        [
+            Paragraph(link("View AS 4736 information", "https://store.standards.org.au/product/as-4736-2006"), styles["table"]),
+            Paragraph("Standards Australia - commercial-composting and microbial-treatment standard", styles["table"]),
+        ],
+        [
+            Paragraph(link("ABA certification information", "https://bioplastics.org.au/certification/"), styles["table"]),
+            Paragraph("Australian verification context for AS 4736 and AS 5810", styles["table"]),
+        ],
+        [
+            Paragraph(link("ACCC environmental claims guidance", "https://www.accc.gov.au/business/advertising-and-promotions/environmental-and-sustainability-claims"), styles["table"]),
+            Paragraph("Current primary guidance on truthful, accurate and evidence-backed environmental claims", styles["table"]),
+        ],
+        [
+            Paragraph(link("ACCC 2023 guide - additional reading", "https://www.accc.gov.au/about-us/publications/a-guide-to-making-environmental-claims-for-business"), styles["table"]),
+            Paragraph("Earlier detailed guide; the ACCC notes that it does not reflect penalty increases effective 28 March 2026", styles["table"]),
+        ],
+        [Paragraph("INTERNATIONAL CERTIFICATION SCHEMES", styles["table_head"]), ""],
+        [
+            Paragraph(link("OK compost HOME", "https://okcert.tuvaustria.com/ok-compost-home-en/"), styles["table"]),
+            Paragraph("TÜV AUSTRIA certification information for home-composting conditions", styles["table"]),
+        ],
+        [
+            Paragraph(link("OK compost INDUSTRIAL", "https://okcert.tuvaustria.com/ok-compost-industrial-en/"), styles["table"]),
+            Paragraph("TÜV AUSTRIA certification information for industrial-composting conditions", styles["table"]),
+        ],
     ]
-    source_data = [[
-        Paragraph("Source", styles["table_head"]),
-        Paragraph("Used for", styles["table_head"]),
-        Paragraph("Official page", styles["table_head"]),
-    ]]
-    source_data.extend([
-        [Paragraph(esc(row[0]), styles["table"]), Paragraph(esc(row[1]), styles["table"]), Paragraph(esc(row[2]), styles["table"])]
-        for row in source_rows
-    ])
-    source_table = Table(source_data, colWidths=[43 * mm, 58 * mm, 55 * mm], repeatRows=1)
+    source_table = Table(source_data, colWidths=[62 * mm, 94 * mm])
     source_table.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), COMPOST),
+        ("BACKGROUND", (0, 6), (-1, 6), COMPOST),
+        ("SPAN", (0, 0), (-1, 0)),
+        ("SPAN", (0, 6), (-1, 6)),
         ("GRID", (0, 0), (-1, -1), 0.5, LINE),
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
-        ("TOPPADDING", (0, 0), (-1, -1), 8),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+        ("TOPPADDING", (0, 0), (-1, -1), 5.5),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 5.5),
         ("LEFTPADDING", (0, 0), (-1, -1), 7),
         ("RIGHTPADDING", (0, 0), (-1, -1), 7),
     ]))
@@ -314,18 +345,37 @@ def build() -> None:
             styles["body"],
         ),
         Spacer(1, 5 * mm),
-        Paragraph("Primary official sources", styles["h2"]),
+        Paragraph("Official sources and guidance", styles["h2"]),
         source_table,
-        Spacer(1, 8 * mm),
+        Spacer(1, 5 * mm),
+        callout(
+            "Guide last reviewed: September 2026<br/><font name='ZPSans'>Packaging specifications, certification schemes, disposal pathways and regulatory guidance can change. Confirm current project-specific requirements before publishing claims or disposal instructions.</font>",
+            styles,
+            rich=True,
+        ),
+        Spacer(1, 5 * mm),
         Paragraph("Ready to discuss your packaging?", styles["h2"]),
         Paragraph(
             "Bring Zero Pack the packaging problem, or a finished brief. Share the product, likely quantities, destination, artwork status and timing you know so far.",
             styles["body"],
         ),
-        callout("Explore custom packaging or request a custom quote at zeropack.co", styles),
-        Spacer(1, 12 * mm),
-        Image(str(LOGO_GREEN), width=22 * mm, height=22 * mm),
-        Paragraph("Custom compostable packaging that makes sense for your product, brand and operation.", styles["center"]),
+        Table(
+            [[
+                Paragraph(link("Explore custom packaging", "https://www.zeropack.co/custom-compostable-packaging/", "#214E34"), styles["callout"]),
+                Paragraph(link("Request a custom quote", "https://www.zeropack.co/quote/", "#214E34"), styles["callout"]),
+            ]],
+            colWidths=[78 * mm, 78 * mm],
+            style=TableStyle([
+                ("BACKGROUND", (0, 0), (-1, -1), MIST),
+                ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#BFD9C4")),
+                ("LINEBEFORE", (0, 0), (0, -1), 4, LEAF),
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                ("LEFTPADDING", (0, 0), (-1, -1), 12),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 12),
+                ("TOPPADDING", (0, 0), (-1, -1), 9),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 9),
+            ]),
+        ),
     ])
 
     doc.build(story)

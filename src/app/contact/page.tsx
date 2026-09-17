@@ -121,8 +121,8 @@ export default async function Page() {
               Send us a message
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-charcoal/70">
-              Complete the form and your message will go directly to the Zero Pack team. If your enquiry is about
-              pricing, please use the custom quote form so we receive the details needed to respond properly.
+              Complete the form below and tell us how we can help. If your enquiry is about pricing, please use the
+              custom quote form so we receive the details needed to respond properly.
             </p>
 
             <div className="mt-8 rounded-2xl border border-slate-200/80 bg-stone p-6">

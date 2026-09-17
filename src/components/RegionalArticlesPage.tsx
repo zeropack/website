@@ -15,6 +15,7 @@ export function RegionalArticlesPage({
   const articles = getArticlesForMarket(market);
   const regional = articles.filter((article) => getArticleMarket(article) === market);
   const global = articles.filter((article) => getArticleMarket(article) === "GLOBAL");
+  const marketAdjective = market === "AU" ? "Australian" : "UK";
 
   return (
     <>
@@ -23,7 +24,7 @@ export function RegionalArticlesPage({
           <div className="max-w-4xl">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-air">Packaging resources</p>
             <h1 className="mt-4 font-heading text-4xl font-semibold leading-tight text-charcoal sm:text-5xl">
-              Packaging guidance for {marketName} businesses
+              Packaging guidance for {marketAdjective} businesses
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-relaxed text-charcoal/70 sm:text-xl">
               Market-relevant updates alongside straightforward global guidance on choosing, designing and ordering

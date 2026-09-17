@@ -115,9 +115,9 @@ export function ArticleTemplate({ article }: { article: Article }) {
 
         {!article.isSpokeGuide ? (
           <p className="mt-4 rounded-xl border border-slate-200/60 bg-white px-4 py-3 text-sm text-charcoal/75">
-            For the full picture on branded and eco friendly packaging, read the{" "}
+            For practical help choosing and planning custom compostable packaging, read the{" "}
             <Link className="font-semibold text-air hover:underline" href={PILLAR_PATH}>
-              2026 Brand Guide
+              Custom Compostable Packaging Guide
             </Link>
             .
           </p>
@@ -127,7 +127,7 @@ export function ArticleTemplate({ article }: { article: Article }) {
           <p className="mt-4 rounded-xl border border-air/20 bg-air/5 px-4 py-3 text-sm text-charcoal/75">
             Part of the{" "}
             <Link className="font-semibold text-air hover:underline" href={article.pillarPath ?? PILLAR_PATH}>
-              2026 Branded & Eco Friendly Packaging Guide
+              Custom Compostable Packaging Guide
             </Link>
             . Read the full guide for checklists, decision frameworks, and FAQs.
           </p>
@@ -230,7 +230,7 @@ export function ArticleTemplate({ article }: { article: Article }) {
           <p className="font-heading text-lg font-semibold text-charcoal">Next step</p>
           <p className="mt-2 text-sm text-charcoal/70">
             If you want pricing for custom compostable mailers, request a quote. If you are still researching, start
-            with the full Brand Guide.
+            with the full Packaging Guide.
           </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <CTAButton href={quoteHref} variant="primary">
@@ -276,7 +276,7 @@ export function ArticleTemplate({ article }: { article: Article }) {
           </Link>
           {" · "}
           <Link className="font-medium text-air hover:underline" href={PILLAR_PATH}>
-            Brand Guide
+            Packaging Guide
           </Link>
         </p>
       </div>

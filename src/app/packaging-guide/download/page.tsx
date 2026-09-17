@@ -3,6 +3,8 @@ import Link from "next/link";
 import { CTAButton } from "@/components/CTAButton";
 import { KlaviyoEmbed } from "@/components/KlaviyoEmbed";
 import { SiteImage } from "@/components/SiteImage";
+import { brandGuide } from "@/content/guides/brandGuide";
+import { getGuidePdfBrowserHref, isGuidePreviewBuild } from "@/lib/guidePdf";
 import { QUOTE_FORM_HREF } from "@/lib/site";
 import { buildMarketPageMetadata, getRequestMarket } from "@/lib/requestMarket";
 
@@ -29,6 +31,9 @@ const included = [
 ] as const;
 
 export default function Page() {
+  const isPreview = isGuidePreviewBuild();
+  const previewPdfUrl = getGuidePdfBrowserHref(brandGuide.pdfFilename);
+
   return (
     <main className="bg-stone py-12 sm:py-16 lg:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -45,7 +50,7 @@ export default function Page() {
               Free download
             </p>
             <h1 className="mt-3 font-heading text-3xl font-semibold leading-tight text-charcoal sm:text-4xl lg:text-5xl">
-              Get The Brand&apos;s Guide to Custom Compostable Packaging
+              Get Zero Pack&apos;s Guide to Custom Compostable Packaging
             </h1>
             <p className="mt-5 text-lg leading-relaxed text-charcoal/75">
               Tell us a little about your packaging plans and we will email you
@@ -55,7 +60,7 @@ export default function Page() {
             <div className="mt-8 grid grid-cols-[7rem_minmax(0,1fr)] gap-5 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-slate-200/40 sm:grid-cols-[9rem_minmax(0,1fr)]">
               <SiteImage
                 src="/images/guides/custom-compostable-packaging-guide-cover.webp"
-                alt="Cover of The Brand's Guide to Custom Compostable Packaging"
+                alt="Cover of Zero Pack's Guide to Custom Compostable Packaging"
                 width={910}
                 height={1287}
                 sizes="144px"
@@ -75,9 +80,21 @@ export default function Page() {
             </div>
 
             <p className="mt-5 text-sm leading-relaxed text-charcoal/55">
-              The checklist and planning tools are included in the 28-page PDF,
+              The checklist and planning tools are included in the 14-page PDF,
               so there is only one file to keep and share with your team.
             </p>
+            {isPreview ? (
+              <p className="mt-4">
+                <a
+                  href={previewPdfUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-sm font-semibold text-air underline decoration-air/30 underline-offset-4 hover:decoration-air"
+                >
+                  Open the review PDF without submitting the form
+                </a>
+              </p>
+            ) : null}
           </div>
 
           <section

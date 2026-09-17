@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CTAButton } from "@/components/CTAButton";
 import { brandGuide } from "@/content/guides/brandGuide";
+import { getGuidePdfBrowserHref, getGuidePdfDownloadHref } from "@/lib/guidePdf";
 import { QUOTE_FORM_HREF } from "@/lib/site";
 import { buildMarketPageMetadata, getRequestMarket } from "@/lib/requestMarket";
 
@@ -18,7 +19,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function Page() {
-  const pdfUrl = `/${brandGuide.pdfFilename}`;
+  const pdfDownloadUrl = getGuidePdfDownloadHref(brandGuide.pdfFilename);
+  const pdfBrowserUrl = getGuidePdfBrowserHref(brandGuide.pdfFilename);
 
   return (
     <section className="bg-stone py-16 sm:py-24">
@@ -32,7 +34,7 @@ export default function Page() {
         <ul className="mt-4 space-y-2 text-sm text-charcoal/75">
           <li className="flex gap-2">
             <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-leaf" aria-hidden />
-            <span>The Brand&apos;s Guide to Custom Compostable Packaging (PDF)</span>
+            <span>Zero Pack&apos;s Guide to Custom Compostable Packaging (PDF)</span>
           </li>
           <li className="flex gap-2">
             <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-leaf" aria-hidden />
@@ -51,15 +53,23 @@ export default function Page() {
           You are also subscribed to Zero Pack marketing emails. You can unsubscribe at any time.
         </p>
 
-        <p className="mt-8">
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
           <a
             className="inline-flex rounded-full bg-compost px-5 py-2.5 text-sm font-semibold text-white hover:bg-compost/90"
-            href={pdfUrl}
+            href={pdfDownloadUrl}
             download
           >
             Download now (PDF)
           </a>
-        </p>
+          <a
+            className="inline-flex text-sm font-semibold text-air underline decoration-air/30 underline-offset-4 hover:decoration-air"
+            href={pdfBrowserUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Open PDF in browser
+          </a>
+        </div>
 
 
         <p className="mt-8 text-charcoal/75">

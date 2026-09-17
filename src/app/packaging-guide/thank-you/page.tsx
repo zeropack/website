@@ -32,7 +32,7 @@ export default function Page() {
         <ul className="mt-4 space-y-2 text-sm text-charcoal/75">
           <li className="flex gap-2">
             <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-leaf" aria-hidden />
-            <span>The Brand&apos;s Guide to Custom Compostable Packaging (PDF)</span>
+            <span>Zero Pack&apos;s Guide to Custom Compostable Packaging (PDF)</span>
           </li>
           <li className="flex gap-2">
             <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-leaf" aria-hidden />

@@ -42,7 +42,7 @@ const guideBenefits = [
 
 const included = [
   {
-    title: "The complete 28-page guide",
+    title: "The complete 14-page guide",
     description:
       "A practical walk-through of custom compostable packaging, from material choices to first-order planning.",
   },
@@ -100,13 +100,13 @@ export function GuideTemplate({ market }: { market: LaunchedMarket }) {
   const guideJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: "The Brand's Guide to Custom Compostable Packaging",
+    name: "Zero Pack's Guide to Custom Compostable Packaging",
     description:
       "A practical guide to choosing, planning and briefing custom compostable packaging.",
     url: pageUrl,
     mainEntity: {
       "@type": "CreativeWork",
-      name: "The Brand's Guide to Custom Compostable Packaging",
+      name: "Zero Pack's Guide to Custom Compostable Packaging",
       author: { "@type": "Organization", name: "Zero Pack" },
       encoding: {
         "@type": "MediaObject",
@@ -136,7 +136,7 @@ export function GuideTemplate({ market }: { market: LaunchedMarket }) {
               Free packaging guide
             </p>
             <h1 className="mt-3 max-w-3xl font-heading text-4xl font-semibold leading-[1.08] text-white sm:text-5xl lg:text-6xl">
-              The Brand&apos;s Guide to Custom Compostable Packaging
+              Zero Pack&apos;s Guide to Custom Compostable Packaging
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/80 sm:text-xl">
               Before you order a single bag, get clear on what will suit your
@@ -155,7 +155,7 @@ export function GuideTemplate({ market }: { market: LaunchedMarket }) {
               </Link>
             </div>
             <p className="mt-4 text-sm text-white/55">
-              28 pages · Practical checklists · Built for real packaging decisions
+              14 pages · Practical checklists · Built for real packaging decisions
             </p>
           </div>
 
@@ -167,7 +167,7 @@ export function GuideTemplate({ market }: { market: LaunchedMarket }) {
             <div className="relative -rotate-2 overflow-hidden rounded-2xl border border-white/15 bg-white p-2 shadow-2xl shadow-black/35 transition-transform duration-300 hover:rotate-0 hover:scale-[1.02]">
               <SiteImage
                 src="/images/guides/custom-compostable-packaging-guide-cover.webp"
-                alt="Cover of The Brand's Guide to Custom Compostable Packaging by Zero Pack"
+                alt="Cover of Zero Pack's Guide to Custom Compostable Packaging"
                 width={910}
                 height={1287}
                 sizes="(max-width: 1024px) 80vw, 34vw"

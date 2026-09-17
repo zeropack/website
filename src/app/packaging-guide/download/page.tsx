@@ -45,7 +45,7 @@ export default function Page() {
               Free download
             </p>
             <h1 className="mt-3 font-heading text-3xl font-semibold leading-tight text-charcoal sm:text-4xl lg:text-5xl">
-              Get The Brand&apos;s Guide to Custom Compostable Packaging
+              Get Zero Pack&apos;s Guide to Custom Compostable Packaging
             </h1>
             <p className="mt-5 text-lg leading-relaxed text-charcoal/75">
               Tell us a little about your packaging plans and we will email you
@@ -55,7 +55,7 @@ export default function Page() {
             <div className="mt-8 grid grid-cols-[7rem_minmax(0,1fr)] gap-5 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-slate-200/40 sm:grid-cols-[9rem_minmax(0,1fr)]">
               <SiteImage
                 src="/images/guides/custom-compostable-packaging-guide-cover.webp"
-                alt="Cover of The Brand's Guide to Custom Compostable Packaging"
+                alt="Cover of Zero Pack's Guide to Custom Compostable Packaging"
                 width={910}
                 height={1287}
                 sizes="144px"
@@ -75,7 +75,7 @@ export default function Page() {
             </div>
 
             <p className="mt-5 text-sm leading-relaxed text-charcoal/55">
-              The checklist and planning tools are included in the 28-page PDF,
+              The checklist and planning tools are included in the 14-page PDF,
               so there is only one file to keep and share with your team.
             </p>
           </div>

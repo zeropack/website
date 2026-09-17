@@ -12,7 +12,7 @@ export function Shell({ children }: { children: ReactNode }) {
       <MarketingClient />
       <Header />
       <MarketExperience />
-      <main className="flex-1 pb-24 pt-[var(--site-header-height)] sm:pb-6">{children}</main>
+      <main className="flex-1 pt-[var(--site-header-height)]">{children}</main>
       <Footer />
       <StickyMobileCTA />
       <StickyDesktopCTA />

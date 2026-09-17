@@ -27,7 +27,7 @@ const groups = [
 
 export function Footer() {
   return (
-    <footer className="mt-auto bg-[#214E34] text-white">
+    <footer className="mt-auto bg-[#214E34] pb-24 text-white sm:pb-0">
       <div className="mx-auto min-w-0 max-w-6xl px-4 py-14 sm:px-6">
         <div className="mx-auto mb-12 w-full lg:w-1/2">
           <NewsletterSignup />

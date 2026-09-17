@@ -1,18 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { buildMetadata } from "@/lib/metadata";
 import { CTAButton } from "@/components/CTAButton";
 import { brandGuide } from "@/content/guides/brandGuide";
 import { QUOTE_FORM_HREF } from "@/lib/site";
+import { buildMarketPageMetadata, getRequestMarket } from "@/lib/requestMarket";
 
-export const metadata: Metadata = {
-  ...buildMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  const market = await getRequestMarket();
+  const metadata = buildMarketPageMetadata({
+    market,
     title: "Thank You | Packaging Guide Download",
     description: "Your guide request was received. Download the PDF or continue reading online.",
     path: "/packaging-guide/thank-you/",
-  }),
-  robots: { index: false, follow: false },
-};
+  });
+
+  return { ...metadata, robots: { index: false, follow: false } };
+}
 
 export default function Page() {
   const pdfUrl = `/${brandGuide.pdfFilename}`;
@@ -29,7 +32,7 @@ export default function Page() {
         <ul className="mt-4 space-y-2 text-sm text-charcoal/75">
           <li className="flex gap-2">
             <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-leaf" aria-hidden />
-            <span>The full 2026 Branded &amp; Eco Friendly Packaging Guide (PDF)</span>
+            <span>The Brand&apos;s Guide to Custom Compostable Packaging (PDF)</span>
           </li>
           <li className="flex gap-2">
             <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-leaf" aria-hidden />
@@ -45,8 +48,7 @@ export default function Page() {
           </li>
         </ul>
         <p className="mt-4 text-sm text-charcoal/60">
-          You are also on the list for the next annual edition — we publish an updated guide every
-          year and notify subscribers first.
+          You are also subscribed to Zero Pack marketing emails. You can unsubscribe at any time.
         </p>
 
         <p className="mt-8">
@@ -66,7 +68,7 @@ export default function Page() {
         </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <CTAButton href={QUOTE_FORM_HREF} variant="primary">
-            Request a custom quote
+            Get a Custom Quote
           </CTAButton>
           <Link className="text-sm font-semibold text-air hover:underline" href="/articles/">
             Keep reading in Articles

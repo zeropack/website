@@ -1,91 +1,118 @@
 import type { Metadata } from "next";
-import { buildMetadata } from "@/lib/metadata";
+import Link from "next/link";
 import { CTAButton } from "@/components/CTAButton";
 import { KlaviyoEmbed } from "@/components/KlaviyoEmbed";
+import { SiteImage } from "@/components/SiteImage";
 import { QUOTE_FORM_HREF } from "@/lib/site";
+import { buildMarketPageMetadata, getRequestMarket } from "@/lib/requestMarket";
 
-export const metadata: Metadata = {
-  ...buildMetadata({
-    title: "Download The 2026 Branded & Eco Friendly Packaging Guide + Toolkit",
+const path = "/packaging-guide/download/";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const market = await getRequestMarket();
+  const metadata = buildMarketPageMetadata({
+    market,
+    title: "Download the Custom Compostable Packaging Guide",
     description:
-      "Get the full packaging guide as a formatted PDF plus the print-ready decision checklist, quote-ready planning prompt, and artwork brief template.",
-    path: "/packaging-guide/download/",
-  }),
-  robots: { index: false, follow: true },
-};
+      "Get Zero Pack's practical guide to choosing, planning and briefing custom compostable packaging.",
+    path,
+  });
+
+  return { ...metadata, robots: { index: false, follow: true } };
+}
 
 const included = [
-  {
-    title: "The 2026 Branded & Eco Friendly Packaging Guide (PDF)",
-    description:
-      "The complete 18-section guide — certification, MOQ, artwork, lead times, and more — formatted for offline reading and team sharing.",
-  },
-  {
-    title: "Print-ready decision checklist",
-    description:
-      "10 yes/no questions to assess whether your brand is ready for custom compostable packaging, with a scored outcome guide.",
-  },
-  {
-    title: "Quote-ready planning prompt",
-    description:
-      "A structured set of questions to gather before contacting Zero Pack — product type, dimensions, quantity, timeline, and artwork status.",
-  },
-  {
-    title: "Artwork brief template",
-    description:
-      "10 requirements to share with your designer before artwork is created — file format, colour mode, bleed, fonts, and proofing sign-off.",
-  },
-];
+  "How to compare custom compostable packaging options",
+  "The commercial and operational questions worth asking",
+  "Certification, disposal guidance and clearer claims",
+  "A decision checklist, planning prompt and artwork brief",
+] as const;
 
 export default function Page() {
   return (
-    <section className="bg-stone py-16 sm:py-24">
+    <main className="bg-stone py-12 sm:py-16 lg:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <p className="text-xs font-semibold uppercase tracking-wide text-compost">
-          Free download · Annual edition
-        </p>
-        <h1 className="mt-2 font-heading text-3xl font-semibold leading-tight text-charcoal sm:text-4xl">
-          Download the 2026 Guide + Toolkit
-        </h1>
-        <p className="mt-4 text-lg text-charcoal/75">
-          Fill in the short form and we will email you the full package. Takes under a minute.
-        </p>
+        <Link
+          href="/packaging-guide/"
+          className="text-sm font-semibold text-compost underline decoration-compost/25 underline-offset-4 hover:decoration-compost"
+        >
+          ← Back to guide overview
+        </Link>
 
-        <div className="mt-8 space-y-4">
-          {included.map((item, i) => (
-            <div key={i} className="flex gap-4 rounded-xl border border-black/5 bg-white px-5 py-4">
-              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-leaf/15 text-xs font-bold text-compost">
-                {i + 1}
-              </span>
+        <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,0.82fr)_minmax(24rem,1.18fr)] lg:items-start lg:gap-14">
+          <div className="lg:sticky lg:top-[calc(var(--site-header-height)+2rem)]">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-air">
+              Free download
+            </p>
+            <h1 className="mt-3 font-heading text-3xl font-semibold leading-tight text-charcoal sm:text-4xl lg:text-5xl">
+              Get The Brand&apos;s Guide to Custom Compostable Packaging
+            </h1>
+            <p className="mt-5 text-lg leading-relaxed text-charcoal/75">
+              Tell us a little about your packaging plans and we will email you
+              the complete guide.
+            </p>
+
+            <div className="mt-8 grid grid-cols-[7rem_minmax(0,1fr)] gap-5 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-slate-200/40 sm:grid-cols-[9rem_minmax(0,1fr)]">
+              <SiteImage
+                src="/images/guides/custom-compostable-packaging-guide-cover.webp"
+                alt="Cover of The Brand's Guide to Custom Compostable Packaging"
+                width={910}
+                height={1287}
+                sizes="144px"
+                className="h-auto w-full rounded-lg border border-slate-200 shadow-md"
+              />
               <div>
-                <p className="text-sm font-semibold text-charcoal">{item.title}</p>
-                <p className="mt-0.5 text-sm text-charcoal/70">{item.description}</p>
+                <p className="font-heading text-lg font-semibold text-charcoal">Inside the guide</p>
+                <ul className="mt-3 space-y-2 text-sm leading-relaxed text-charcoal/70">
+                  {included.map((item) => (
+                    <li key={item} className="flex gap-2">
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-leaf" aria-hidden />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
-          ))}
+
+            <p className="mt-5 text-sm leading-relaxed text-charcoal/55">
+              The checklist and planning tools are included in the 28-page PDF,
+              so there is only one file to keep and share with your team.
+            </p>
+          </div>
+
+          <section
+            id="guideform"
+            aria-label="Guide download form"
+            className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-xl shadow-slate-200/40 sm:p-8"
+          >
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-air">
+              Send me the guide
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-charcoal/65">
+              Complete the form below. We will use your answers to send the guide
+              and understand which packaging information may be most relevant to you.
+            </p>
+            <KlaviyoEmbed formId="R8WtWh" className="mt-6" />
+          </section>
         </div>
 
-        <div className="mt-10">
-          <p className="font-heading text-lg font-semibold text-charcoal">
-            Download the Guide and Toolkit
-          </p>
-          <KlaviyoEmbed formId="R8WtWh" className="mt-5 lg:mx-auto lg:w-3/4" />
-        </div>
-
-        <div className="mt-8 rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
-          <p className="font-heading text-xl font-semibold text-charcoal">
-            Ready to go fully Customised with Branded Packaging?
-          </p>
-          <p className="mt-2 text-sm text-charcoal/70">
-            Tell us what you ship and we will help you work through size, specification, and pricing.
-          </p>
-          <div className="mt-5">
+        <section className="mt-12 rounded-2xl bg-compost p-7 text-white sm:flex sm:items-center sm:justify-between sm:gap-8 sm:p-9">
+          <div>
+            <p className="font-heading text-xl font-semibold sm:text-2xl">
+              Already have a clear packaging project?
+            </p>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/75">
+              Tell us what you need and we will help you work through the right
+              packaging, size, print and production details.
+            </p>
+          </div>
+          <div className="mt-6 shrink-0 sm:mt-0">
             <CTAButton href={QUOTE_FORM_HREF} variant="primary">
               Get a Custom Quote
             </CTAButton>
           </div>
-        </div>
+        </section>
       </div>
-    </section>
+    </main>
   );
 }

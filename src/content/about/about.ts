@@ -3,13 +3,13 @@ export const aboutZeroPack = {
     eyebrow: "About Zero Pack",
     heading: "Custom compostable packaging that works for your product and your brand",
     body:
-      "Zero Pack helps businesses replace conventional plastic packaging with made-to-order, certified compostable solutions — developed around what you are packing, how it needs to perform and how you want your brand to show up.",
+      "Zero Pack helps businesses replace conventional plastic packaging with made-to-order, certified compostable solutions — developed around what you are packing, how it needs to perform and how you want your brand to look.",
   },
   breadth: {
     eyebrow: "More than mailers",
-    heading: "Bring us the packaging problem, not a finished brief",
+    heading: "Bring us the packaging problem, or a finished brief",
     body: [
-      "Mailers are where Zero Pack began, but they are only part of what we do. We help businesses explore compostable alternatives across flexible and rigid packaging, shopping and carry bags, garment bags, padded and protective packaging, food-packaging applications, layflat tubing and bespoke projects.",
+      "Mailers are where Zero Pack began, but they are only part of what we do. We help businesses explore compostable alternatives across flexible and rigid packaging, shopping and carry bags, garment bags, padded and protective packaging, food-packaging products, layflat tubing and bespoke projects.",
       "You do not need to know the exact material, construction or specification before you contact us. Show us what you use now, tell us what needs to change and we will help you work through the right questions.",
     ],
   },
@@ -35,7 +35,7 @@ export const aboutZeroPack = {
         number: "03",
         heading: "Keep the claims credible",
         body:
-          "All packaging Zero Pack sells as compostable is certified compostable. The exact certification depends on the product, material and final specification.",
+          "All Zero Pack compostable packaging is certified compostable.",
       },
     ],
   },

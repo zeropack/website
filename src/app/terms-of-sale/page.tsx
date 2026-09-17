@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LegalMarketNotice } from "@/components/LegalMarketNotice";
 import { buildMarketPageMetadata, getRequestMarket } from "@/lib/requestMarket";
 
-const updated = "8 September 2026";
+const updated = "17 September 2026";
 
 export async function generateMetadata(): Promise<Metadata> {
   const market = await getRequestMarket();
@@ -95,7 +95,7 @@ export default function Page() {
 
           <section>
             <h2 className="font-heading text-xl font-semibold text-charcoal">13. Environmental and certification information</h2>
-            <p className="mt-3">Environmental, compostability and certification claims apply only to the product or specification supported by the relevant current documentation. Certification does not mean every packaging format has the same scope or that the same end-of-life pathway is available in every location.</p>
+            <p className="mt-3">All Zero Pack compostable packaging is certified compostable. The applicable certification and supporting documentation depend on the packaging type, material and confirmed specification. Certification does not mean every product carries the same standard or that the same end-of-life pathway is available in every location.</p>
           </section>
 
           <section>

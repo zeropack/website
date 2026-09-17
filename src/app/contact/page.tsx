@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CalendlyEmbed } from "@/components/CalendlyEmbed";
 import { CTAButton } from "@/components/CTAButton";
 import { KlaviyoEmbed } from "@/components/KlaviyoEmbed";
 import { TrackedOutbound } from "@/components/TrackedOutbound";
@@ -6,8 +7,6 @@ import { CONTACT_EMAIL, QUOTE_FORM_HREF } from "@/lib/site";
 import { buildMarketPageMetadata, getRequestMarket } from "@/lib/requestMarket";
 
 const path = "/contact/";
-const consultationUrl = "https://calendly.com/zeropackco/30min";
-
 export async function generateMetadata(): Promise<Metadata> {
   const market = await getRequestMarket();
   const description =
@@ -88,7 +87,7 @@ export default async function Page() {
                 with us first.
               </p>
               <div className="mt-7">
-                <CTAButton href={consultationUrl} variant="secondary" external>
+                <CTAButton href="#consultation" variant="secondary">
                   Book a Consultation
                 </CTAButton>
               </div>
@@ -113,7 +112,25 @@ export default async function Page() {
         </div>
       </section>
 
-      <section id="general-enquiry" className="scroll-mt-24 bg-white py-16 sm:py-24">
+      <section id="consultation" className="scroll-mt-24 bg-white py-16 sm:py-24">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-air">Packaging consultation</p>
+            <h2 className="mt-4 font-heading text-3xl font-semibold leading-tight text-charcoal sm:text-4xl">
+              Book a time that suits you
+            </h2>
+            <p className="mt-5 text-lg leading-relaxed text-charcoal/70">
+              Choose a 30-minute time below and we can talk through your product, current packaging or early idea.
+            </p>
+          </div>
+
+          <div className="mt-10 overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-[0_18px_55px_rgba(17,24,39,0.08)]">
+            <CalendlyEmbed height={780} />
+          </div>
+        </div>
+      </section>
+
+      <section id="general-enquiry" className="scroll-mt-24 bg-stone py-16 sm:py-24">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-16 lg:px-8">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-air">General enquiries</p>
@@ -134,12 +151,6 @@ export default async function Page() {
               >
                 {CONTACT_EMAIL}
               </TrackedOutbound>
-            </div>
-
-            <div className="mt-8">
-              <CTAButton href={QUOTE_FORM_HREF} variant="secondary">
-                Go to the Quote Form
-              </CTAButton>
             </div>
           </div>
 

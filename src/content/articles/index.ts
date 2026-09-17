@@ -3,9 +3,16 @@ import { articlesPartA } from "./partA";
 import { articlesPartB } from "./partB";
 import { spokeGuides } from "./spokeGuides";
 import { generatedArticles } from "./generated";
+import { compostableVsBiodegradable } from "./evergreen/compostableVsBiodegradable";
 import { buildMarketUrl } from "@/lib/marketRouting";
 
-const historical: Article[] = [...articlesPartA, ...articlesPartB, ...spokeGuides];
+const remediatedSlugs = new Set([compostableVsBiodegradable.slug]);
+const supportingArticles: Article[] = [
+  compostableVsBiodegradable,
+  ...articlesPartA.filter((article) => !remediatedSlugs.has(article.slug)),
+  ...articlesPartB,
+];
+const historical: Article[] = [...supportingArticles, ...spokeGuides];
 const all: Article[] = [...historical, ...generatedArticles];
 
 export function getArticleMarket(article: Article): ArticleMarket {
@@ -42,7 +49,7 @@ export function getSpokeGuides(): Article[] {
 }
 
 export function getSupportingArticles(): Article[] {
-  return [...articlesPartA, ...articlesPartB];
+  return supportingArticles;
 }
 
 export function getArticleSlugs(): string[] {

@@ -1,80 +1,153 @@
 import type { Metadata } from "next";
-import { TrackedOutbound } from "@/components/TrackedOutbound";
 import { CTAButton } from "@/components/CTAButton";
-import { CalendlyEmbed } from "@/components/CalendlyEmbed";
 import { KlaviyoEmbed } from "@/components/KlaviyoEmbed";
+import { TrackedOutbound } from "@/components/TrackedOutbound";
 import { CONTACT_EMAIL, QUOTE_FORM_HREF } from "@/lib/site";
 import { buildMarketPageMetadata, getRequestMarket } from "@/lib/requestMarket";
 
 const path = "/contact/";
+const consultationUrl = "https://calendly.com/zeropackco/30min";
 
 export async function generateMetadata(): Promise<Metadata> {
   const market = await getRequestMarket();
   const description =
     market === "uk"
-      ? "Contact Zero Pack for custom compostable mailers and packaging for UK ecommerce brands, with Australia-based project support and made-to-order production."
+      ? "Contact Zero Pack for a custom compostable packaging quote, a packaging consultation or a general UK enquiry."
       : market === "au"
-        ? "Contact Zero Pack for custom compostable mailers and packaging for Australian ecommerce brands."
-        : "Contact Zero Pack for custom compostable mailers and packaging — global B2B support for ecommerce brands.";
+        ? "Contact Zero Pack for a custom compostable packaging quote, a packaging consultation or a general Australian enquiry."
+        : "Contact Zero Pack for a custom compostable packaging quote, a packaging consultation or a general enquiry.";
 
-  return buildMarketPageMetadata({ market, title: "Contact Zero Pack", description, path });
+  return buildMarketPageMetadata({
+    market,
+    title: "Contact Zero Pack | Quotes, Consultations & Enquiries",
+    description,
+    path,
+  });
 }
 
 export default async function Page() {
   const market = await getRequestMarket();
   const marketNote =
     market === "uk"
-      ? "We support UK customers directly from Australia. Share your planned volumes, required delivery timing and packaging goals so we can confirm the production and freight assumptions for your quote."
+      ? "UK enquiries are handled directly by the Zero Pack team in Australia. Tell us where your packaging needs to go and we will make sure the right delivery details are considered."
       : market === "au"
-        ? "Australian customers work directly with the Zero Pack team. Share your volumes, timing and packaging goals and we will confirm the right next step for your specification."
-        : "We work with ecommerce brands globally. Share your market, volumes and packaging goals — we will confirm what is possible for your specification and freight route.";
+        ? "Australian enquiries are handled directly by the Zero Pack team."
+        : "We work with businesses around the world. Tell us where you are based so we can guide the right next step.";
 
   return (
-    <section className="bg-white py-14 sm:py-24">
-      <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <h1 className="font-heading text-3xl font-semibold text-charcoal sm:text-4xl">Contact</h1>
-        <p className="mt-4 text-charcoal/75">
-          For the fastest response on pricing and specifications, use the{" "}
-          <a className="font-semibold text-air hover:underline" href={QUOTE_FORM_HREF}>
-            quote form
-          </a>
-          . Use this page for direct questions or partnerships.
-        </p>
-
-        <KlaviyoEmbed formId="RkPePW" className="mt-10" />
-
-        <div id="calendly" className="mt-12">
-          <h2 className="font-heading text-xl font-semibold text-charcoal">Book a call</h2>
-          <p className="mt-2 text-sm text-charcoal/75">
-            Pick a time that suits you and we will talk through your packaging requirements.
-          </p>
-          <CalendlyEmbed className="mt-6" />
+    <>
+      <section className="bg-white py-16 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-air">Contact Zero Pack</p>
+            <h1 className="mt-4 font-heading text-4xl font-semibold leading-tight text-charcoal sm:text-5xl">
+              Tell us what you need help with
+            </h1>
+            <p className="mt-6 max-w-3xl text-lg leading-relaxed text-charcoal/70 sm:text-xl">
+              Ready for pricing, want to talk through a packaging idea or have a general question? Choose the option
+              that best matches what you need and we will take it from there.
+            </p>
+            <p className="mt-5 max-w-3xl text-sm leading-relaxed text-charcoal/60">{marketNote}</p>
+          </div>
         </div>
+      </section>
 
-        <div className="mt-8 rounded-2xl border border-black/5 bg-stone p-6">
-          <h2 className="font-heading text-lg font-semibold text-compost">Get in touch</h2>
-          <p className="mt-2 text-sm text-charcoal/75">
-            Email:{" "}
-            <TrackedOutbound
-              className="font-semibold text-air hover:underline"
-              href={`mailto:${CONTACT_EMAIL}`}
-              event="outbound_email_click"
-            >
-              {CONTACT_EMAIL}
-            </TrackedOutbound>
-          </p>
-          <p className="mt-3 text-sm text-charcoal/70">{marketNote}</p>
-        </div>
+      <section className="bg-stone py-16 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-air">Choose the right next step</p>
+            <h2 className="mt-4 font-heading text-3xl font-semibold leading-tight text-charcoal sm:text-4xl">
+              What would you like to do?
+            </h2>
+          </div>
 
-        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-          <CTAButton href={QUOTE_FORM_HREF} variant="primary">
-            Get a Custom Quote
-          </CTAButton>
-          <CTAButton href="/packaging-guide/download/" variant="secondary">
-            Download the Guide
-          </CTAButton>
+          <div className="mt-10 grid gap-5 lg:grid-cols-3">
+            <article className="flex h-full flex-col rounded-3xl border border-slate-200/80 bg-white p-7 shadow-[0_14px_40px_rgba(17,24,39,0.05)] sm:p-8">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-air/10 text-sm font-bold text-air">
+                01
+              </span>
+              <h3 className="mt-6 font-heading text-2xl font-semibold text-charcoal">Get a custom quote</h3>
+              <p className="mt-4 flex-1 leading-relaxed text-charcoal/70">
+                The quickest route for pricing. Share what you are packing, roughly how many you need and any size,
+                artwork or delivery details you already know.
+              </p>
+              <div className="mt-7">
+                <CTAButton href={QUOTE_FORM_HREF} variant="primary">
+                  Get a Custom Quote
+                </CTAButton>
+              </div>
+            </article>
+
+            <article className="flex h-full flex-col rounded-3xl border border-slate-200/80 bg-white p-7 shadow-[0_14px_40px_rgba(17,24,39,0.05)] sm:p-8">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-air/10 text-sm font-bold text-air">
+                02
+              </span>
+              <h3 className="mt-6 font-heading text-2xl font-semibold text-charcoal">Book a packaging consultation</h3>
+              <p className="mt-4 flex-1 leading-relaxed text-charcoal/70">
+                Book a 30-minute call if you would rather talk through your product, existing packaging or early idea
+                with us first.
+              </p>
+              <div className="mt-7">
+                <CTAButton href={consultationUrl} variant="secondary" external>
+                  Book a Consultation
+                </CTAButton>
+              </div>
+            </article>
+
+            <article className="flex h-full flex-col rounded-3xl border border-slate-200/80 bg-white p-7 shadow-[0_14px_40px_rgba(17,24,39,0.05)] sm:p-8">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-air/10 text-sm font-bold text-air">
+                03
+              </span>
+              <h3 className="mt-6 font-heading text-2xl font-semibold text-charcoal">Send a general enquiry</h3>
+              <p className="mt-4 flex-1 leading-relaxed text-charcoal/70">
+                Use the general enquiry form for partnerships, media, supplier enquiries or questions that are not
+                part of a packaging quote.
+              </p>
+              <div className="mt-7">
+                <CTAButton href="#general-enquiry" variant="secondary">
+                  Send a Message
+                </CTAButton>
+              </div>
+            </article>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <section id="general-enquiry" className="scroll-mt-24 bg-white py-16 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-16 lg:px-8">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-air">General enquiries</p>
+            <h2 className="mt-4 font-heading text-3xl font-semibold leading-tight text-charcoal sm:text-4xl">
+              Send us a message
+            </h2>
+            <p className="mt-5 text-lg leading-relaxed text-charcoal/70">
+              Complete the form and your message will go directly to the Zero Pack team. If your enquiry is about
+              pricing, please use the custom quote form so we receive the details needed to respond properly.
+            </p>
+
+            <div className="mt-8 rounded-2xl border border-slate-200/80 bg-stone p-6">
+              <p className="text-sm font-semibold text-charcoal">Prefer email?</p>
+              <TrackedOutbound
+                className="mt-2 inline-flex font-semibold text-air hover:underline"
+                href={`mailto:${CONTACT_EMAIL}`}
+                event="outbound_email_click"
+              >
+                {CONTACT_EMAIL}
+              </TrackedOutbound>
+            </div>
+
+            <div className="mt-8">
+              <CTAButton href={QUOTE_FORM_HREF} variant="secondary">
+                Go to the Quote Form
+              </CTAButton>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_18px_55px_rgba(17,24,39,0.08)] sm:p-8">
+            <KlaviyoEmbed formId="RkPePW" className="min-h-[360px]" />
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

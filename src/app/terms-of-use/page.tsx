@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LegalMarketNotice } from "@/components/LegalMarketNotice";
 import { buildMarketPageMetadata, getRequestMarket } from "@/lib/requestMarket";
 
-const updated = "8 September 2026";
+const updated = "17 September 2026";
 
 export async function generateMetadata(): Promise<Metadata> {
   const market = await getRequestMarket();
@@ -34,7 +34,7 @@ export default function Page() {
 
           <section>
             <h2 className="font-heading text-xl font-semibold text-charcoal">Website information</h2>
-            <p className="mt-3">We aim to keep website information useful and accurate, but product availability, specifications, minimum order quantities, lead times, pricing, freight, certification scope and other commercial details can change. Website information is general and should not be treated as a binding quotation, specification, legal statement or promise that a particular packaging format will be suitable for every application.</p>
+            <p className="mt-3">We aim to keep website information useful and accurate, but product availability, specifications, minimum order quantities, lead times, pricing, freight, certification scope and other commercial details can change. Website information is general and should not be treated as a binding quotation, specification, legal statement or promise that a particular packaging product will suit every project.</p>
             <p className="mt-3">Product suitability, artwork, dimensions, materials, printing, certification coverage, production timing and delivery requirements should be confirmed for the specific project before an order is placed.</p>
           </section>
 
@@ -45,8 +45,8 @@ export default function Page() {
 
           <section>
             <h2 className="font-heading text-xl font-semibold text-charcoal">Environmental and certification information</h2>
-            <p className="mt-3">Compostability, certification, material and environmental information on this website is intended to describe the relevant product or specification as accurately as possible. Certification does not mean that every product has the same certification scope or that an end-of-life pathway is available in every location.</p>
-            <p className="mt-3">Where a certification, standard or environmental claim is material to your purchasing or compliance decision, request the current product-specific documentation and confirm the exact scope before relying on the claim.</p>
+            <p className="mt-3">All Zero Pack compostable packaging is certified compostable. The applicable certification and its scope depend on the packaging type, material and confirmed specification. Certification does not mean every product carries the same standard or that the same end-of-life pathway is available in every location.</p>
+            <p className="mt-3">Where a certification, standard or environmental claim is material to your purchasing or compliance decision, request the current product-specific documentation and confirm the exact scope before relying on the claim. Certification evidence is available on request once the relevant product and material specification are confirmed.</p>
           </section>
 
           <section>

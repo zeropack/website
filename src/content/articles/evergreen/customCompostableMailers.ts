@@ -3,7 +3,7 @@ import type { Article } from "../types";
 export const customCompostableMailers: Article = {
   slug: "custom-compostable-mailers-guide",
   title: "Custom Compostable Mailers: An Ecommerce Guide",
-  category: "Packaging guide",
+  category: "Packaging guides",
   description:
     "Learn how custom compostable mailers work, what to specify, how certification affects claims and what to prepare before requesting a quote.",
   publishedAt: "2026-03-05",
@@ -34,7 +34,7 @@ export const customCompostableMailers: Article = {
   keyTakeaways: [
     "Custom compostable mailers combine made-to-order sizing and branding with certified compostable material options.",
     "They suit many soft, non-fragile ecommerce products but are not a replacement for rigid protection where a product needs it.",
-    "Custom compostable mailer production starts from 2,000 units*, with the final MOQ depending on size, print, material and specification.",
+    "Custom compostable mailers are available from 2,000 units*, with the final MOQ depending on size, print, material and specification.",
     "Standard custom compostable mailers can be strong, durable and waterproof, with single- or double-adhesive options available.",
     "Certification and disposal wording must match the exact mailer material being supplied; home and industrial compostability are not interchangeable.",
   ],
@@ -123,14 +123,12 @@ export const customCompostableMailers: Article = {
     {
       id: "moq",
       heading: "What is the MOQ for custom compostable mailers?",
-      answerBox:
-        "Custom compostable mailer production starts from 2,000 units*. The final MOQ depends on size, print, material and specification.",
       paragraphs: [
+        "Custom compostable mailers are available from 2,000 units*. *Final MOQ depends on size, print, material and specification.",
         "Custom production has setup work that stock packaging does not: the size and construction are confirmed, artwork is prepared, print is set up and material is allocated for the run. A minimum order quantity makes that process commercially workable.",
         "The right order quantity is not automatically the lowest available quantity. Estimate how many mailers you use, how much storage is available, whether the artwork is likely to change and how seasonal peaks affect demand. That gives a more useful ordering decision than choosing a quantity without a realistic usage plan.",
         "MOQ should be confirmed with the complete specification. A change in dimensions, print or material can change the production requirement, so the 2,000-unit starting point should not be treated as a universal promise for every mailer design or other type of packaging.",
       ],
-      note: "*Final MOQ depends on size, print, material and specification.",
     },
     {
       id: "certification",
@@ -198,7 +196,7 @@ export const customCompostableMailers: Article = {
       id: "sources",
       heading: "Sources and further reading",
       paragraphs: [
-        "[Australasian Bioplastics Association — Certification](https://bioplastics.org.au/)",
+        "[Australasian Bioplastics Association — Certification](https://bioplastics.org.au/certification/)",
         "[TÜV AUSTRIA — OK compost HOME](https://okcert.tuvaustria.com/ok-compost-home-en/)",
         "[TÜV AUSTRIA — OK compost INDUSTRIAL](https://okcert.tuvaustria.com/ok-compost-industrial-en/)",
         "[European Commission — Biobased, biodegradable and compostable plastics](https://environment.ec.europa.eu/topics/plastics/biobased-biodegradable-and-compostable-plastics_en)",
@@ -216,7 +214,7 @@ export const customCompostableMailers: Article = {
     {
       question: "What is the minimum order for custom compostable mailers?",
       answer:
-        "Custom compostable mailer production starts from 2,000 units. The final MOQ depends on size, print, material and specification, so it is confirmed for the complete project rather than treated as a universal minimum for every design.",
+        "Custom compostable mailers are available from 2,000 units. The final MOQ depends on size, print, material and specification, so it is confirmed for the complete project rather than treated as a universal minimum for every design.",
     },
     {
       question: "Are custom compostable mailers waterproof and durable?",

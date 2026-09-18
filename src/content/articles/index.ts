@@ -11,6 +11,19 @@ import { bestPackagingOptionsForFashionBrands } from "./evergreen/bestPackagingO
 import { howCustomCompostableMailersWork } from "./evergreen/howCustomCompostableMailersWork";
 import { whatMoqMeansInCustomPackaging } from "./evergreen/whatMoqMeansInCustomPackaging";
 import { whatToAskBeforeOrderingCustomPackaging } from "./evergreen/whatToAskBeforeOrderingCustomPackaging";
+import {
+  artworkForCustomMailers,
+  brandedMailersForEcommerce,
+  brandedPackagingCustomerExperience,
+  compostablePackagingGuide,
+  compostableVsRecycledPlasticMailers,
+  customCompostablePackagingGuide,
+  ecommerceMailersGuide,
+  ecoFriendlyMailersGuide,
+  ecoFriendlyPackagingGuide,
+  reducePlasticPackagingInEcommerce,
+  whyPackagingMattersForEcommerceBrands,
+} from "./evergreen/remainingEvergreen";
 import { buildMarketUrl } from "@/lib/marketRouting";
 
 const remediatedSlugs = new Set([
@@ -22,6 +35,17 @@ const remediatedSlugs = new Set([
   howCustomCompostableMailersWork.slug,
   whatMoqMeansInCustomPackaging.slug,
   whatToAskBeforeOrderingCustomPackaging.slug,
+  ecommerceMailersGuide.slug,
+  brandedMailersForEcommerce.slug,
+  artworkForCustomMailers.slug,
+  compostableVsRecycledPlasticMailers.slug,
+  ecoFriendlyMailersGuide.slug,
+  ecoFriendlyPackagingGuide.slug,
+  reducePlasticPackagingInEcommerce.slug,
+  compostablePackagingGuide.slug,
+  customCompostablePackagingGuide.slug,
+  whyPackagingMattersForEcommerceBrands.slug,
+  brandedPackagingCustomerExperience.slug,
 ]);
 const supportingArticles: Article[] = [
   compostableVsBiodegradable,
@@ -32,6 +56,17 @@ const supportingArticles: Article[] = [
   howCustomCompostableMailersWork,
   whatMoqMeansInCustomPackaging,
   whatToAskBeforeOrderingCustomPackaging,
+  ecommerceMailersGuide,
+  brandedMailersForEcommerce,
+  artworkForCustomMailers,
+  compostableVsRecycledPlasticMailers,
+  ecoFriendlyMailersGuide,
+  ecoFriendlyPackagingGuide,
+  reducePlasticPackagingInEcommerce,
+  compostablePackagingGuide,
+  customCompostablePackagingGuide,
+  whyPackagingMattersForEcommerceBrands,
+  brandedPackagingCustomerExperience,
   ...articlesPartA.filter((article) => !remediatedSlugs.has(article.slug)),
   ...articlesPartB.filter((article) => !remediatedSlugs.has(article.slug)),
 ];

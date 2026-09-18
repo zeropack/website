@@ -218,7 +218,7 @@ export function ArticleTemplate({ article }: { article: Article }) {
                                 key={ci}
                                 className={`border-b border-black/5 px-4 py-3 text-charcoal/80 last:border-b-0 ${ci === 0 ? "font-semibold text-charcoal" : ""}`}
                               >
-                                {cell}
+                                {renderParagraph(cell)}
                               </td>
                             ))}
                           </tr>

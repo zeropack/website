@@ -8,6 +8,9 @@ import { homeVsIndustrialCompostable } from "./evergreen/homeVsIndustrialCompost
 import { customCompostableMailers } from "./evergreen/customCompostableMailers";
 import { compostableMailersGuide } from "./evergreen/compostableMailersGuide";
 import { bestPackagingOptionsForFashionBrands } from "./evergreen/bestPackagingOptionsForFashionBrands";
+import { howCustomCompostableMailersWork } from "./evergreen/howCustomCompostableMailersWork";
+import { whatMoqMeansInCustomPackaging } from "./evergreen/whatMoqMeansInCustomPackaging";
+import { whatToAskBeforeOrderingCustomPackaging } from "./evergreen/whatToAskBeforeOrderingCustomPackaging";
 import { buildMarketUrl } from "@/lib/marketRouting";
 
 const remediatedSlugs = new Set([
@@ -16,6 +19,9 @@ const remediatedSlugs = new Set([
   customCompostableMailers.slug,
   compostableMailersGuide.slug,
   bestPackagingOptionsForFashionBrands.slug,
+  howCustomCompostableMailersWork.slug,
+  whatMoqMeansInCustomPackaging.slug,
+  whatToAskBeforeOrderingCustomPackaging.slug,
 ]);
 const supportingArticles: Article[] = [
   compostableVsBiodegradable,
@@ -23,6 +29,9 @@ const supportingArticles: Article[] = [
   customCompostableMailers,
   compostableMailersGuide,
   bestPackagingOptionsForFashionBrands,
+  howCustomCompostableMailersWork,
+  whatMoqMeansInCustomPackaging,
+  whatToAskBeforeOrderingCustomPackaging,
   ...articlesPartA.filter((article) => !remediatedSlugs.has(article.slug)),
   ...articlesPartB.filter((article) => !remediatedSlugs.has(article.slug)),
 ];

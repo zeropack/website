@@ -3,11 +3,11 @@ import type { Article } from "../types";
 export const compostableVsBiodegradable: Article = {
   slug: "compostable-vs-biodegradable-packaging",
   title: "Compostable vs Biodegradable Packaging: What the Difference Actually Means",
-  category: "Compostable packaging education",
+  category: "Compostable packaging",
   description:
     "Understand compostable vs biodegradable packaging, what certification proves, how disposal differs and how to make clearer packaging claims.",
   publishedAt: "2026-01-10",
-  dateModified: "2026-09-17",
+  dateModified: "2026-09-18",
   market: "GLOBAL",
   jurisdiction: ["Global"],
   topics: [
@@ -51,7 +51,11 @@ export const compostableVsBiodegradable: Article = {
         href: "/packaging-guide/download/",
         variant: "secondary",
       },
-      { label: "Request a quote", href: "/contact/", variant: "ghost" },
+      {
+        label: "Request a quote",
+        href: "/custom-compostable-packaging/#quoteform",
+        variant: "ghost",
+      },
     ],
   },
   sections: [
@@ -91,7 +95,7 @@ export const compostableVsBiodegradable: Article = {
           [
             "Oxo-degradable",
             "Additives accelerate the fragmentation of conventional plastic when exposed to factors such as heat, light or oxygen.",
-            "It is not another name for compostable packaging. Products made from oxo-degradable plastic are prohibited from being placed on the EU market under the Single-Use Plastics Directive.",
+            "It is not another name for compostable packaging. Products made from oxo-degradable plastic are prohibited from being placed on the EU market under the [Single-Use Plastics Directive](https://eur-lex.europa.eu/eli/dir/2019/904/2026-08-12/eng).",
           ],
           [
             "Recyclable",
@@ -115,7 +119,7 @@ export const compostableVsBiodegradable: Article = {
       heading: "Why biodegradable needs more context",
       paragraphs: [
         "A biodegradable claim can be accurate, but the word alone leaves the most useful questions unanswered. Customers still need to know the environment in which breakdown is expected, the timescale, the evidence behind the claim and what they should do with the packaging after use.",
-        "Broad language can also create a stronger impression than the evidence supports. Australian and UK regulators tell businesses to make environmental claims clear, accurate and supported by evidence, and to explain important conditions or qualifications. The safest approach is not to make the claim sound bigger; it is to make it more precise.",
+        "Broad language can also create a stronger impression than the evidence supports. [Australian](https://www.accc.gov.au/business/advertising-and-promotions/environmental-and-sustainability-claims) and [UK](https://greenclaims.campaign.gov.uk/) regulators tell businesses to make environmental claims clear, accurate and supported by evidence, and to explain important conditions or qualifications. The safest approach is not to make the claim sound bigger; it is to make it more precise.",
         "If packaging is certified compostable, the specific compostable claim and its conditions will usually communicate more than the broader word biodegradable. If it is not certified compostable, do not let biodegradable imply that customers can place it in a compost bin.",
       ],
     },

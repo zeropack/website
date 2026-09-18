@@ -5,19 +5,25 @@ import { spokeGuides } from "./spokeGuides";
 import { generatedArticles } from "./generated";
 import { compostableVsBiodegradable } from "./evergreen/compostableVsBiodegradable";
 import { homeVsIndustrialCompostable } from "./evergreen/homeVsIndustrialCompostable";
+import { customCompostableMailers } from "./evergreen/customCompostableMailers";
 import { buildMarketUrl } from "@/lib/marketRouting";
 
 const remediatedSlugs = new Set([
   compostableVsBiodegradable.slug,
   homeVsIndustrialCompostable.slug,
+  customCompostableMailers.slug,
 ]);
 const supportingArticles: Article[] = [
   compostableVsBiodegradable,
   homeVsIndustrialCompostable,
+  customCompostableMailers,
   ...articlesPartA.filter((article) => !remediatedSlugs.has(article.slug)),
   ...articlesPartB.filter((article) => !remediatedSlugs.has(article.slug)),
 ];
-const historical: Article[] = [...supportingArticles, ...spokeGuides];
+const historical: Article[] = [
+  ...supportingArticles,
+  ...spokeGuides.filter((article) => !remediatedSlugs.has(article.slug)),
+];
 const all: Article[] = [...historical, ...generatedArticles];
 
 export function getArticleMarket(article: Article): ArticleMarket {

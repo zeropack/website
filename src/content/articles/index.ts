@@ -6,17 +6,20 @@ import { generatedArticles } from "./generated";
 import { compostableVsBiodegradable } from "./evergreen/compostableVsBiodegradable";
 import { homeVsIndustrialCompostable } from "./evergreen/homeVsIndustrialCompostable";
 import { customCompostableMailers } from "./evergreen/customCompostableMailers";
+import { compostableMailersGuide } from "./evergreen/compostableMailersGuide";
 import { buildMarketUrl } from "@/lib/marketRouting";
 
 const remediatedSlugs = new Set([
   compostableVsBiodegradable.slug,
   homeVsIndustrialCompostable.slug,
   customCompostableMailers.slug,
+  compostableMailersGuide.slug,
 ]);
 const supportingArticles: Article[] = [
   compostableVsBiodegradable,
   homeVsIndustrialCompostable,
   customCompostableMailers,
+  compostableMailersGuide,
   ...articlesPartA.filter((article) => !remediatedSlugs.has(article.slug)),
   ...articlesPartB.filter((article) => !remediatedSlugs.has(article.slug)),
 ];

@@ -55,6 +55,11 @@ export type Article = {
   answerBox?: string;
   howToSteps?: HowToStep[];
   isSpokeGuide?: boolean;
+  cta?: {
+    title: string;
+    text: string;
+    links: { label: string; href: string; variant: "primary" | "secondary" | "ghost" }[];
+  };
   sections: ArticleSection[];
   faqs: { question: string; answer: string }[];
 };

@@ -39,6 +39,15 @@ export function ArticleTemplate({ article }: { article: Article }) {
     .filter(Boolean) as Article[];
   const articleUrl = getArticleCanonicalUrl(article);
   const articlesHub = "/articles/";
+  const cta = article.cta ?? {
+    title: "Next step",
+    text: "If you want pricing for custom compostable mailers, request a quote. If you are still researching, start with the full Packaging Guide.",
+    links: [
+      { label: "Request a quote", href: quoteHref, variant: "primary" as const },
+      { label: "Download the Guide", href: "/packaging-guide/download/", variant: "secondary" as const },
+      { label: "Custom compostable mailers", href: mailersHref, variant: "ghost" as const },
+    ],
+  };
 
   const howToJsonLd = article.howToSteps && article.howToSteps.length > 0
     ? {
@@ -209,7 +218,7 @@ export function ArticleTemplate({ article }: { article: Article }) {
                                 key={ci}
                                 className={`border-b border-black/5 px-4 py-3 text-charcoal/80 last:border-b-0 ${ci === 0 ? "font-semibold text-charcoal" : ""}`}
                               >
-                                {cell}
+                                {renderParagraph(cell)}
                               </td>
                             ))}
                           </tr>
@@ -227,21 +236,14 @@ export function ArticleTemplate({ article }: { article: Article }) {
         </div>
 
         <div className="mt-12 rounded-2xl border border-black/5 bg-mist p-6">
-          <p className="font-heading text-lg font-semibold text-charcoal">Next step</p>
-          <p className="mt-2 text-sm text-charcoal/70">
-            If you want pricing for custom compostable mailers, request a quote. If you are still researching, start
-            with the full Packaging Guide.
-          </p>
+          <p className="font-heading text-lg font-semibold text-charcoal">{cta.title}</p>
+          <p className="mt-2 text-sm text-charcoal/70">{cta.text}</p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <CTAButton href={quoteHref} variant="primary">
-              Request a quote
-            </CTAButton>
-            <CTAButton href="/packaging-guide/download/" variant="secondary">
-              Download the Guide
-            </CTAButton>
-            <CTAButton href={mailersHref} variant="ghost">
-              Custom compostable mailers
-            </CTAButton>
+            {cta.links.map((link) => (
+              <CTAButton key={`${link.href}-${link.label}`} href={link.href} variant={link.variant}>
+                {link.label}
+              </CTAButton>
+            ))}
           </div>
         </div>
 

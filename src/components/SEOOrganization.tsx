@@ -33,7 +33,7 @@ export function SEOOrganization() {
     email: CONTACT_EMAIL,
     foundingDate: "2018",
     description:
-      "Zero Pack supplies made-to-order custom compostable packaging for ecommerce brands, with a primary focus on custom compostable mailers.",
+      "Zero Pack is a specialist B2B supplier of made-to-order custom compostable packaging, helping businesses develop certified compostable alternatives to conventional plastic packaging.",
     areaServed: "Worldwide",
     sameAs: [
       "https://www.zeropack.co",

@@ -4,13 +4,18 @@ import { articlesPartB } from "./partB";
 import { spokeGuides } from "./spokeGuides";
 import { generatedArticles } from "./generated";
 import { compostableVsBiodegradable } from "./evergreen/compostableVsBiodegradable";
+import { homeVsIndustrialCompostable } from "./evergreen/homeVsIndustrialCompostable";
 import { buildMarketUrl } from "@/lib/marketRouting";
 
-const remediatedSlugs = new Set([compostableVsBiodegradable.slug]);
+const remediatedSlugs = new Set([
+  compostableVsBiodegradable.slug,
+  homeVsIndustrialCompostable.slug,
+]);
 const supportingArticles: Article[] = [
   compostableVsBiodegradable,
+  homeVsIndustrialCompostable,
   ...articlesPartA.filter((article) => !remediatedSlugs.has(article.slug)),
-  ...articlesPartB,
+  ...articlesPartB.filter((article) => !remediatedSlugs.has(article.slug)),
 ];
 const historical: Article[] = [...supportingArticles, ...spokeGuides];
 const all: Article[] = [...historical, ...generatedArticles];

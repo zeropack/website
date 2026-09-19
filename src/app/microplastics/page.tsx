@@ -65,7 +65,8 @@ const sources = [
 
 export default async function Page() {
   const requestMarket = await getRequestMarket();
-  if (requestMarket !== "au") permanentRedirect(canonicalUrl);
+  const isVercelPreview = process.env.VERCEL_ENV === "preview";
+  if (requestMarket !== "au" && !isVercelPreview) permanentRedirect(canonicalUrl);
 
   const structuredData = [
     {

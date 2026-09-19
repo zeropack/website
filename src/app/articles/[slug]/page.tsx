@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!article || !canonicalMarket) return {};
 
   return buildMetadata({
-    title: article.title,
+    title: article.metaTitle ?? article.title,
     description: article.description,
     path: `/articles/${article.slug}/`,
     canonicalUrl: getArticleCanonicalUrl(article),

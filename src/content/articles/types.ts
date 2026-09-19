@@ -38,6 +38,7 @@ export type ArticleMarket = "GLOBAL" | "AU" | "UK";
 export type Article = {
   slug: string;
   title: string;
+  metaTitle?: string;
   category: string;
   description: string;
   publishedAt: string;
@@ -47,6 +48,8 @@ export type Article = {
   topics?: string[];
   heroImage?: string;
   heroAlt?: string;
+  projectAttribution?: string;
+  hideGuidePromo?: boolean;
   primaryKeyword?: string;
   secondaryKeywords?: string[];
   relatedSlugs?: string[];

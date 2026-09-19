@@ -94,6 +94,9 @@ export function ArticleTemplate({ article }: { article: Article }) {
         <h1 className="mt-2 font-heading text-3xl font-semibold leading-tight text-charcoal sm:text-4xl">
           {article.title}
         </h1>
+        {article.projectAttribution ? (
+          <p className="mt-3 text-sm font-medium text-charcoal/70">{article.projectAttribution}</p>
+        ) : null}
         <p className="mt-4 text-sm text-charcoal/60">
           Published {article.publishedAt}
           {article.dateModified && article.dateModified !== article.publishedAt
@@ -122,7 +125,7 @@ export function ArticleTemplate({ article }: { article: Article }) {
           </div>
         ) : null}
 
-        {!article.isSpokeGuide ? (
+        {!article.isSpokeGuide && !article.hideGuidePromo ? (
           <p className="mt-4 rounded-xl border border-slate-200/60 bg-white px-4 py-3 text-sm text-charcoal/75">
             For practical help choosing and planning custom compostable packaging, read the{" "}
             <Link className="font-semibold text-air hover:underline" href={PILLAR_PATH}>
@@ -276,10 +279,14 @@ export function ArticleTemplate({ article }: { article: Article }) {
           <Link className="font-medium text-air hover:underline" href={articlesHub}>
             Articles hub
           </Link>
-          {" · "}
-          <Link className="font-medium text-air hover:underline" href={PILLAR_PATH}>
-            Packaging Guide
-          </Link>
+          {!article.hideGuidePromo ? (
+            <>
+              {" · "}
+              <Link className="font-medium text-air hover:underline" href={PILLAR_PATH}>
+                Packaging Guide
+              </Link>
+            </>
+          ) : null}
         </p>
       </div>
     </article>

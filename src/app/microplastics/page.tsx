@@ -92,16 +92,6 @@ export default async function Page() {
   return (
     <main className="bg-white">
       <JsonLd data={structuredData} />
-      <div className="border-b border-slate-200 bg-white">
-        <nav aria-label="Breadcrumb" className="mx-auto max-w-6xl px-4 py-4 text-sm text-charcoal/60 sm:px-6 lg:px-8">
-          <ol className="flex items-center gap-2">
-            <li><Link href="/" className="hover:text-air">Australia</Link></li>
-            <li aria-hidden>/</li>
-            <li aria-current="page" className="text-charcoal">Microplastics</li>
-          </ol>
-        </nav>
-      </div>
-
       <section className="relative overflow-hidden bg-charcoal py-16 text-white sm:py-24">
         <div className="absolute inset-y-0 right-0 w-1/3 bg-[radial-gradient(circle_at_center,rgba(0,168,243,0.18),transparent_68%)]" aria-hidden />
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">

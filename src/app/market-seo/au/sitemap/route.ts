@@ -18,6 +18,7 @@ export function GET() {
     "/quote",
     "/packaging-guide",
     "/contact",
+    "/microplastics",
     "/articles",
     ...getMarketArticleSlugs("AU").map((slug) => `/articles/${slug}`),
   ];

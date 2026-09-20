@@ -393,8 +393,12 @@ export function MicroplasticsTools() {
                       <p className="mt-1 text-charcoal/75">{finderResult.federal.memberFor}</p>
                       <p className="text-sm text-charcoal/60">{finderResult.federal.role}</p>
                       <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                        <a href={finderResult.federal.officialProfileUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-air px-5 py-2.5 font-semibold text-white hover:bg-[#008fd0]">Open official contact page ↗</a>
+                        <a href={finderResult.federal.officialProfileUrl} target="_blank" rel="noreferrer" aria-describedby="mp-contact-help" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-air px-5 py-2.5 font-semibold text-white hover:bg-[#008fd0]">Open MP contact options ↗</a>
                         <a href={finderResult.federal.aecProfileUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-2.5 font-semibold text-charcoal hover:border-air">View AEC electorate profile ↗</a>
+                      </div>
+                      <div id="mp-contact-help" className="mt-5 rounded-xl border border-air/20 bg-[#eef7f9] p-4 text-sm leading-relaxed text-charcoal/70">
+                        <p className="font-semibold text-charcoal">What happens next?</p>
+                        <p className="mt-1">This opens your MP’s official Parliament page. Look for the <strong>Connect</strong> section and choose the available contact option. If there is a contact form, paste in the message you created here.</p>
                       </div>
                       <p className="mt-4 text-xs leading-relaxed text-charcoal/55">Checked {finderResult.checkedAt}. Sources: {finderResult.sources.map((source, index) => <span key={source.href}>{index ? ", " : ""}<a href={source.href} target="_blank" rel="noreferrer" className="underline hover:text-air">{source.label}</a></span>)}.</p>
                     </div>
@@ -468,6 +472,42 @@ export function MicroplasticsTools() {
         </div>
       </section>
 
+      <section aria-labelledby="contact-your-mp-heading" className="bg-stone py-16 sm:py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <h2 id="contact-your-mp-heading" className="font-heading text-3xl font-semibold leading-tight text-charcoal sm:text-4xl">How to contact your MP</h2>
+          </div>
+
+          <ol className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <li className="rounded-2xl border border-slate-200 bg-white p-5">
+              <p className="text-sm font-bold text-air">1. Find your representative</p>
+              <p className="mt-2 text-sm leading-relaxed text-charcoal/70">Use the <a href="#representative-finder" className="font-semibold text-air hover:underline">Find your representatives</a> tool above to identify the federal MP for your area.</p>
+            </li>
+            <li className="rounded-2xl border border-slate-200 bg-white p-5">
+              <p className="text-sm font-bold text-air">2. Build your message</p>
+              <p className="mt-2 text-sm leading-relaxed text-charcoal/70">Use the <a href="#message-builder" className="font-semibold text-air hover:underline">Build an editable message</a> tool to choose the issues you care about and create a draft. Review it and change anything you want before sending.</p>
+            </li>
+            <li className="rounded-2xl border border-slate-200 bg-white p-5">
+              <p className="text-sm font-bold text-air">3. Open your MP’s official contact page</p>
+              <p className="mt-2 text-sm leading-relaxed text-charcoal/70">When available, click <strong>Open MP contact options</strong> beside your MP’s details. This takes you to their Parliament of Australia profile.</p>
+            </li>
+            <li className="rounded-2xl border border-slate-200 bg-white p-5 lg:col-span-2">
+              <p className="text-sm font-bold text-air">4. Look under “Connect”</p>
+              <p className="mt-2 text-sm leading-relaxed text-charcoal/70">The Parliament page may show a contact form, social-media links or other official ways to contact the MP. Where a contact form is available, it is usually the simplest direct route.</p>
+            </li>
+            <li className="rounded-2xl border border-slate-200 bg-white p-5">
+              <p className="text-sm font-bold text-air">5. Paste in your message</p>
+              <p className="mt-2 text-sm leading-relaxed text-charcoal/70">Open the contact form, fill in the details it asks for, then copy and paste the message you created here. You can edit it again before submitting.</p>
+            </li>
+          </ol>
+
+          <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-5 text-sm leading-relaxed text-charcoal/70">
+            <p className="font-semibold text-charcoal">If there is no contact form</p>
+            <p className="mt-1">Check the MP’s official profile for another contact option, such as their electorate office details or an official website link. Use the official contact method shown for that representative.</p>
+          </div>
+        </div>
+      </section>
+
       <section id="message-builder" className="bg-white py-16 sm:py-24">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
@@ -506,7 +546,7 @@ export function MicroplasticsTools() {
               <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <button type="button" onClick={() => draftRef.current?.focus()} className="min-h-12 rounded-xl border border-charcoal/20 bg-white px-5 py-3 font-semibold text-charcoal hover:border-air">Edit message</button>
                 <button type="button" onClick={copyDraft} className="min-h-12 rounded-xl bg-charcoal px-5 py-3 font-semibold text-white hover:bg-compost">Copy message</button>
-                <a href={directoryHref} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-air/30 bg-white px-5 py-3 font-semibold text-air hover:bg-air/5">{resolvedRepresentative ? `Open ${resolvedRepresentative.name}’s official contact page` : "Open official contact directory"} ↗</a>
+                <a href={directoryHref} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-air/30 bg-white px-5 py-3 font-semibold text-air hover:bg-air/5">{resolvedRepresentative ? "Open MP contact options" : "Open official contact directory"} ↗</a>
               </div>
               {copyStatus ? <p className="mt-3 text-sm font-medium text-compost" role="status">{copyStatus}</p> : null}
             </div>

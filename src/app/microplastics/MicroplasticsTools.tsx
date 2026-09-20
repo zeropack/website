@@ -1,6 +1,7 @@
 "use client";
 
 import { type FormEvent, useRef, useState } from "react";
+import { pushDataLayer } from "@/lib/tracking";
 
 type Service = {
   label: string;
@@ -261,6 +262,7 @@ export function MicroplasticsTools() {
 
   async function findRepresentatives(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    pushDataLayer("microplastics_lookup_started");
     setFinderLoading(true);
     setFinderError("");
     setFinderResult(null);
@@ -274,6 +276,9 @@ export function MicroplasticsTools() {
       const data = (await response.json()) as FinderResult | { error?: string };
       if (!response.ok && !("status" in data)) throw new Error(data.error || "The official lookup could not be completed.");
       if (!("status" in data)) throw new Error("The official lookup returned an unexpected response.");
+      if (data.status === "resolved") pushDataLayer("microplastics_lookup_resolved");
+      if (data.status === "ambiguous") pushDataLayer("microplastics_lookup_ambiguous");
+      if (data.status === "unresolved") pushDataLayer("microplastics_lookup_unresolved");
       setFinderResult(data);
       setMessageSuburb(lookupSuburb.trim());
     } catch (error) {
@@ -310,6 +315,7 @@ export function MicroplasticsTools() {
     setDraft(
       `Subject: Microplastics, food-contact materials and plastic pollution\n\n${salutation}\n\n${identity}${concernText}\n\n${personalExperience}${requestText}\n\n${personalNote}I’d appreciate an update on any work already underway and whether further action is being considered in this area.\n\n${signoff}\n\nEvidence and sources: https://www.zeropack.au/microplastics/`,
     );
+    pushDataLayer("microplastics_message_built");
     setCopyStatus("");
     window.setTimeout(() => draftRef.current?.focus(), 0);
   }
@@ -318,6 +324,7 @@ export function MicroplasticsTools() {
     if (!draft) return;
     try {
       await navigator.clipboard.writeText(draft);
+      pushDataLayer("microplastics_message_copied");
       setCopyStatus("Copied to your clipboard.");
     } catch {
       draftRef.current?.select();
@@ -393,7 +400,7 @@ export function MicroplasticsTools() {
                       <p className="mt-1 text-charcoal/75">{finderResult.federal.memberFor}</p>
                       <p className="text-sm text-charcoal/60">{finderResult.federal.role}</p>
                       <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                        <a href={finderResult.federal.officialProfileUrl} target="_blank" rel="noreferrer" aria-describedby="mp-contact-help" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-air px-5 py-2.5 font-semibold text-white hover:bg-[#008fd0]">Open MP contact options ↗</a>
+                        <a href={finderResult.federal.officialProfileUrl} target="_blank" rel="noreferrer" aria-describedby="mp-contact-help" onClick={() => pushDataLayer("microplastics_contact_opened")} className="inline-flex min-h-11 items-center justify-center rounded-xl bg-air px-5 py-2.5 font-semibold text-white hover:bg-[#008fd0]">Open MP contact options ↗</a>
                         <a href={finderResult.federal.aecProfileUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-2.5 font-semibold text-charcoal hover:border-air">View AEC electorate profile ↗</a>
                       </div>
                       <div id="mp-contact-help" className="mt-5 rounded-xl border border-air/20 bg-[#eef7f9] p-4 text-sm leading-relaxed text-charcoal/70">
@@ -415,7 +422,7 @@ export function MicroplasticsTools() {
                       <p className="mt-2">{finderResult.message} Rather than risk naming the wrong person, confirm the member in the official directory.</p>
                       <div className="mt-3 flex flex-wrap gap-4 font-semibold text-air">
                         <a href={finderResult.aecProfileUrl} target="_blank" rel="noreferrer" className="hover:underline">AEC profile ↗</a>
-                        <a href={finderResult.officialDirectoryUrl} target="_blank" rel="noreferrer" className="hover:underline">Parliament member search ↗</a>
+                        <a href={finderResult.officialDirectoryUrl} target="_blank" rel="noreferrer" onClick={() => pushDataLayer("microplastics_contact_opened")} className="hover:underline">Parliament member search ↗</a>
                       </div>
                     </div>
                   ) : (
@@ -546,7 +553,7 @@ export function MicroplasticsTools() {
               <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <button type="button" onClick={() => draftRef.current?.focus()} className="min-h-12 rounded-xl border border-charcoal/20 bg-white px-5 py-3 font-semibold text-charcoal hover:border-air">Edit message</button>
                 <button type="button" onClick={copyDraft} className="min-h-12 rounded-xl bg-charcoal px-5 py-3 font-semibold text-white hover:bg-compost">Copy message</button>
-                <a href={directoryHref} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-air/30 bg-white px-5 py-3 font-semibold text-air hover:bg-air/5">{resolvedRepresentative ? "Open MP contact options" : "Open official contact directory"} ↗</a>
+                <a href={directoryHref} target="_blank" rel="noreferrer" onClick={() => pushDataLayer("microplastics_contact_opened")} className="inline-flex min-h-12 items-center justify-center rounded-xl border border-air/30 bg-white px-5 py-3 font-semibold text-air hover:bg-air/5">{resolvedRepresentative ? "Open MP contact options" : "Open official contact directory"} ↗</a>
               </div>
               {copyStatus ? <p className="mt-3 text-sm font-medium text-compost" role="status">{copyStatus}</p> : null}
             </div>

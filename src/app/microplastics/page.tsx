@@ -5,6 +5,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { buildMetadata } from "@/lib/metadata";
 import { getRequestMarket } from "@/lib/requestMarket";
 import { MicroplasticsTools } from "./MicroplasticsTools";
+import { MicroplasticsTrackedLink } from "./MicroplasticsTrackedLink";
 
 const canonicalUrl = "https://www.zeropack.au/microplastics/";
 const articleUrl = "https://www.zeropack.au/articles/microplastics-food-packaging-australia/";
@@ -100,7 +101,7 @@ export default async function Page() {
           <p className="mt-7 max-w-4xl text-lg leading-relaxed text-white/75 sm:text-xl">Microplastics have been reported in food, water, air and human samples. Some food-contact materials can release particles, and chemicals can migrate into food. These are different mechanisms. Research is continuing, and current evidence does not establish that everyday exposure causes a specific disease in people.</p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <a href="#representative-finder" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-air px-6 py-3 font-semibold text-white transition hover:bg-[#008fd0]">Find my representatives</a>
-            <a href={articleUrl} className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/30 bg-white/5 px-6 py-3 font-semibold text-white transition hover:bg-white/10">Read the full evidence</a>
+            <MicroplasticsTrackedLink href={articleUrl} className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/30 bg-white/5 px-6 py-3 font-semibold text-white transition hover:bg-white/10">Read the full evidence</MicroplasticsTrackedLink>
           </div>
           <div className="mt-9 flex flex-col gap-2 border-t border-white/15 pt-6 text-sm text-white/65 sm:flex-row sm:gap-8">
             <p><strong className="text-white">Evidence last reviewed:</strong> 19 September 2026</p>
@@ -122,7 +123,9 @@ export default async function Page() {
                 <h3 className="mt-4 font-heading text-lg font-semibold text-charcoal">{card.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-charcoal/70">{card.body}</p>
                 <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold text-air">
-                  {card.links.map((link) => <a key={link.href} href={link.href} className="hover:underline">{link.label} ↗</a>)}
+                  {card.links.map((link) => link.href === articleUrl
+                    ? <MicroplasticsTrackedLink key={link.href} href={link.href} className="hover:underline">{link.label} ↗</MicroplasticsTrackedLink>
+                    : <a key={link.href} href={link.href} className="hover:underline">{link.label} ↗</a>)}
                 </div>
               </article>
             ))}
@@ -139,7 +142,7 @@ export default async function Page() {
             <h2 className="mt-4 font-heading text-3xl font-semibold text-charcoal">Read the full Australian article</h2>
             <p className="mt-4 max-w-3xl text-lg leading-relaxed text-charcoal/70">For the source-by-source discussion, limitations and practical context, read the complete evidence article. This hub keeps the overview short so you can move from evidence to official information and your own message.</p>
           </div>
-          <a href={articleUrl} className="inline-flex min-h-12 items-center justify-center rounded-xl bg-charcoal px-6 py-3 font-semibold text-white hover:bg-compost">Open the full article</a>
+          <MicroplasticsTrackedLink href={articleUrl} className="inline-flex min-h-12 items-center justify-center rounded-xl bg-charcoal px-6 py-3 font-semibold text-white hover:bg-compost">Open the full article</MicroplasticsTrackedLink>
         </div>
       </section>
 
@@ -171,7 +174,9 @@ export default async function Page() {
             {sources.map((source, index) => (
               <li key={source.href} className="rounded-2xl border border-slate-200 bg-stone p-5">
                 <p className="text-xs font-bold uppercase tracking-[0.14em] text-air">{String(index + 1).padStart(2, "0")} · {source.area}</p>
-                <a href={source.href} className="mt-2 block font-heading text-base font-semibold leading-snug text-charcoal hover:text-air">{source.label} ↗</a>
+                {source.href === articleUrl
+                  ? <MicroplasticsTrackedLink href={source.href} className="mt-2 block font-heading text-base font-semibold leading-snug text-charcoal hover:text-air">{source.label} ↗</MicroplasticsTrackedLink>
+                  : <a href={source.href} className="mt-2 block font-heading text-base font-semibold leading-snug text-charcoal hover:text-air">{source.label} ↗</a>}
               </li>
             ))}
           </ol>

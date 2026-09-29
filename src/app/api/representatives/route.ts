@@ -4,6 +4,11 @@ const HANDBOOK_API_URL = "https://handbookapi.aph.gov.au/api/individuals";
 const APH_SEARCH_URL = "https://www.aph.gov.au/Senators_and_Members/Parliamentarian_Search_Results";
 
 const STATES = new Set(["NSW", "VIC", "QLD", "WA", "SA", "TAS", "ACT", "NT"]);
+const ALLOWED_ORIGINS = new Set([
+  "https://www.zeropack.au",
+  "https://zerowasteco.com.au",
+  "https://www.zerowasteco.com.au",
+]);
 const RESPONSE_HEADERS = {
   "Cache-Control": "private, no-store, max-age=0",
   "Content-Type": "application/json; charset=utf-8",
@@ -33,8 +38,31 @@ type HandbookMember = {
   MPorSenator: string[];
 };
 
-function json(data: unknown, status = 200) {
-  return new Response(JSON.stringify(data), { status, headers: RESPONSE_HEADERS });
+function isAllowedOrigin(origin: string | null) {
+  return origin === null || ALLOWED_ORIGINS.has(origin);
+}
+
+function responseHeaders(request: Request, preflight = false) {
+  const headers = new Headers(RESPONSE_HEADERS);
+  const origin = request.headers.get("origin");
+
+  headers.set("Vary", "Origin");
+
+  if (origin && ALLOWED_ORIGINS.has(origin)) {
+    headers.set("Access-Control-Allow-Origin", origin);
+
+    if (preflight) {
+      headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+      headers.set("Access-Control-Allow-Headers", "Content-Type");
+      headers.set("Access-Control-Max-Age", "86400");
+    }
+  }
+
+  return headers;
+}
+
+function json(request: Request, data: unknown, status = 200) {
+  return new Response(JSON.stringify(data), { status, headers: responseHeaders(request) });
 }
 
 function decodeHtml(value: string) {
@@ -133,14 +161,18 @@ async function fetchHandbookMember(electorate: string, state: string) {
 }
 
 export async function POST(request: Request) {
+  if (!isAllowedOrigin(request.headers.get("origin"))) {
+    return json(request, { error: "Origin not allowed." }, 403);
+  }
+
   const contentLength = Number(request.headers.get("content-length") ?? 0);
-  if (contentLength > 2_048) return json({ error: "The request is too large." }, 413);
+  if (contentLength > 2_048) return json(request, { error: "The request is too large." }, 413);
 
   let body: LookupInput;
   try {
     body = (await request.json()) as LookupInput;
   } catch {
-    return json({ error: "Enter a valid state or territory, suburb and postcode." }, 400);
+    return json(request, { error: "Enter a valid state or territory, suburb and postcode." }, 400);
   }
 
   const state = typeof body.state === "string" ? body.state.trim().toUpperCase() : "";
@@ -149,7 +181,7 @@ export async function POST(request: Request) {
   const validSuburb = suburb.length >= 2 && suburb.length <= 100 && /^[A-Za-zÀ-ÖØ-öø-ÿ'’ .-]+$/.test(suburb);
 
   if (!STATES.has(state) || !validSuburb || !/^\d{4}$/.test(postcode)) {
-    return json({ error: "Enter a valid state or territory, suburb and four-digit postcode." }, 400);
+    return json(request, { error: "Enter a valid state or territory, suburb and four-digit postcode." }, 400);
   }
 
   const searchParams = new URLSearchParams({ filter: postcode, filterby: "Postcode" });
@@ -160,7 +192,7 @@ export async function POST(request: Request) {
     const electorates = parseAecLocalityResults(localityHtml, state, suburb, postcode);
 
     if (electorates.length === 0) {
-      return json({
+      return json(request, {
         status: "unresolved",
         checkedAt: checkedDate(),
         message: "We could not match that suburb and postcode in the current AEC results.",
@@ -169,7 +201,7 @@ export async function POST(request: Request) {
     }
 
     if (electorates.length > 1) {
-      return json({
+      return json(request, {
         status: "ambiguous",
         checkedAt: checkedDate(),
         electorates: electorates.map((item) => item.name),
@@ -183,7 +215,7 @@ export async function POST(request: Request) {
     const handbookMember = await fetchHandbookMember(selected.name, state);
 
     if (!handbookMember) {
-      return json({
+      return json(request, {
         status: "electorate-only",
         checkedAt: checkedDate(),
         electorate: selected.name,
@@ -195,7 +227,7 @@ export async function POST(request: Request) {
 
     const memberName = displayMemberName(handbookMember);
 
-    return json({
+    return json(request, {
       status: "resolved",
       checkedAt: checkedDate(),
       federal: {
@@ -214,7 +246,7 @@ export async function POST(request: Request) {
       ],
     });
   } catch {
-    return json({
+    return json(request, {
       status: "error",
       checkedAt: checkedDate(),
       message: "The official services did not respond, so we cannot safely show a representative right now.",
@@ -222,4 +254,12 @@ export async function POST(request: Request) {
       officialDirectoryUrl: APH_SEARCH_URL,
     }, 502);
   }
+}
+
+export function OPTIONS(request: Request) {
+  if (!isAllowedOrigin(request.headers.get("origin")) || !request.headers.get("origin")) {
+    return json(request, { error: "Origin not allowed." }, 403);
+  }
+
+  return new Response(null, { status: 204, headers: responseHeaders(request, true) });
 }

@@ -183,8 +183,8 @@ export const microplasticsFoodPackagingAustralia: Article = {
       id: "from-information-to-action",
       heading: "From information to action",
       paragraphs: [
-        "The companion resource at /microplastics/ will bring the evidence into one place and provide two user-controlled tools: a representative finder based on current official sources, and a message builder that helps people express their own concerns and requests. The tool will not rank representatives, target people by political profile or automatically send a message. Users will review and control the final text.",
-        "Until the hub launches, the most useful action is to stay specific: reduce unnecessary plastic where practical, use food-contact items as intended, and ask businesses and decision-makers for transparent, evidence-based standards without overstating unsettled health claims.",
+        "The [free Australian microplastics resource](https://www.zeropack.au/microplastics/) is now available. If you want to contact your representative about your own concerns surrounding microplastics, it can help you find the relevant representative using official sources, build an editable message expressing your concerns and requests, and open their official contact options. The tools do not rank representatives, tailor messages by political profile or send anything automatically. You decide what to say, review the final text and choose whether to contact them.",
+        "Whether or not you use the tool, keep your actions specific: reduce unnecessary plastic where practical, use food-contact items as intended, and ask businesses and decision-makers for transparent, evidence-based standards without overstating unsettled health claims.",
       ],
     },
     {

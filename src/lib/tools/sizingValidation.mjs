@@ -58,19 +58,20 @@ export function calculateLayflatCandidate({
   if (productWidthMm <= 0 || productLengthMm <= 0 || productDepthMm <= 0 || widthClearanceMm < 5 || cutterTailMm < 5) return null;
 
   const rawWidthMm = productWidthMm + productDepthMm + widthClearanceMm;
-  const rawCutLengthMm = productLengthMm + productDepthMm / 2 + cutterTailMm;
+  const rawSealedLengthMm = productLengthMm + productDepthMm / 2;
+  const sealedLengthMm = roundUpToFiveMm(rawSealedLengthMm);
+  const overallCutLengthMm = sealedLengthMm + cutterTailMm;
   const layflatWidthMm = roundUpToFiveMm(rawWidthMm);
-  const cutLengthMm = roundUpToFiveMm(rawCutLengthMm);
   const flags = [];
 
-  if (layflatWidthMm < ZERO_PACK_MIN_RECOMMENDED_DIMENSION_MM || cutLengthMm < ZERO_PACK_MIN_RECOMMENDED_DIMENSION_MM) flags.push("direct_contact_under_100mm");
-  if (layflatWidthMm > ZERO_PACK_MAX_RECOMMENDED_DIMENSION_MM || cutLengthMm > ZERO_PACK_MAX_RECOMMENDED_DIMENSION_MM) flags.push("direct_contact_over_1000mm");
+  if (layflatWidthMm < ZERO_PACK_MIN_RECOMMENDED_DIMENSION_MM || overallCutLengthMm < ZERO_PACK_MIN_RECOMMENDED_DIMENSION_MM) flags.push("direct_contact_under_100mm");
+  if (layflatWidthMm > ZERO_PACK_MAX_RECOMMENDED_DIMENSION_MM || overallCutLengthMm > ZERO_PACK_MAX_RECOMMENDED_DIMENSION_MM) flags.push("direct_contact_over_1000mm");
   if (widthClearanceMm > 50) flags.push("custom_width_clearance_above_slider_range");
   if (cutterTailMm > 50) flags.push("custom_cutter_tail_above_slider_range");
 
   return {
     productWidthMm, productLengthMm, productDepthMm, widthClearanceMm, cutterTailMm,
-    rawWidthMm, rawCutLengthMm, layflatWidthMm, cutLengthMm,
+    rawWidthMm, rawSealedLengthMm, layflatWidthMm, sealedLengthMm, overallCutLengthMm,
     manufacturingToleranceMm: ZERO_PACK_MANUFACTURING_TOLERANCE_MM,
     flags,
   };

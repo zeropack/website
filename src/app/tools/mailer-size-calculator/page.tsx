@@ -35,7 +35,7 @@ export default async function Page() {
       { question: "Should I order straight from the calculated size?", answer: "Use the result as a starting point for your quote and specification. For custom production, especially where the fit is close, confirm the final dimensions with a sample or mock-up before manufacture." },
     ]}
     related={[
-      { href: "/tools/layflat-tubing-calculator/", title: "Layflat Tubing Calculator", description: "Estimate layflat width and cut length for a packed product." },
+      { href: "/tools/layflat-tubing-calculator/", title: "Layflat Tubing Calculator", description: "Estimate layflat width, sealed length and overall cut length for a packed product." },
       { href: "/custom-compostable-mailers#quoteform", title: "Custom compostable mailers", description: "Explore Zero Pack custom mailer options and request a quote." },
     ]}
   ><SizingCalculator mode="mailer" tool={tool} /></ToolPage>;

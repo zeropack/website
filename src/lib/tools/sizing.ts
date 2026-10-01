@@ -3,8 +3,8 @@ export type AdhesiveType = "single" | "double";
 
 export const MM_PER_INCH = 25.4;
 export const ZERO_PACK_TOLERANCE_MM = 5;
-export const MIN_FLEXIBLE_WIDTH_MM = 100;
-export const MAX_MAILER_BODY_LENGTH_MM = 1000;
+export const MIN_RECOMMENDED_DIMENSION_MM = 100;
+export const MAX_RECOMMENDED_DIMENSION_MM = 1000;
 export const DEFAULT_MAILER_WIDTH_CLEARANCE_MM = 5;
 export const DEFAULT_MAILER_LENGTH_CLEARANCE_MM = 15;
 export const DEFAULT_TUBING_WIDTH_CLEARANCE_MM = 5;
@@ -29,7 +29,7 @@ export function formatDimension(valueMm: number, unit: SizingUnit): string {
 }
 
 export function mailerFlapMm(bodyLengthMm: number, adhesive: AdhesiveType): number | null {
-  if (bodyLengthMm > MAX_MAILER_BODY_LENGTH_MM) return null;
+  if (bodyLengthMm > MAX_RECOMMENDED_DIMENSION_MM) return null;
   if (adhesive === "double") return 70;
   return bodyLengthMm < 600 ? 40 : 50;
 }
@@ -46,18 +46,18 @@ export function calculateMailerSize(params: {
   const adhesive = params.adhesive ?? "single";
   const rawWidthMm = productWidthMm + productDepthMm + DEFAULT_MAILER_WIDTH_CLEARANCE_MM + extraRoomMm;
   const rawLengthMm = productLengthMm + productDepthMm / 2 + DEFAULT_MAILER_LENGTH_CLEARANCE_MM + extraRoomMm;
-  const bodyWidthMm = Math.max(MIN_FLEXIBLE_WIDTH_MM, roundUpToFiveMm(rawWidthMm));
+  const bodyWidthMm = roundUpToFiveMm(rawWidthMm);
   const bodyLengthMm = roundUpToFiveMm(rawLengthMm);
-  const requiresReview = bodyLengthMm > MAX_MAILER_BODY_LENGTH_MM;
+  const requiresContact = bodyWidthMm < MIN_RECOMMENDED_DIMENSION_MM || bodyWidthMm > MAX_RECOMMENDED_DIMENSION_MM || bodyLengthMm < MIN_RECOMMENDED_DIMENSION_MM || bodyLengthMm > MAX_RECOMMENDED_DIMENSION_MM;
   return {
     rawWidthMm,
     rawLengthMm,
     bodyWidthMm,
     bodyLengthMm,
-    flapMm: requiresReview ? null : mailerFlapMm(bodyLengthMm, adhesive),
+    flapMm: requiresContact ? null : mailerFlapMm(bodyLengthMm, adhesive),
     adhesive,
     extraRoomMm,
-    requiresReview,
+    requiresContact,
   };
 }
 
@@ -75,9 +75,10 @@ export function calculateLayflatSize(params: {
   return {
     rawWidthMm,
     rawCutLengthMm,
-    layflatWidthMm: Math.max(MIN_FLEXIBLE_WIDTH_MM, roundUpToFiveMm(rawWidthMm)),
+    layflatWidthMm: roundUpToFiveMm(rawWidthMm),
     cutLengthMm: roundUpToFiveMm(rawCutLengthMm),
     widthClearanceMm,
     cutterTailMm,
+    requiresContact: roundUpToFiveMm(rawWidthMm) < MIN_RECOMMENDED_DIMENSION_MM || roundUpToFiveMm(rawWidthMm) > MAX_RECOMMENDED_DIMENSION_MM || roundUpToFiveMm(rawCutLengthMm) < MIN_RECOMMENDED_DIMENSION_MM || roundUpToFiveMm(rawCutLengthMm) > MAX_RECOMMENDED_DIMENSION_MM,
   };
 }

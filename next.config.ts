@@ -4,6 +4,16 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/quote",
+        destination: "/custom-compostable-mailers#quoteform",
+        permanent: true,
+      },
+      {
+        source: "/quote/:path*",
+        destination: "/custom-compostable-mailers#quoteform",
+        permanent: true,
+      },
+      {
         source: "/2026-Zero-Pack-Brand-Guide-Custom-Compostable-Packaging.pdf",
         destination: "/2026-Zero-Pack-Custom-Compostable-Packaging-Guide.pdf",
         permanent: true,

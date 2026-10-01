@@ -297,7 +297,12 @@ export function PremiumMailerPage({ market = "global" }: { market?: PublicMarket
               <p>They are a great fit for many ecommerce products, including apparel, accessories, books, stationery, textiles, gifts, homewares and many non-fragile beauty and wellness products.</p>
               <p>Rather than choosing from generic stock sizes and designs, we work with you to create a mailer that suits your products and matches your brand.</p>
             </div>
-            <div className="mt-7"><QuoteButton /></div>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <QuoteButton />
+              <Link href="/tools/mailer-size-calculator/" className="inline-flex items-center justify-center rounded-lg border border-compost/25 bg-white px-6 py-3.5 text-sm font-semibold text-compost transition hover:bg-mist">
+                Calculate a mailer size
+              </Link>
+            </div>
           </div>
           <SiteImage src={dimpleOrange} alt="Custom printed compostable mailer" width={dimpleOrange.width} height={dimpleOrange.height} className="w-full rounded-3xl object-cover shadow-sm" sizes="(max-width: 1024px) 100vw, 55vw" />
         </div>

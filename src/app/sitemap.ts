@@ -16,11 +16,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/how-it-works/",
     "/customer-showcase/",
     "/about/",
-    "/quote/",
     "/packaging-guide/",
     "/tools/",
     "/tools/box-volume-calculator/",
     "/tools/shipping-carton-cbm-calculator/",
+    "/tools/mailer-size-calculator/",
+    "/tools/layflat-tubing-calculator/",
     "/articles/",
     "/contact/",
   ];

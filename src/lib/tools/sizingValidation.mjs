@@ -4,8 +4,8 @@
  */
 
 export const ZERO_PACK_MANUFACTURING_TOLERANCE_MM = 5;
-export const ZERO_PACK_MIN_FLEXIBLE_WIDTH_MM = 100;
-export const ZERO_PACK_MAX_MAILER_BODY_LENGTH_MM = 1000;
+export const ZERO_PACK_MIN_RECOMMENDED_DIMENSION_MM = 100;
+export const ZERO_PACK_MAX_RECOMMENDED_DIMENSION_MM = 1000;
 
 export function roundUpToFiveMm(value) {
   if (!Number.isFinite(value) || value <= 0) return null;
@@ -13,7 +13,7 @@ export function roundUpToFiveMm(value) {
 }
 
 export function mailerFlapMm(bodyLengthMm, adhesive = "single") {
-  if (!Number.isFinite(bodyLengthMm) || bodyLengthMm <= 0 || bodyLengthMm > ZERO_PACK_MAX_MAILER_BODY_LENGTH_MM) return null;
+  if (!Number.isFinite(bodyLengthMm) || bodyLengthMm <= 0 || bodyLengthMm > ZERO_PACK_MAX_RECOMMENDED_DIMENSION_MM) return null;
   if (adhesive === "double") return 70;
   return bodyLengthMm < 600 ? 40 : 50;
 }
@@ -30,12 +30,12 @@ export function calculateMailerCandidate({
 
   const rawWidthMm = productWidthMm + productDepthMm + 5 + extraRoomMm;
   const rawLengthMm = productLengthMm + productDepthMm / 2 + 15 + extraRoomMm;
-  const bodyWidthMm = Math.max(ZERO_PACK_MIN_FLEXIBLE_WIDTH_MM, roundUpToFiveMm(rawWidthMm));
+  const bodyWidthMm = roundUpToFiveMm(rawWidthMm);
   const bodyLengthMm = roundUpToFiveMm(rawLengthMm);
   const flags = [];
 
-  if (bodyWidthMm === ZERO_PACK_MIN_FLEXIBLE_WIDTH_MM && rawWidthMm < ZERO_PACK_MIN_FLEXIBLE_WIDTH_MM) flags.push("raised_to_100mm_min_width");
-  if (bodyLengthMm > ZERO_PACK_MAX_MAILER_BODY_LENGTH_MM) flags.push("manual_review_over_1000mm_body_length");
+  if (bodyWidthMm < ZERO_PACK_MIN_RECOMMENDED_DIMENSION_MM || bodyLengthMm < ZERO_PACK_MIN_RECOMMENDED_DIMENSION_MM) flags.push("direct_contact_under_100mm");
+  if (bodyWidthMm > ZERO_PACK_MAX_RECOMMENDED_DIMENSION_MM || bodyLengthMm > ZERO_PACK_MAX_RECOMMENDED_DIMENSION_MM) flags.push("direct_contact_over_1000mm");
   if (extraRoomMm > 50) flags.push("custom_extra_room_above_slider_range");
 
   return {
@@ -59,11 +59,12 @@ export function calculateLayflatCandidate({
 
   const rawWidthMm = productWidthMm + productDepthMm + widthClearanceMm;
   const rawCutLengthMm = productLengthMm + productDepthMm / 2 + cutterTailMm;
-  const layflatWidthMm = Math.max(ZERO_PACK_MIN_FLEXIBLE_WIDTH_MM, roundUpToFiveMm(rawWidthMm));
+  const layflatWidthMm = roundUpToFiveMm(rawWidthMm);
   const cutLengthMm = roundUpToFiveMm(rawCutLengthMm);
   const flags = [];
 
-  if (layflatWidthMm === ZERO_PACK_MIN_FLEXIBLE_WIDTH_MM && rawWidthMm < ZERO_PACK_MIN_FLEXIBLE_WIDTH_MM) flags.push("raised_to_100mm_min_width");
+  if (layflatWidthMm < ZERO_PACK_MIN_RECOMMENDED_DIMENSION_MM || cutLengthMm < ZERO_PACK_MIN_RECOMMENDED_DIMENSION_MM) flags.push("direct_contact_under_100mm");
+  if (layflatWidthMm > ZERO_PACK_MAX_RECOMMENDED_DIMENSION_MM || cutLengthMm > ZERO_PACK_MAX_RECOMMENDED_DIMENSION_MM) flags.push("direct_contact_over_1000mm");
   if (widthClearanceMm > 50) flags.push("custom_width_clearance_above_slider_range");
   if (cutterTailMm > 50) flags.push("custom_cutter_tail_above_slider_range");
 

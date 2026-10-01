@@ -11,7 +11,11 @@ const groups = [
       { href: TREND_PACKAGING_FUNNEL_HREF, label: "Custom compostable mailers" },
       { href: "/custom-compostable-packaging/", label: "Custom compostable packaging" },
       { href: "/packaging-guide/", label: "Branded packaging guide" },
-      { href: "/tools/", label: "Packaging calculators" },
+      { href: "/tools/", label: "Tools & calculators" },
+      { href: "/tools/box-volume-calculator/", label: "Box Volume Calculator" },
+      { href: "/tools/shipping-carton-cbm-calculator/", label: "Shipping Carton / CBM Calculator" },
+      { href: "/tools/mailer-size-calculator/", label: "Mailer Size Calculator" },
+      { href: "/tools/layflat-tubing-calculator/", label: "Layflat Tubing Calculator" },
     ],
   },
   {

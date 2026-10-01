@@ -15,7 +15,6 @@ export function GET() {
     "/how-it-works",
     "/customer-showcase",
     "/about",
-    "/quote",
     "/packaging-guide",
     "/tools",
     "/tools/box-volume-calculator",

@@ -5,6 +5,7 @@ export const MM_PER_INCH = 25.4;
 export const ZERO_PACK_TOLERANCE_MM = 5;
 export const MIN_RECOMMENDED_DIMENSION_MM = 100;
 export const MAX_RECOMMENDED_DIMENSION_MM = 1000;
+export const MAX_LAYFLAT_OVERALL_CUT_LENGTH_MM = 10000;
 export const DEFAULT_MAILER_WIDTH_CLEARANCE_MM = 5;
 export const DEFAULT_MAILER_LENGTH_CLEARANCE_MM = 15;
 export const DEFAULT_TUBING_WIDTH_CLEARANCE_MM = 5;
@@ -84,6 +85,6 @@ export function calculateLayflatSize(params: {
     cutLengthMm: overallCutLengthMm,
     widthClearanceMm,
     cutterTailMm,
-    requiresContact: roundUpToFiveMm(rawWidthMm) < MIN_RECOMMENDED_DIMENSION_MM || roundUpToFiveMm(rawWidthMm) > MAX_RECOMMENDED_DIMENSION_MM || overallCutLengthMm < MIN_RECOMMENDED_DIMENSION_MM || overallCutLengthMm > MAX_RECOMMENDED_DIMENSION_MM,
+    requiresContact: roundUpToFiveMm(rawWidthMm) < MIN_RECOMMENDED_DIMENSION_MM || roundUpToFiveMm(rawWidthMm) > MAX_RECOMMENDED_DIMENSION_MM || overallCutLengthMm < MIN_RECOMMENDED_DIMENSION_MM || overallCutLengthMm > MAX_LAYFLAT_OVERALL_CUT_LENGTH_MM,
   };
 }

@@ -45,12 +45,12 @@ export function SizingCalculator({ mode, tool }: { mode: "mailer" | "layflat"; t
   const [error, setError] = useState("");
   const started = useRef(false);
 
-  function start() {
+  function start(resetResult = true) {
     if (!started.current) {
       started.current = true;
       trackTool("tool_start", tool.id, tool.name, tool.market, "started");
     }
-    setSubmitted(false);
+    if (resetResult) setSubmitted(false);
     setError("");
   }
 
@@ -160,8 +160,8 @@ export function SizingCalculator({ mode, tool }: { mode: "mailer" | "layflat"; t
           <label htmlFor="mailer-extra-room" className="block text-sm font-semibold">Additional room beyond the minimum recommendation</label>
           <p className="mt-1 text-xs leading-relaxed text-charcoal/65">The default is the minimum recommended fit. Add more space if your product or packing process needs it.</p>
           <div className="mt-3 flex items-center gap-4">
-            <input id="mailer-extra-room" type="range" min="0" max="50" step="5" value={Math.min(extraRoomMm, 50)} onChange={(event) => { start(); setExtraRoomMm(Number(event.target.value)); }} className="w-full" />
-            <div className="flex items-center gap-1"><input aria-label="Additional room in millimetres" type="number" min="0" step="5" value={extraRoomMm} onChange={(event) => { start(); setExtraRoomMm(Math.max(0, Number(event.target.value) || 0)); }} className="min-h-11 w-24 rounded-lg border border-charcoal/25 px-3" /><span className="text-sm">mm</span></div>
+            <input id="mailer-extra-room" type="range" min="0" max="50" step="5" value={Math.min(extraRoomMm, 50)} onChange={(event) => { start(false); setExtraRoomMm(Number(event.target.value)); }} className="w-full" />
+            <div className="flex items-center gap-1"><input aria-label="Additional room in millimetres" type="number" min="0" step="5" value={extraRoomMm} onChange={(event) => { start(false); setExtraRoomMm(Math.max(0, Number(event.target.value) || 0)); }} className="min-h-11 w-24 rounded-lg border border-charcoal/25 px-3" /><span className="text-sm">mm</span></div>
           </div>
           <div className="mt-1 flex justify-between text-xs text-charcoal/60"><span>Minimum</span><span>+25 mm</span><span>+50 mm</span></div>
           {extraRoomMm > 50 && <p className="mt-2 text-xs text-charcoal/65">Custom extra room selected above the slider range.</p>}
@@ -169,7 +169,7 @@ export function SizingCalculator({ mode, tool }: { mode: "mailer" | "layflat"; t
 
         <div>
           <label htmlFor="mailer-adhesive" className="block text-sm font-semibold">Closure</label>
-          <select id="mailer-adhesive" value={adhesive} onChange={(event) => { start(); setAdhesive(event.target.value as AdhesiveType); }} className="mt-2 min-h-12 w-full max-w-sm rounded-lg border border-charcoal/25 bg-white px-3">
+          <select id="mailer-adhesive" value={adhesive} onChange={(event) => { start(false); setAdhesive(event.target.value as AdhesiveType); }} className="mt-2 min-h-12 w-full max-w-sm rounded-lg border border-charcoal/25 bg-white px-3">
             <option value="single">Single adhesive</option>
             <option value="double">Double adhesive</option>
           </select>
@@ -179,8 +179,8 @@ export function SizingCalculator({ mode, tool }: { mode: "mailer" | "layflat"; t
           <label htmlFor="tube-clearance" className="block text-sm font-semibold">Width clearance</label>
           <p className="mt-1 text-xs leading-relaxed text-charcoal/65">5 mm is the minimum recommended clearance from our physical fit testing. Increase it if you want a roomier sleeve.</p>
           <div className="mt-3 flex items-center gap-4">
-            <input id="tube-clearance" type="range" min="5" max="50" step="5" value={Math.min(widthClearanceMm, 50)} onChange={(event) => { start(); setWidthClearanceMm(Number(event.target.value)); }} className="w-full" />
-            <div className="flex items-center gap-1"><input aria-label="Layflat width clearance in millimetres" type="number" min="5" step="5" value={widthClearanceMm} onChange={(event) => { start(); setWidthClearanceMm(Math.max(5, Number(event.target.value) || 5)); }} className="min-h-11 w-24 rounded-lg border border-charcoal/25 px-3" /><span className="text-sm">mm</span></div>
+            <input id="tube-clearance" type="range" min="5" max="50" step="5" value={Math.min(widthClearanceMm, 50)} onChange={(event) => { start(false); setWidthClearanceMm(Number(event.target.value)); }} className="w-full" />
+            <div className="flex items-center gap-1"><input aria-label="Layflat width clearance in millimetres" type="number" min="5" step="5" value={widthClearanceMm} onChange={(event) => { start(false); setWidthClearanceMm(Math.max(5, Number(event.target.value) || 5)); }} className="min-h-11 w-24 rounded-lg border border-charcoal/25 px-3" /><span className="text-sm">mm</span></div>
           </div>
           {widthClearanceMm > 50 && <p className="mt-2 text-xs text-charcoal/65">Custom clearance selected above the slider range.</p>}
         </div>
@@ -189,8 +189,8 @@ export function SizingCalculator({ mode, tool }: { mode: "mailer" | "layflat"; t
           <label htmlFor="tube-cutter-tail" className="block text-sm font-semibold">Material beyond the seal for your cutter</label>
           <p className="mt-1 text-xs leading-relaxed text-charcoal/65">Minimum 5 mm. We recommend 15 mm as a practical starting point, but your sealer or cutter may need less or more.</p>
           <div className="mt-3 flex items-center gap-4">
-            <input id="tube-cutter-tail" type="range" min={MIN_TUBING_CUTTER_TAIL_MM} max="50" step="5" value={Math.min(cutterTailMm, 50)} onChange={(event) => { start(); setCutterTailMm(Number(event.target.value)); }} className="w-full" />
-            <div className="flex items-center gap-1"><input aria-label="Cutter tail in millimetres" type="number" min={MIN_TUBING_CUTTER_TAIL_MM} step="5" value={cutterTailMm} onChange={(event) => { start(); setCutterTailMm(Math.max(MIN_TUBING_CUTTER_TAIL_MM, Number(event.target.value) || MIN_TUBING_CUTTER_TAIL_MM)); }} className="min-h-11 w-24 rounded-lg border border-charcoal/25 px-3" /><span className="text-sm">mm</span></div>
+            <input id="tube-cutter-tail" type="range" min={MIN_TUBING_CUTTER_TAIL_MM} max="50" step="5" value={Math.min(cutterTailMm, 50)} onChange={(event) => { start(false); setCutterTailMm(Number(event.target.value)); }} className="w-full" />
+            <div className="flex items-center gap-1"><input aria-label="Cutter tail in millimetres" type="number" min={MIN_TUBING_CUTTER_TAIL_MM} step="5" value={cutterTailMm} onChange={(event) => { start(false); setCutterTailMm(Math.max(MIN_TUBING_CUTTER_TAIL_MM, Number(event.target.value) || MIN_TUBING_CUTTER_TAIL_MM)); }} className="min-h-11 w-24 rounded-lg border border-charcoal/25 px-3" /><span className="text-sm">mm</span></div>
           </div>
         </div>
       </div>}

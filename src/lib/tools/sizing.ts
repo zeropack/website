@@ -71,14 +71,18 @@ export function calculateLayflatSize(params: {
   const widthClearanceMm = Math.max(DEFAULT_TUBING_WIDTH_CLEARANCE_MM, params.widthClearanceMm ?? DEFAULT_TUBING_WIDTH_CLEARANCE_MM);
   const cutterTailMm = Math.max(MIN_TUBING_CUTTER_TAIL_MM, params.cutterTailMm ?? DEFAULT_TUBING_CUTTER_TAIL_MM);
   const rawWidthMm = params.productWidthMm + params.productDepthMm + widthClearanceMm;
-  const rawCutLengthMm = params.productLengthMm + params.productDepthMm / 2 + cutterTailMm;
+  const rawSealedLengthMm = params.productLengthMm + params.productDepthMm / 2;
+  const sealedLengthMm = roundUpToFiveMm(rawSealedLengthMm);
+  const cutLengthMm = sealedLengthMm + cutterTailMm;
   return {
     rawWidthMm,
-    rawCutLengthMm,
+    rawSealedLengthMm,
+    rawCutLengthMm: rawSealedLengthMm + cutterTailMm,
     layflatWidthMm: roundUpToFiveMm(rawWidthMm),
-    cutLengthMm: roundUpToFiveMm(rawCutLengthMm),
+    sealedLengthMm,
+    cutLengthMm,
     widthClearanceMm,
     cutterTailMm,
-    requiresContact: roundUpToFiveMm(rawWidthMm) < MIN_RECOMMENDED_DIMENSION_MM || roundUpToFiveMm(rawWidthMm) > MAX_RECOMMENDED_DIMENSION_MM || roundUpToFiveMm(rawCutLengthMm) < MIN_RECOMMENDED_DIMENSION_MM || roundUpToFiveMm(rawCutLengthMm) > MAX_RECOMMENDED_DIMENSION_MM,
+    requiresContact: roundUpToFiveMm(rawWidthMm) < MIN_RECOMMENDED_DIMENSION_MM || roundUpToFiveMm(rawWidthMm) > MAX_RECOMMENDED_DIMENSION_MM || cutLengthMm < MIN_RECOMMENDED_DIMENSION_MM || cutLengthMm > MAX_RECOMMENDED_DIMENSION_MM,
   };
 }

@@ -271,18 +271,12 @@ export function SizingCalculator({ mode, tool }: { mode: "mailer" | "layflat"; t
         </div>
       </div>}
 
-      <figure className="mt-7 overflow-hidden rounded-xl border border-charcoal/10 bg-stone p-3">
-        {mode === "mailer" ? (
-          <Image src="/tools/mailer-dimensions.png" alt="Diagram showing mailer body width, body length and the separate adhesive flap." width={480} height={640} unoptimized className="mx-auto h-auto max-h-[520px] w-auto max-w-full rounded-lg" />
-        ) : (
-          <Image src="/tools/layflat-tubing-dimensions.png" alt="Diagram showing layflat width, sealed length, seal position, cutter tail and overall cut length." width={640} height={427} unoptimized className="h-auto w-full rounded-lg" />
-        )}
+      {mode === "mailer" && <figure className="mt-7 overflow-hidden rounded-xl border border-charcoal/10 bg-stone p-3">
+        <Image src="/tools/mailer-dimensions.png" alt="Diagram showing mailer body width, body length and the separate adhesive flap." width={480} height={640} unoptimized className="mx-auto h-auto max-h-[520px] w-auto max-w-full rounded-lg" />
         <figcaption className="mt-2 text-xs leading-relaxed text-charcoal/60">
-          {mode === "mailer"
-            ? "Quoted mailer dimensions are the usable body dimensions and exclude the adhesive flap."
-            : "Overall cut length = sealed length + cutter tail. The cutter tail is the material left beyond the seal for your cutter or sealing setup."}
+          Quoted mailer dimensions are the usable body dimensions and exclude the adhesive flap.
         </figcaption>
-      </figure>
+      </figure>}
 
       {error && <p role="alert" className="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-800">{error}</p>}
       <div className="mt-7 flex flex-wrap gap-3">
@@ -315,6 +309,12 @@ export function SizingCalculator({ mode, tool }: { mode: "mailer" | "layflat"; t
           <div className="flex justify-between gap-4"><dt>Width clearance</dt><dd className="font-semibold">{formatDimension(widthClearanceMm, unit)}</dd></div>
         </dl>
         <p className="mt-4 text-sm text-white/80">Overall cut length = sealed length + cutter tail.</p>
+        <figure className="mt-6 overflow-hidden rounded-xl bg-white p-3 text-charcoal">
+          <Image src="/tools/layflat-tubing-dimensions.png" alt="Diagram showing layflat width, sealed length, seal position, cutter tail and overall cut length." width={640} height={427} unoptimized className="h-auto w-full rounded-lg" />
+          <figcaption className="mt-2 text-xs leading-relaxed text-charcoal/65">
+            Use the diagram to match each calculated dimension to the finished tubing piece.
+          </figcaption>
+        </figure>
         </>}
       </div>}
       {result && !result.value.requiresContact && <div className="mt-8 border-t border-white/25 pt-6">

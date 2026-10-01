@@ -8,7 +8,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return buildMarketPageMetadata({
     market: await getRequestMarket(),
     title: "Mailer Size Calculator",
-    description: "Estimate a suitable custom mailer body size from your packed product width, length and depth, with optional extra room and flap guidance.",
+    description: "Estimate a suitable custom mailer body size from your packed product width, length and depth / height, with optional extra room and flap guidance.",
     path,
   });
 }

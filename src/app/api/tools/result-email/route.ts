@@ -20,6 +20,8 @@ type ResultPayload = {
   flap_mm?: number | null;
   adhesive?: "single" | "double" | null;
   extra_room_mm?: number | null;
+  sealed_length_mm?: number | null;
+  overall_cut_length_mm?: number | null;
   width_clearance_mm?: number | null;
   cutter_tail_mm?: number | null;
 };
@@ -120,6 +122,8 @@ export async function POST(req: NextRequest) {
     if (payload.adhesive) properties.adhesive = payload.adhesive;
     if (typeof payload.extra_room_mm === "number") properties.extra_room_mm = payload.extra_room_mm;
   } else {
+    if (typeof payload.sealed_length_mm === "number") properties.sealed_length_mm = payload.sealed_length_mm;
+    if (typeof payload.overall_cut_length_mm === "number") properties.overall_cut_length_mm = payload.overall_cut_length_mm;
     if (typeof payload.width_clearance_mm === "number") properties.width_clearance_mm = payload.width_clearance_mm;
     if (typeof payload.cutter_tail_mm === "number") properties.cutter_tail_mm = payload.cutter_tail_mm;
   }

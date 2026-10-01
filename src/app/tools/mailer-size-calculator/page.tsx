@@ -19,6 +19,7 @@ export default async function Page() {
     title="Mailer Size Calculator"
     intro="Estimate a practical starting size for a flat custom mailer from the dimensions of your packed product. Measure the product exactly as it will be packed, then choose whether you want any extra room beyond the minimum recommendation."
     tool={tool}
+    quoteHref="/custom-compostable-mailers#quoteform"
     explanation={<>
       <p>The calculator starts with the packed product width, length and finished depth. It allows for the way a flat mailer wraps around that depth, then adds a small practical clearance and rounds the result upward to a production-friendly 5 mm increment.</p>
       <p>The quoted mailer body size excludes the adhesive flap. Single-adhesive flap length is shown separately, and double-adhesive mailers use a larger flap.</p>
@@ -35,7 +36,7 @@ export default async function Page() {
     ]}
     related={[
       { href: "/tools/layflat-tubing-calculator/", title: "Layflat Tubing Calculator", description: "Estimate layflat width and cut length for a packed product." },
-      { href: "/custom-compostable-mailers/", title: "Custom compostable mailers", description: "Explore Zero Pack custom mailer options and request a quote." },
+      { href: "/custom-compostable-mailers#quoteform", title: "Custom compostable mailers", description: "Explore Zero Pack custom mailer options and request a quote." },
     ]}
   ><SizingCalculator mode="mailer" tool={tool} /></ToolPage>;
 }

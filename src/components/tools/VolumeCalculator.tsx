@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRef, useState, type FormEvent } from "react";
 import type { ToolIdentity } from "./ToolTracking";
 import { trackTool } from "@/lib/tools/analytics";
@@ -103,6 +104,13 @@ export function VolumeCalculator({ mode, tool }: { mode: "box" | "cbm"; tool: To
     <form onSubmit={calculate} noValidate className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm sm:p-8">
       <h2 className="font-heading text-2xl font-semibold">{mode === "box" ? "Enter the space to measure" : "Enter packed carton dimensions"}</h2>
       <p className="mt-3 text-sm leading-relaxed text-charcoal/70">{mode === "box" ? "Measure the length, width and height of the same rectangular space. Use internal measurements if you want the available interior space." : "Use the outside length, width and height of each packed shipping carton. Add a row for each carton size."}</p>
+      <figure className="mt-6 overflow-hidden rounded-xl border border-charcoal/10 bg-white">
+        <img src="/tools/packed-product-dimensions.png" alt="Box measurement diagram showing width, length and depth or height" className="h-auto w-full" />
+        <figcaption className="border-t border-charcoal/10 px-4 py-3 text-xs leading-relaxed text-charcoal/65">
+          Measure width, length and depth / height consistently from the same box or packed carton.
+        </figcaption>
+      </figure>
+      {mode === "box" && <p className="mt-4 text-sm text-charcoal/70"><Link href="/tools/shipping-carton-cbm-calculator/" className="font-semibold text-compost underline decoration-air/40 decoration-2 underline-offset-4 hover:text-air">More than one box?</Link> Use the Shipping Carton / CBM Calculator to add quantities or different carton sizes.</p>}
       <div className="mt-6 max-w-xs"><label htmlFor="volume-unit" className="block text-sm font-semibold">Measurement unit</label><select id="volume-unit" value={unit} onChange={(event) => changeUnit(event.target.value as Unit)} className="mt-2 min-h-12 w-full rounded-lg border border-charcoal/25 bg-white px-3">{(Object.keys(unitLabels) as Unit[]).map((value) => <option key={value} value={value}>{unitLabels[value]}</option>)}</select><p className="mt-2 text-xs text-charcoal/65">Changing units converts dimensions already entered.</p></div>
       <div className="mt-6 space-y-6">{rows.map((row, index) => <fieldset key={row.id} className="min-w-0 rounded-xl border border-charcoal/15 p-4 sm:p-5">
         <legend className="px-1 font-semibold">{mode === "box" ? "Dimensions" : `Carton size ${index + 1}`}</legend>

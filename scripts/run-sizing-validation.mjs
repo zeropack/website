@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
 import {
-  FIT_LEVELS,
   ZERO_PACK_MANUFACTURING_TOLERANCE_MM,
   generateMailerMatrix,
-  generateRoundTubingMatrix,
+  generateLayflatMatrix,
+  physicalMailerCases,
+  physicalLayflatCases,
   summariseFlags,
 } from "../src/lib/tools/sizingValidation.mjs";
 
@@ -29,32 +30,35 @@ function toCsv(rows, fields) {
   ].join("\n");
 }
 
-function risky(rows) {
+function flagged(rows) {
   return rows.filter((row) => (row.flags ?? []).length > 0);
 }
 
 function printSummary(name, rows) {
-  const flagged = risky(rows);
+  const flaggedRows = flagged(rows);
   console.log(`\n=== ${name} ===`);
   console.log(`Rows: ${rows.length}`);
-  console.log(`Flagged rows: ${flagged.length}`);
-  console.log("Flag counts:");
+  console.log(`Flagged rows: ${flaggedRows.length}`);
   const counts = summariseFlags(rows);
-  for (const [flag, count] of Object.entries(counts)) {
-    console.log(`  - ${flag}: ${count}`);
+  if (Object.keys(counts).length) {
+    console.log("Flag counts:");
+    for (const [flag, count] of Object.entries(counts)) console.log(`  - ${flag}: ${count}`);
   }
-  console.log("\nRepresentative flagged cases:");
-  for (const row of flagged.slice(0, 12)) {
-    console.log("  ", JSON.stringify(row));
+  if (flaggedRows.length) {
+    console.log("\nRepresentative flagged cases:");
+    for (const row of flaggedRows.slice(0, 12)) console.log("  ", JSON.stringify(row));
   }
 }
 
 const args = parseArgs(process.argv.slice(2));
 const mailers = generateMailerMatrix();
-const tubing = generateRoundTubingMatrix();
+const tubing = generateLayflatMatrix();
 
 if (args.format === "json") {
-  const payload = {};
+  const payload = {
+    physicalMailerCases,
+    physicalLayflatCases,
+  };
   if (args.product === "all" || args.product === "mailer") payload.mailers = mailers;
   if (args.product === "all" || args.product === "tubing") payload.tubing = tubing;
   console.log(JSON.stringify(payload, null, 2));
@@ -64,16 +68,17 @@ if (args.format === "json") {
 if (args.format === "csv") {
   if (args.product === "mailer") {
     console.log(toCsv(mailers, [
-      "productWidthMm","productLengthMm","productDepthMm","fitPercent",
-      "baseWidthMm","baseLengthMm","widthAllowanceMm","lengthAllowanceMm",
-      "suggestedWidthMm","suggestedLengthMm","adhesive","flapMm","manufacturingToleranceMm","flags"
+      "productWidthMm","productLengthMm","productDepthMm","extraRoomMm",
+      "rawWidthMm","rawLengthMm","bodyWidthMm","bodyLengthMm",
+      "adhesive","flapMm","manufacturingToleranceMm","flags"
     ]));
     process.exit(0);
   }
   if (args.product === "tubing") {
     console.log(toCsv(tubing, [
-      "productDiameterMm","fitPercent","baseLayflatWidthMm","allowanceMm",
-      "suggestedWidthMm","manufacturingToleranceMm","flags"
+      "productWidthMm","productLengthMm","productDepthMm","widthClearanceMm",
+      "cutterTailMm","rawWidthMm","rawCutLengthMm","layflatWidthMm",
+      "cutLengthMm","manufacturingToleranceMm","flags"
     ]));
     process.exit(0);
   }
@@ -82,12 +87,13 @@ if (args.format === "csv") {
 }
 
 console.log("Zero Pack packaging sizing validation harness");
-console.log("Candidate rules only — not approved public sizing logic.");
-console.log(`Fit references: X ${FIT_LEVELS.x.percent}%, Y ${FIT_LEVELS.y.percent}%, Z ${FIT_LEVELS.z.percent}%.`);
+console.log("Mirrors the approved customer-facing mailer and layflat rules.");
 console.log(`Manufacturing tolerance caveat: ±${ZERO_PACK_MANUFACTURING_TOLERANCE_MM} mm.`);
+console.log(`Physical mailer references: ${physicalMailerCases.length}`);
+console.log(`Physical layflat references: ${physicalLayflatCases.length}`);
 
-if (args.product === "all" || args.product === "mailer") printSummary("Mailer candidate matrix", mailers);
-if (args.product === "all" || args.product === "tubing") printSummary("Round layflat tubing candidate matrix", tubing);
+if (args.product === "all" || args.product === "mailer") printSummary("Mailer validation matrix", mailers);
+if (args.product === "all" || args.product === "tubing") printSummary("Layflat validation matrix", tubing);
 
 console.log("\nCommands:");
 console.log("  npm run validate:sizing");

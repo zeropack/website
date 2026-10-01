@@ -22,7 +22,7 @@ type Inputs = Record<Field, string>;
 const labels: Record<Field, string> = {
   width: "Packed product width",
   length: "Packed product length",
-  depth: "Packed product depth / thickness",
+  depth: "Packed product depth / height",
 };
 
 function positive(value: string) {
@@ -207,7 +207,7 @@ export function SizingCalculator({ mode, tool }: { mode: "mailer" | "layflat"; t
   return <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
     <form onSubmit={calculate} noValidate className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm sm:p-8">
       <h2 className="font-heading text-2xl font-semibold">Measure the packed product</h2>
-      <p className="mt-3 text-sm leading-relaxed text-charcoal/70">Measure the product exactly as it will be packed. Use the outside width, length and finished depth / thickness.</p>
+      <p className="mt-3 text-sm leading-relaxed text-charcoal/70">Measure the product exactly as it will be packed. Use the outside width, length and finished depth / height.</p>
 
       <fieldset className="mt-6">
         <legend className="text-sm font-semibold">Measurement unit</legend>
@@ -285,12 +285,15 @@ export function SizingCalculator({ mode, tool }: { mode: "mailer" | "layflat"; t
       </div> : <div className="mt-6">
         {result.value.requiresContact ? <><p className="text-2xl font-semibold">Please contact us directly</p><p className="mt-3 text-white/85">This result falls outside the 100–1,000 mm width or length range covered by the online calculator. Email us your packed product dimensions and details of your sealing setup and we’ll review the best option.</p><a href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Layflat tubing sizing enquiry")}`} className="mt-5 inline-flex min-h-11 items-center justify-center rounded-lg bg-white px-5 font-semibold text-compost">Email Zero Pack</a></> : <>
         <p className="text-3xl font-semibold tabular-nums">{formatDimension(result.value.layflatWidthMm, unit)} wide</p>
-        <p className="mt-1 text-xl font-semibold tabular-nums">Cut length {formatDimension(result.value.cutLengthMm, unit)}</p>
-        <p className="mt-2 text-sm text-white/75">{formatDimension(result.value.layflatWidthMm, secondaryUnit)} wide · cut {formatDimension(result.value.cutLengthMm, secondaryUnit)}</p>
+        <p className="mt-1 text-xl font-semibold tabular-nums">Overall cut length {formatDimension(result.value.cutLengthMm, unit)}</p>
+        <p className="mt-2 text-sm text-white/75">{formatDimension(result.value.layflatWidthMm, secondaryUnit)} wide · overall cut length {formatDimension(result.value.cutLengthMm, secondaryUnit)}</p>
         <dl className="mt-6 space-y-3 border-t border-white/25 pt-5 text-sm">
-          <div className="flex justify-between gap-4"><dt>Width clearance</dt><dd className="font-semibold">{widthClearanceMm} mm</dd></div>
-          <div className="flex justify-between gap-4"><dt>Cutter tail</dt><dd className="font-semibold">{cutterTailMm} mm</dd></div>
+          <div className="flex justify-between gap-4"><dt>Sealed length</dt><dd className="font-semibold">{formatDimension(result.value.sealedLengthMm, unit)}</dd></div>
+          <div className="flex justify-between gap-4"><dt>Cutter tail</dt><dd className="font-semibold">{formatDimension(cutterTailMm, unit)}</dd></div>
+          <div className="flex justify-between gap-4 border-t border-white/15 pt-3"><dt>Overall cut length</dt><dd className="font-semibold">{formatDimension(result.value.cutLengthMm, unit)}</dd></div>
+          <div className="flex justify-between gap-4"><dt>Width clearance</dt><dd className="font-semibold">{formatDimension(widthClearanceMm, unit)}</dd></div>
         </dl>
+        <p className="mt-4 text-sm text-white/80">Overall cut length = sealed length + cutter tail.</p>
         </>}
       </div>}
       {result && !result.value.requiresContact && <div className="mt-8 border-t border-white/25 pt-6">

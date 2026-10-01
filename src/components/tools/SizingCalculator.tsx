@@ -134,7 +134,7 @@ export function SizingCalculator({ mode, tool }: { mode: "mailer" | "layflat"; t
     event.preventDefault();
     if (!result || !parsed) return;
     const email = resultEmail.trim();
-    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setEmailState("error");
       setEmailError("Enter a valid email address.");
       return;
@@ -271,13 +271,6 @@ export function SizingCalculator({ mode, tool }: { mode: "mailer" | "layflat"; t
         </div>
       </div>}
 
-      {mode === "mailer" && <figure className="mt-7 overflow-hidden rounded-xl border border-charcoal/10 bg-stone p-3">
-        <Image src="/tools/mailer-dimensions.png" alt="Diagram showing mailer body width, body length and the separate adhesive flap." width={480} height={640} unoptimized className="mx-auto h-auto max-h-[520px] w-auto max-w-full rounded-lg" />
-        <figcaption className="mt-2 text-xs leading-relaxed text-charcoal/60">
-          Quoted mailer dimensions are the usable body dimensions and exclude the adhesive flap.
-        </figcaption>
-      </figure>}
-
       {error && <p role="alert" className="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-800">{error}</p>}
       <div className="mt-7 flex flex-wrap gap-3">
         <button type="submit" className="min-h-12 rounded-xl bg-compost px-6 font-semibold text-white hover:bg-forest">Calculate size</button>
@@ -296,6 +289,12 @@ export function SizingCalculator({ mode, tool }: { mode: "mailer" | "layflat"; t
             <div className="flex justify-between gap-4"><dt>Closure flap</dt><dd className="text-right font-semibold">{result.value.flapMm} mm · {adhesive === "double" ? "double" : "single"} adhesive</dd></div>
             <div className="flex justify-between gap-4"><dt>Extra room selected</dt><dd className="text-right font-semibold">{extraRoomMm} mm</dd></div>
           </dl>
+          <figure className="mt-6 overflow-hidden rounded-xl bg-white p-3 text-charcoal">
+            <Image src="/tools/mailer-dimensions.png" alt="Diagram showing mailer body width, body length and the separate adhesive flap." width={480} height={640} unoptimized className="mx-auto h-auto max-h-[520px] w-auto max-w-full rounded-lg" />
+            <figcaption className="mt-2 text-xs leading-relaxed text-charcoal/65">
+              Use the diagram to match the recommended body dimensions and closure flap to the finished mailer. Quoted body dimensions exclude the adhesive flap.
+            </figcaption>
+          </figure>
         </>}
       </div> : <div className="mt-6">
         {result.value.requiresContact ? <><p className="text-2xl font-semibold">Please contact us directly</p><p className="mt-3 text-white/85">This result falls outside the 100–1,000 mm width or length range covered by the online calculator. Email us your packed product dimensions and details of your sealing setup and we’ll review the best option.</p><a href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Layflat tubing sizing enquiry")}`} className="mt-5 inline-flex min-h-11 items-center justify-center rounded-lg bg-white px-5 font-semibold text-compost">Email Zero Pack</a></> : <>

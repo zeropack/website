@@ -11,7 +11,8 @@ const groups = [
       { href: TREND_PACKAGING_FUNNEL_HREF, label: "Custom compostable mailers" },
       { href: "/custom-compostable-packaging/", label: "Custom compostable packaging" },
       { href: "/packaging-guide/", label: "Branded packaging guide" },
-      { href: "/tools/", label: "Tools & calculators" },
+    ],
+    tools: [
       { href: "/tools/box-volume-calculator/", label: "Box Volume Calculator" },
       { href: "/tools/shipping-carton-cbm-calculator/", label: "Shipping Carton / CBM Calculator" },
       { href: "/tools/mailer-size-calculator/", label: "Mailer Size Calculator" },
@@ -61,6 +62,22 @@ export function Footer() {
                   </li>
                 ))}
               </ul>
+              {"tools" in g && g.tools ? (
+                <div className="mt-7 border-t border-white/10 pt-6">
+                  <Link href="/tools/" className="text-sm font-semibold text-leaf hover:text-white">
+                    Tools & calculators
+                  </Link>
+                  <ul className="mt-3 space-y-2 text-sm text-white/85">
+                    {g.tools.map((l) => (
+                      <li key={l.href}>
+                        <Link className="hover:text-white" href={l.href}>
+                          {l.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
             </div>
           ))}
 

@@ -21,6 +21,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/tools/",
     "/tools/box-volume-calculator/",
     "/tools/shipping-carton-cbm-calculator/",
+    "/tools/mailer-size-calculator/",
+    "/tools/layflat-tubing-calculator/",
     "/articles/",
     "/contact/",
   ];

@@ -6,6 +6,7 @@
 export const ZERO_PACK_MANUFACTURING_TOLERANCE_MM = 5;
 export const ZERO_PACK_MIN_RECOMMENDED_DIMENSION_MM = 100;
 export const ZERO_PACK_MAX_RECOMMENDED_DIMENSION_MM = 1000;
+export const ZERO_PACK_MAX_LAYFLAT_OVERALL_CUT_LENGTH_MM = 10000;
 
 export function roundUpToFiveMm(value) {
   if (!Number.isFinite(value) || value <= 0) return null;
@@ -65,7 +66,8 @@ export function calculateLayflatCandidate({
   const flags = [];
 
   if (layflatWidthMm < ZERO_PACK_MIN_RECOMMENDED_DIMENSION_MM || overallCutLengthMm < ZERO_PACK_MIN_RECOMMENDED_DIMENSION_MM) flags.push("direct_contact_under_100mm");
-  if (layflatWidthMm > ZERO_PACK_MAX_RECOMMENDED_DIMENSION_MM || overallCutLengthMm > ZERO_PACK_MAX_RECOMMENDED_DIMENSION_MM) flags.push("direct_contact_over_1000mm");
+  if (layflatWidthMm > ZERO_PACK_MAX_RECOMMENDED_DIMENSION_MM) flags.push("direct_contact_width_over_1000mm");
+  if (overallCutLengthMm > ZERO_PACK_MAX_LAYFLAT_OVERALL_CUT_LENGTH_MM) flags.push("direct_contact_length_over_10000mm");
   if (widthClearanceMm > 50) flags.push("custom_width_clearance_above_slider_range");
   if (cutterTailMm > 50) flags.push("custom_cutter_tail_above_slider_range");
 

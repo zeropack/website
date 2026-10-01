@@ -45,6 +45,10 @@ export function SizingCalculator({ mode, tool }: { mode: "mailer" | "layflat"; t
   const [cutterTailMm, setCutterTailMm] = useState(DEFAULT_TUBING_CUTTER_TAIL_MM);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [resultEmail, setResultEmail] = useState("");
+  const [marketingOptIn, setMarketingOptIn] = useState(false);
+  const [emailState, setEmailState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [emailError, setEmailError] = useState("");
   const started = useRef(false);
 
   function start(resetResult = true) {
@@ -125,6 +129,64 @@ export function SizingCalculator({ mode, tool }: { mode: "mailer" | "layflat"; t
     trackTool("tool_complete", tool.id, tool.name, tool.market, "completed");
   }
 
+  async function emailResult(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!result || !parsed) return;
+    const email = resultEmail.trim();
+    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+      setEmailState("error");
+      setEmailError("Enter a valid email address.");
+      return;
+    }
+
+    const common = {
+      email,
+      tool_id: tool.id,
+      tool_name: tool.name,
+      market: tool.market,
+      display_unit: unit,
+      marketing_opt_in: marketingOptIn,
+      input_width_mm: parsed.widthMm,
+      input_length_mm: parsed.lengthMm,
+      input_depth_mm: parsed.depthMm,
+    };
+
+    const payload = result.kind === "mailer"
+      ? {
+          ...common,
+          recommended_width_mm: result.value.bodyWidthMm,
+          recommended_length_mm: result.value.bodyLengthMm,
+          flap_mm: result.value.flapMm,
+          adhesive,
+          extra_room_mm: extraRoomMm,
+        }
+      : {
+          ...common,
+          recommended_width_mm: result.value.layflatWidthMm,
+          recommended_length_mm: result.value.cutLengthMm,
+          width_clearance_mm: widthClearanceMm,
+          cutter_tail_mm: cutterTailMm,
+        };
+
+    setEmailState("sending");
+    setEmailError("");
+    try {
+      const response = await fetch("/api/tools/result-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json().catch(() => null);
+      if (!response.ok || !data?.ok) throw new Error(data?.error || "Unable to send result.");
+      setEmailState("sent");
+      trackTool("tool_result_email_submit", tool.id, tool.name, tool.market, "completed");
+      if (marketingOptIn) trackTool("tool_marketing_opt_in", tool.id, tool.name, tool.market, "completed");
+    } catch (sendError) {
+      setEmailState("error");
+      setEmailError(sendError instanceof Error ? sendError.message : "Unable to send result.");
+    }
+  }
+
   function reset() {
     setInputs({ width: "", length: "", depth: "" });
     setExtraRoomMm(0);
@@ -133,6 +195,10 @@ export function SizingCalculator({ mode, tool }: { mode: "mailer" | "layflat"; t
     setCutterTailMm(DEFAULT_TUBING_CUTTER_TAIL_MM);
     setSubmitted(false);
     setError("");
+    setResultEmail("");
+    setMarketingOptIn(false);
+    setEmailState("idle");
+    setEmailError("");
     started.current = false;
   }
 
@@ -226,6 +292,21 @@ export function SizingCalculator({ mode, tool }: { mode: "mailer" | "layflat"; t
           <div className="flex justify-between gap-4"><dt>Cutter tail</dt><dd className="font-semibold">{cutterTailMm} mm</dd></div>
         </dl>
         </>}
+      </div>}
+      {result && !result.value.requiresContact && <div className="mt-8 border-t border-white/25 pt-6">
+        <h3 className="font-heading text-xl font-semibold">Email me these measurements</h3>
+        <p className="mt-2 text-sm leading-relaxed text-white/80">Send yourself this sizing result so you have it when you are ready to request a quote.</p>
+        {emailState === "sent" ? <div className="mt-4 rounded-lg bg-white/10 p-4 text-sm"><p className="font-semibold">Result requested.</p><p className="mt-1 text-white/80">Check your inbox shortly. {marketingOptIn ? "We’ve also recorded your request for Zero Pack packaging tips." : ""}</p></div> : <form onSubmit={emailResult} className="mt-4 space-y-3">
+          <label className="block text-sm font-semibold" htmlFor={`tool-result-email-${mode}`}>Email address</label>
+          <input id={`tool-result-email-${mode}`} type="email" autoComplete="email" value={resultEmail} onChange={(event) => { setResultEmail(event.target.value); setEmailState("idle"); setEmailError(""); }} placeholder="you@company.com" className="min-h-12 w-full rounded-lg border border-white/25 bg-white px-3 text-charcoal placeholder:text-charcoal/45" />
+          <label className="flex items-start gap-3 text-sm leading-relaxed text-white/80">
+            <input type="checkbox" checked={marketingOptIn} onChange={(event) => setMarketingOptIn(event.target.checked)} className="mt-1 h-4 w-4 shrink-0" />
+            <span>Also send me practical packaging tips and the Zero Pack Packaging Guide. I can unsubscribe at any time.</span>
+          </label>
+          {emailState === "error" && <p role="alert" className="rounded-lg bg-white/10 p-3 text-sm">{emailError}</p>}
+          <button type="submit" disabled={emailState === "sending"} className="min-h-11 rounded-lg bg-white px-5 font-semibold text-compost disabled:opacity-60">{emailState === "sending" ? "Sending…" : "Email my result"}</button>
+          <p className="text-xs leading-relaxed text-white/60">Requesting your result does not subscribe you to marketing. The optional checkbox above is separate consent.</p>
+        </form>}
       </div>}
       <div className="mt-8 border-t border-white/25 pt-5 text-sm leading-relaxed text-white/85">
         <p className="font-semibold">Measure twice, order once.</p>

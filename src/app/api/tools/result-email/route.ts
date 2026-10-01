@@ -87,6 +87,17 @@ export async function POST(req: NextRequest) {
   }
 
   const source = TOOL_SOURCE[payload.tool_id];
+  const origin = payload.market === "au"
+    ? "https://www.zeropack.au"
+    : payload.market === "uk"
+      ? "https://www.zeropack.co.uk"
+      : "https://www.zeropack.co";
+  const calculatorPath = payload.tool_id === "mailer_size"
+    ? "/tools/mailer-size-calculator/"
+    : "/tools/layflat-tubing-calculator/";
+  const quotePath = payload.tool_id === "mailer_size"
+    ? "/custom-compostable-mailers#quoteform"
+    : "/custom-compostable-packaging#quoteform";
   const properties: Record<string, string | number | boolean> = {
     tool_id: payload.tool_id,
     tool_name: payload.tool_name || source.replace("Website Tool — ", ""),
@@ -100,6 +111,8 @@ export async function POST(req: NextRequest) {
     recommended_length_mm: payload.recommended_length_mm!,
     marketing_opt_in: payload.marketing_opt_in === true,
     consent_source: source,
+    calculator_url: `${origin}${calculatorPath}`,
+    quote_url: `${origin}${quotePath}`,
   };
 
   if (payload.tool_id === "mailer_size") {

@@ -1,83 +1,82 @@
 # Packaging sizing validation harness
 
-Internal Zero Pack development utility for validating candidate mailer and layflat-tubing sizing rules before those rules are approved for customer-facing calculators.
+Internal Zero Pack utility for checking the approved mailer and layflat-tubing calculator rules against a broad range of dimensions and known physical fit tests.
 
-## Status
+## Governing source
 
-Candidate validation logic only. This harness must not be treated as production sizing guidance.
+The live Google Drive document `Zero Pack Packaging Calculator Product Capability & Ruleset` is authoritative.
 
-The governing source is the live Google Drive document:
+## Approved mailer rule
 
-- `Zero Pack Packaging Calculator Product Capability & Ruleset`
+Minimum recommended body size:
 
-## Current candidate logic
+- width = product width + product depth + 5 mm
+- body length = product length + product depth / 2 + 15 mm
+- round upward to the next 5 mm
+- minimum flexible-packaging width reference = 100 mm
+- current mailer body-length limit = 1,000 mm
 
-### Mailers
+Quoted body dimensions exclude the flap.
 
-Base body geometry:
+Single adhesive:
 
-- width basis = packed product width + packed product depth
-- length basis = packed product length + packed product depth
-
-Fit is then modelled as a percentage allowance on those base dimensions.
-
-Current test reference points:
-
-- X = 5%
-- Y = 10%
-- Z = 15%
-- 20% = example above-Z test case
-
-Quoted body dimensions exclude the closure flap.
-
-Candidate single-adhesive flap interpretation:
-
-- body length under 600 mm = 40 mm flap
-- body length 600–1000 mm = 50 mm flap
+- body length under 600 mm → 40 mm flap
+- body length 600–1,000 mm → 50 mm flap
 
 Double adhesive:
 
 - approximately 70 mm flap
 
-Current mailer body maximum:
+Customer-selected extra room is added on top of the minimum recommended result.
 
-- 1000 mm
+## Approved layflat rule
 
-Current flexible-packaging minimum width reference:
+Minimum recommended layflat width:
 
-- 100 mm
+- width = product width + product depth + selected width clearance
+- minimum width clearance = 5 mm
+- round upward to the next 5 mm
 
-### Round layflat tubing
+Cut length:
 
-Base geometry:
+- product length + product depth / 2 + selected cutter tail
+- minimum cutter tail = 5 mm
+- default cutter tail = 15 mm
+- round upward to the next 5 mm
 
-```
-layflat width = π × diameter ÷ 2
-```
+## Production tolerance
 
-Fit is then modelled as a percentage allowance.
+Typical Zero Pack flexible-packaging dimensional tolerance is ±5 mm.
 
-### Manufacturing tolerance
+This is disclosed separately and is not hidden inside the sizing formula.
 
-Current Zero Pack flexible-packaging tolerance:
+## Physical validation basis
 
-- ±5 mm
+Mailer rules were checked against actual Zero Pack mailers:
 
-This is flagged separately from intentional fit allowance and is not silently added to the calculated size.
+- 150 × 220 mm with an approximately 120 × 190 × 23 mm handmade test box — comfortable fit
+- 230 × 320 mm with an approximately 190 × 275 × 30 mm handmade test box — comfortable fit
+- 400 × 480 mm with an approximately 360 × 430 × 35–40 mm handmade test box — snug fit
 
-## Why the harness flags some cases
+Layflat geometry was checked using:
 
-The purpose of the matrix is to find weak assumptions.
+- 205 mm layflat tubing
+- approximately 175 mm wide × 28 mm deep test product
+- result: very snug with essentially no movement at approximately 2 mm spare width
 
-Examples:
+That test supports using 5 mm as the minimum practical width clearance rather than treating the geometric minimum as comfortable.
 
-- a percentage allowance may be smaller than the ±5 mm production tolerance on very small products;
-- the calculated width may fall below the current 100 mm manufacturing-width reference;
-- a mailer body may exceed the current 1000 mm maximum;
-- a fit value above Z is allowed but sits outside the normal recommendation;
-- exact 600 mm body length is explicitly surfaced as a flap-boundary case.
+## Validation method
 
-These flags are validation prompts, not customer-facing errors.
+Keep the process simple:
+
+1. Run the mathematical test harness across small, medium and large dimensions.
+2. Review edge cases such as the 100 mm minimum width, 600 mm flap boundary and 1,000 mm body limit.
+3. Check representative results against actual Zero Pack packaging or simple physical mock-ups.
+4. Update the live ruleset if physical evidence shows the rule needs adjustment.
+5. Run the matrix again before changing public calculator logic.
+
+CAD/3D modelling is not required for this sizing workflow.
 
 ## Commands
 
@@ -99,23 +98,18 @@ Mailer CSV:
 npm run validate:sizing -- --format=csv --product=mailer
 ```
 
-Tubing CSV:
+Layflat CSV:
 
 ```bash
 npm run validate:sizing -- --format=csv --product=tubing
 ```
 
-## Validation workflow
+## Customer-facing safeguard
 
-1. Run the generated matrix.
-2. Review flagged small/large/deep edge cases.
-3. Select representative cases for CAD checks.
-4. Use Onshape for dimensional/geometry validation.
-5. Use Pacdora where helpful for packaging visualisation.
-6. Physically mock up a smaller representative set.
-7. Update the live calculator ruleset.
-8. Only then promote an approved formula into the public calculator.
+Calculator results are recommended starting dimensions, not final manufacturing approval.
 
-## Important
+Use the reminder:
 
-Do not copy candidate constants directly into public customer-facing calculator components until the live ruleset explicitly marks them approved.
+> Measure twice, order once.
+
+For an uncertain custom size, confirm the final fit with a physical sample or mock-up before manufacture.

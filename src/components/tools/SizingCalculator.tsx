@@ -1,8 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useRef, useState } from "react";
 import type { ToolIdentity } from "./ToolTracking";
 import { trackTool } from "@/lib/tools/analytics";
+import { PACKED_PRODUCT_DIMENSIONS_IMAGE } from "@/lib/tools/images/packedProductDimensions";
+import { MAILER_DIMENSIONS_IMAGE } from "@/lib/tools/images/mailerDimensions";
+import { LAYFLAT_TUBING_DIMENSIONS_IMAGE } from "@/lib/tools/images/layflatTubingDimensions";
 import {
   DEFAULT_TUBING_CUTTER_TAIL_MM,
   MIN_TUBING_CUTTER_TAIL_MM,
@@ -164,6 +168,8 @@ export function SizingCalculator({ mode, tool }: { mode: "mailer" | "layflat"; t
           ...common,
           recommended_width_mm: result.value.layflatWidthMm,
           recommended_length_mm: result.value.cutLengthMm,
+          sealed_length_mm: result.value.sealedLengthMm,
+          overall_cut_length_mm: result.value.cutLengthMm,
           width_clearance_mm: widthClearanceMm,
           cutter_tail_mm: cutterTailMm,
         };
@@ -208,6 +214,11 @@ export function SizingCalculator({ mode, tool }: { mode: "mailer" | "layflat"; t
     <form onSubmit={calculate} noValidate className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm sm:p-8">
       <h2 className="font-heading text-2xl font-semibold">Measure the packed product</h2>
       <p className="mt-3 text-sm leading-relaxed text-charcoal/70">Measure the product exactly as it will be packed. Use the outside width, length and finished depth / height.</p>
+
+      <figure className="mt-6 overflow-hidden rounded-xl border border-charcoal/10 bg-stone p-3">
+        <Image src={PACKED_PRODUCT_DIMENSIONS_IMAGE} alt="Diagram showing how to measure packed product width, length and depth / height." width={640} height={360} unoptimized className="h-auto w-full rounded-lg" />
+        <figcaption className="mt-2 text-xs leading-relaxed text-charcoal/60">Measure the outside dimensions of the product exactly as it will be packed.</figcaption>
+      </figure>
 
       <fieldset className="mt-6">
         <legend className="text-sm font-semibold">Measurement unit</legend>
@@ -254,14 +265,27 @@ export function SizingCalculator({ mode, tool }: { mode: "mailer" | "layflat"; t
         </div>
 
         <div>
-          <label htmlFor="tube-cutter-tail" className="block text-sm font-semibold">Material beyond the seal for your cutter</label>
-          <p className="mt-1 text-xs leading-relaxed text-charcoal/65">Minimum 5 mm. We recommend 15 mm as a practical starting point, but your sealer or cutter may need less or more.</p>
+          <label htmlFor="tube-cutter-tail" className="block text-sm font-semibold">Cutter tail</label>
+          <p className="mt-1 text-xs leading-relaxed text-charcoal/65">Material left beyond the seal for your cutter or sealing setup. Minimum 5 mm. We recommend 15 mm as a practical starting point, but your equipment may need less or more.</p>
           <div className="mt-3 flex items-center gap-4">
             <input id="tube-cutter-tail" type="range" min={MIN_TUBING_CUTTER_TAIL_MM} max="50" step="5" value={Math.min(cutterTailMm, 50)} onChange={(event) => { start(false); setCutterTailMm(Number(event.target.value)); }} className="w-full" />
             <div className="flex items-center gap-1"><input aria-label="Cutter tail in millimetres" type="number" min={MIN_TUBING_CUTTER_TAIL_MM} step="5" value={cutterTailMm} onChange={(event) => { start(false); setCutterTailMm(Math.max(MIN_TUBING_CUTTER_TAIL_MM, Number(event.target.value) || MIN_TUBING_CUTTER_TAIL_MM)); }} className="min-h-11 w-24 rounded-lg border border-charcoal/25 px-3" /><span className="text-sm">mm</span></div>
           </div>
         </div>
       </div>}
+
+      <figure className="mt-7 overflow-hidden rounded-xl border border-charcoal/10 bg-stone p-3">
+        {mode === "mailer" ? (
+          <Image src={MAILER_DIMENSIONS_IMAGE} alt="Diagram showing mailer body width, body length and the separate adhesive flap." width={480} height={640} unoptimized className="mx-auto h-auto max-h-[520px] w-auto max-w-full rounded-lg" />
+        ) : (
+          <Image src={LAYFLAT_TUBING_DIMENSIONS_IMAGE} alt="Diagram showing layflat width, sealed length, seal position, cutter tail and overall cut length." width={640} height={427} unoptimized className="h-auto w-full rounded-lg" />
+        )}
+        <figcaption className="mt-2 text-xs leading-relaxed text-charcoal/60">
+          {mode === "mailer"
+            ? "Quoted mailer dimensions are the usable body dimensions and exclude the adhesive flap."
+            : "Overall cut length = sealed length + cutter tail. The cutter tail is the material left beyond the seal for your cutter or sealing setup."}
+        </figcaption>
+      </figure>
 
       {error && <p role="alert" className="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-800">{error}</p>}
       <div className="mt-7 flex flex-wrap gap-3">

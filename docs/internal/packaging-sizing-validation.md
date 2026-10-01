@@ -37,12 +37,16 @@ Minimum recommended layflat width:
 - minimum width clearance = 5 mm
 - round upward to the next 5 mm
 
-Cut length:
+Length terminology:
 
-- product length + product depth / 2 + selected cutter tail
+- sealed length = product length + product depth / 2
+- round sealed length upward to the next 5 mm
+- cutter tail = customer-selected material left beyond the seal
 - minimum cutter tail = 5 mm
 - default cutter tail = 15 mm
-- round upward to the next 5 mm
+- overall cut length = sealed length + cutter tail
+
+The customer-facing calculator must show sealed length, cutter tail and overall cut length separately so the final cut position is unambiguous.
 
 ## Production tolerance
 

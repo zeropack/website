@@ -35,7 +35,7 @@ export default async function Page() {
     ]}
     related={[
       { href: "/tools/mailer-size-calculator/", title: "Mailer Size Calculator", description: "Estimate a custom mailer body size from packed product dimensions." },
-      { href: "/custom-compostable-packaging/", title: "Custom packaging", description: "Talk to Zero Pack about the packaging you need and your product requirements." },
+      { href: "/custom-compostable-packaging#quoteform", title: "Custom packaging", description: "Talk to Zero Pack about the packaging you need and your product requirements." },
     ]}
   ><SizingCalculator mode="layflat" tool={tool} /></ToolPage>;
 }

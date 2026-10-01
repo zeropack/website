@@ -16,7 +16,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/how-it-works/",
     "/customer-showcase/",
     "/about/",
-    "/quote/",
     "/packaging-guide/",
     "/tools/",
     "/tools/box-volume-calculator/",

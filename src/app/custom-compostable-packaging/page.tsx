@@ -424,6 +424,23 @@ export default async function Page() {
         </div>
       </section>
 
+      <section className="bg-mist/60 py-12 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-6 rounded-3xl border border-compost/10 bg-white p-7 shadow-sm md:grid-cols-[1fr_auto] md:items-center sm:p-9">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-air">Need help with sizing?</p>
+              <h2 className="mt-3 font-heading text-2xl font-semibold text-charcoal sm:text-3xl">Start with a Zero Pack calculator</h2>
+              <p className="mt-3 max-w-3xl leading-relaxed text-charcoal/70">If you already know what you are packing, use the sizing tools to get a practical starting point before you request a quote.</p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row md:flex-col">
+              <CTAButton href="/tools/mailer-size-calculator/" variant="secondary">Mailer Size Calculator</CTAButton>
+              <CTAButton href="/tools/layflat-tubing-calculator/" variant="secondary">Layflat Tubing Calculator</CTAButton>
+              <CTAButton href="/tools/" variant="secondary">View All Tools</CTAButton>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="relative overflow-hidden bg-gradient-to-br from-[#07150f] via-[#103224] to-[#0a1b18] py-14 text-white sm:py-20 lg:py-24">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_30%,rgba(0,168,243,0.18),transparent_38%)]" aria-hidden />
         <div className="relative mx-auto max-w-5xl px-4 text-center sm:px-6">

@@ -20,6 +20,8 @@ export function GET() {
     "/tools",
     "/tools/box-volume-calculator",
     "/tools/shipping-carton-cbm-calculator",
+    "/tools/mailer-size-calculator",
+    "/tools/layflat-tubing-calculator",
     "/contact",
     "/microplastics",
     "/articles",

@@ -213,7 +213,7 @@ export function SizingCalculator({ mode, tool }: { mode: "mailer" | "layflat"; t
       <p className="mt-3 text-sm leading-relaxed text-charcoal/70">Measure the product exactly as it will be packed. Use the outside width, length and finished depth / height.</p>
 
       <figure className="mt-6 overflow-hidden rounded-xl border border-charcoal/10 bg-stone p-3">
-        <Image src="/images/tools/packed-product-dimensions.jpg" alt="Diagram showing how to measure packed product width, length and depth / height." width={640} height={360} unoptimized className="h-auto w-full rounded-lg" />
+        <Image src="/tools/packed-product-dimensions.png" alt="Diagram showing how to measure packed product width, length and depth / height." width={640} height={360} unoptimized className="h-auto w-full rounded-lg" />
         <figcaption className="mt-2 text-xs leading-relaxed text-charcoal/60">Measure the outside dimensions of the product exactly as it will be packed.</figcaption>
       </figure>
 
@@ -273,9 +273,9 @@ export function SizingCalculator({ mode, tool }: { mode: "mailer" | "layflat"; t
 
       <figure className="mt-7 overflow-hidden rounded-xl border border-charcoal/10 bg-stone p-3">
         {mode === "mailer" ? (
-          <Image src="/images/tools/mailer-dimensions.jpg" alt="Diagram showing mailer body width, body length and the separate adhesive flap." width={480} height={640} unoptimized className="mx-auto h-auto max-h-[520px] w-auto max-w-full rounded-lg" />
+          <Image src="/tools/mailer-dimensions.png" alt="Diagram showing mailer body width, body length and the separate adhesive flap." width={480} height={640} unoptimized className="mx-auto h-auto max-h-[520px] w-auto max-w-full rounded-lg" />
         ) : (
-          <Image src="/images/tools/layflat-tubing-dimensions.jpg" alt="Diagram showing layflat width, sealed length, seal position, cutter tail and overall cut length." width={640} height={427} unoptimized className="h-auto w-full rounded-lg" />
+          <Image src="/tools/layflat-tubing-dimensions.png" alt="Diagram showing layflat width, sealed length, seal position, cutter tail and overall cut length." width={640} height={427} unoptimized className="h-auto w-full rounded-lg" />
         )}
         <figcaption className="mt-2 text-xs leading-relaxed text-charcoal/60">
           {mode === "mailer"

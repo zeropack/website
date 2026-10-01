@@ -12,7 +12,7 @@ const tools = [
   { title: "Box Volume Calculator", href: "/tools/box-volume-calculator/", text: "Calculate the volume of a rectangular space from its length, width and height. See cubic centimetres, litres and cubic metres." },
   { title: "Shipping Carton / CBM Calculator", href: "/tools/shipping-carton-cbm-calculator/", text: "Calculate the combined external volume of the cartons in cubic metres. Add quantities and different carton sizes." },
   { title: "Mailer Size Calculator", href: "/tools/mailer-size-calculator/", text: "Estimate a practical custom mailer body size from the width, length and depth of your packed product." },
-  { title: "Layflat Tubing Calculator", href: "/tools/layflat-tubing-calculator/", text: "Estimate layflat tubing width and cut length, with adjustable clearance and cutter-tail allowance." },
+  { title: "Layflat Tubing Calculator", href: "/tools/layflat-tubing-calculator/", text: "Estimate layflat tubing width, sealed length and overall cut length, with adjustable clearance and cutter-tail allowance." },
 ];
 const planned = [
   { title: "Packaging Finder", text: "Planned. An assisted route to explore packaging options is being developed." },

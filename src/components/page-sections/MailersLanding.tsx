@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import Link from "next/link";
 import { globalMailers } from "@/content/global/home";
 import { mailersContent, type MailersVariant } from "@/content/mailersContent";
@@ -12,7 +11,7 @@ import { ProcessSteps } from "@/components/ProcessSteps";
 import { ComparisonTable } from "@/components/ComparisonTable";
 import { CustomerShowcaseGrid } from "@/components/CustomerShowcaseGrid";
 import { LeadMagnetBlock } from "@/components/LeadMagnetBlock";
-import { QuoteFormMultiStep } from "@/components/QuoteFormMultiStep";
+import { TypeformFormEmbed } from "@/components/TypeformFormEmbed";
 import { FAQAccordion } from "@/components/FAQAccordion";
 import { FAQSchema } from "@/components/FAQSchema";
 import { CTASection } from "@/components/CTASection";
@@ -230,10 +229,8 @@ export function MailersLanding({ variant }: { variant: MailersVariant }) {
                 Quote pricing depends on size, quantity and print. If you are unsure, choose “Not sure” options — we
                 still respond with guidance.
               </p>
-              <div className="mt-8 rounded-2xl border border-black/5 bg-stone p-6">
-                <Suspense fallback={<p className="text-sm text-charcoal/60">Loading form…</p>}>
-                  <QuoteFormMultiStep defaultRegion={region} />
-                </Suspense>
+              <div id="quoteform" className="mt-8 rounded-2xl border border-black/5 bg-stone p-3 sm:p-5">
+                <TypeformFormEmbed className="min-h-[620px] w-full" />
               </div>
             </div>
             <div>

@@ -11,6 +11,7 @@ const groups = [
       { href: TREND_PACKAGING_FUNNEL_HREF, label: "Custom compostable mailers" },
       { href: "/custom-compostable-packaging/", label: "Custom compostable packaging" },
       { href: "/packaging-guide/", label: "Branded packaging guide" },
+      { href: "/tools/", label: "Packaging calculators" },
     ],
   },
   {

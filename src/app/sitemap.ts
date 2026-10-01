@@ -18,6 +18,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/about/",
     "/quote/",
     "/packaging-guide/",
+    "/tools/",
+    "/tools/box-volume-calculator/",
+    "/tools/shipping-carton-cbm-calculator/",
     "/articles/",
     "/contact/",
   ];

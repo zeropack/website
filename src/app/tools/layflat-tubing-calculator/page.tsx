@@ -20,8 +20,8 @@ export default async function Page() {
     intro="Estimate the layflat tubing width and overall cut length you need from the dimensions of your packed product. The calculator separates the sealed length from the cutter tail so it is clear where the seal sits and where the tubing is finally cut."
     tool={tool}
     explanation={<>
-      <p>The tubing width starts with the packed product width plus its depth, then adds your selected clearance. The minimum recommended clearance is 5 mm.</p>
-      <p>Sealed length allows for the product length plus half of the product depth at the sealing end. Your selected cutter tail is then added beyond the seal. Overall cut length = sealed length + cutter tail. The default cutter tail is 15 mm, with a 5 mm minimum.</p>
+      <p>The tubing width starts with the packed product width plus its depth / height, then adds your selected clearance. The minimum recommended clearance is 5 mm.</p>
+      <p>Sealed length allows for the product length plus half of the product depth / height at the sealing end. Your selected cutter tail is then added beyond the seal. Overall cut length = sealed length + cutter tail. The default cutter tail is 15 mm, with a 5 mm minimum.</p>
     </>}
     limitations={<>
       <p>The cutter-tail setting depends on your sealing and cutting equipment. Keep enough material beyond the seal for your own machine and workflow.</p>

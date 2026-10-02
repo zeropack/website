@@ -81,13 +81,10 @@ function decodeToken(token: string): { itemId: string; nonce: string } | null {
   }
 }
 
-function linkContainsToken(link: string, token: string): boolean {
-  try {
-    const parsed = new URL(link);
-    return parsed.searchParams.get("t") === token;
-  } catch {
-    return false;
-  }
+function commentsContainToken(comments: string, token: string): boolean {
+  return comments
+    .split(/\\r?\\n/)
+    .some((line) => line.trim() === `[ZP_SUBSCRIBE_TOKEN:${token}]`);
 }
 
 function validEmail(value: string): boolean {

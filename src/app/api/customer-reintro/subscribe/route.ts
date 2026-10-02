@@ -3,10 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { KLAVIYO_API_REVISION, MONDAY_API_VERSION } from "@/lib/integrations/klaviyo-monday/config";
 
 const COOKIE_NAME = "zp_reintro_token";
-const CONTACTS_BOARD_ID = 5029468199;
 const EMAIL_COLUMN_ID = "contact_email";
 const FIRST_NAME_COLUMN_ID = "text_mm5n6d0w";
-const OUTREACH_LINK_COLUMN_ID = "text_mm6h8npv";
+const COMMENTS_COLUMN_ID = "long_text4";
 const NEWSLETTER_LIST_ID = "VaVKfk";
 const SUBSCRIPTION_SOURCE = "Zero Pack customer re-introduction — explicit landing-page opt-in";
 const ACQUISITION_SOURCE = "ZWC Customer Re-introduction";
@@ -83,7 +82,7 @@ function decodeToken(token: string): { itemId: string; nonce: string } | null {
 
 function commentsContainToken(comments: string, token: string): boolean {
   return comments
-    .split(/\\r?\\n/)
+    .split(/\r?\n/)
     .some((line) => line.trim() === `[ZP_SUBSCRIBE_TOKEN:${token}]`);
 }
 
@@ -106,7 +105,7 @@ async function resolveContact(token: string): Promise<ContactIdentity | null> {
     query CustomerReintroContact($ids: [ID!]!) {
       items(ids: $ids) {
         id
-        column_values(ids: ["${EMAIL_COLUMN_ID}", "${FIRST_NAME_COLUMN_ID}", "${OUTREACH_LINK_COLUMN_ID}"]) {
+        column_values(ids: ["${EMAIL_COLUMN_ID}", "${FIRST_NAME_COLUMN_ID}", "${COMMENTS_COLUMN_ID}"]) {
           id
           text
         }
@@ -123,10 +122,10 @@ async function resolveContact(token: string): Promise<ContactIdentity | null> {
 
   const columns = Object.fromEntries(item.column_values.map((column) => [column.id, column.text || ""]));
   const email = String(columns[EMAIL_COLUMN_ID] || "").trim().toLowerCase();
-  const outreachLink = String(columns[OUTREACH_LINK_COLUMN_ID] || "").trim();
+  const comments = String(columns[COMMENTS_COLUMN_ID] || "");
   const firstName = String(columns[FIRST_NAME_COLUMN_ID] || "").trim() || null;
 
-  if (!validEmail(email) || !outreachLink || !linkContainsToken(outreachLink, token)) return null;
+  if (!validEmail(email) || !commentsContainToken(comments, token)) return null;
 
   return { itemId: item.id, email, firstName };
 }

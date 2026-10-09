@@ -30,7 +30,7 @@ test("subjects are not sufficient for email deduplication", () => {
   const b = { ...a, occurredAt: "2026-10-02T00:00:00Z" };
   assert.equal(sameEmail(a, b), false);
   assert.equal(shouldRecoverOutlookMessage(a, [b], null), false);
-  assert.equal(shouldRecoverOutlookMessage(a, [b], "123"), true);
+  assert.equal(shouldRecoverOutlookMessage(a, [b], "123"), false);\n  assert.equal(shouldRecoverOutlookMessage({ ...a, internetMessageId: "<unique@zeropack.co>" }, [b], "123"), true);
   assert.equal(sameEmail({ ...a, internetMessageId: "<abc@example.com>" }, { ...b, internetMessageId: "abc@example.com" }), true);
 });
 

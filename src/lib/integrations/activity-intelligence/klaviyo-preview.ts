@@ -39,8 +39,11 @@ export async function fetchRecentKlaviyoEvents(lookbackHours: number, maxPages: 
   const since = new Date(Date.now() - lookbackHours * 3600000).toISOString();
   let path: string | null = `/api/events/?filter=${encodeURIComponent(`greater-or-equal(datetime,${since})`)}&include=profile,metric&page[size]=100&sort=-datetime`;
   const events: KlaviyoEventInput[] = [];
+  const pageUrls = new Set<string>();
   for (let page = 0; path && page < maxPages; page++) {
     const url: URL = new URL(path, KLAVIYO_ORIGIN);
+    if (pageUrls.has(url.href)) throw new Error("Repeated Klaviyo pagination cursor");
+    pageUrls.add(url.href);
     if (url.origin !== KLAVIYO_ORIGIN || !url.pathname.startsWith("/api/events/")) {
       throw new Error("Unsafe Klaviyo pagination URL");
     }
@@ -64,6 +67,7 @@ export async function fetchRecentKlaviyoEvents(lookbackHours: number, maxPages: 
     }
     path = body.links?.next || null;
   }
+  if (path) throw new Error("Event page budget exhausted; refusing incomplete preview");
   return events;
 }
 

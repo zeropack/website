@@ -93,7 +93,7 @@ export function shouldRecoverOutlookMessage(
   nativeMessages: MailSummary[],
   contactId: string | null,
 ): boolean {
-  if (!contactId) return false;
+  if (!contactId || (!candidate.internetMessageId && !candidate.providerMessageId)) return false;
   // If the native timeline cannot be inspected comprehensively, caller must not invoke this function.
   return !nativeMessages.some((native) => sameEmail(candidate, native));
 }

@@ -1,5 +1,6 @@
 import { MONDAY_API_VERSION } from "@/lib/integrations/klaviyo-monday/config";
 import { ACTIVITY_TYPES } from "./activity-types";
+import { claimKlaviyoEvent } from "./event-claim";
 import { reconciliationKeysFromTimeline } from "./monday-replay";
 import type { ActivityCandidate } from "./model";
 
@@ -39,6 +40,8 @@ export async function writePilotKlaviyoActivity(candidate: ActivityCandidate): P
   if (!/^\d+$/.test(candidate.contactId) || !candidate.sourceEventId) throw new Error("Invalid candidate identity");
   const existing = await readCompleteMondayKeys(candidate.contactId);
   if (existing.has(candidate.fingerprint)) return { status: "already_recorded" };
+  // A durable, create-only claim prevents two independent invocations from writing the same event.
+  if (!await claimKlaviyoEvent(candidate.sourceEventId)) return { status: "already_recorded" };
   const content = [
     "Source: Klaviyo",
     `Metric: ${candidate.kind}`,

@@ -47,9 +47,10 @@ export function classifyKlaviyoMetric(name: string, properties: Record<string, u
       return { kind: "klaviyo_newsletter_signup", class: "behavioural", confidence: "confirmed" };
     case "Active on Site":
       return { kind: "klaviyo_site_activity", class: "diagnostic", confidence: "uncertain" };
+    case "Filled Out Form":
     case "Form completed by profile":
     case "Form submitted by profile": {
-      const target = String(properties.page_url || properties.form_name || properties.formName || "");
+      const target = String(properties.page_url || properties.step_name || properties.form_name || properties.formName || "");
       if (/packaging-guide/i.test(target)) {
         return { kind: "klaviyo_guide_signup", class: "behavioural", confidence: "basic" };
       }

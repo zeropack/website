@@ -18,7 +18,7 @@ type KlaviyoEventResource = {
   };
   relationships?: {
     profile?: { data?: { id?: string } | null };
-    metric?: { data?: { id?: string } | null };
+    metric?: { data?: { id?: string; attributes?: { name?: string } } | null };
   };
 };
 
@@ -55,7 +55,8 @@ export async function fetchRecentKlaviyoEvents(lookbackHours: number, maxPages: 
     const body = await response.json() as KlaviyoResponse;
     const metrics = new Map((body.included || []).filter(x => x.type === "metric").map(x => [x.id, x.attributes?.name || ""]));
     for (const item of body.data || []) {
-      const metricName = metrics.get(item.relationships?.metric?.data?.id || "") || "";
+      const embeddedMetric = item.relationships?.metric?.data;
+      const metricName = embeddedMetric?.attributes?.name || metrics.get(embeddedMetric?.id || "") || "";
       if (!METRIC_NAMES.has(metricName)) continue;
       events.push({
         id: item.id,

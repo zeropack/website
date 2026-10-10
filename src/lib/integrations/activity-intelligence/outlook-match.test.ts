@@ -37,3 +37,9 @@ test("opaque but fully read native emails do not indefinitely block matching Con
   const opaque = { ...candidate, internetMessageId: undefined, providerMessageId: undefined, from: "", subject: "" };
   assert.equal(reconcileOutlookWithMonday(candidate, "buyer@example.test", contacts, [opaque], true).action, "eligible");
 });
+
+test("opaque native email with same Contact subject and timestamp is suppressed", () => {
+  const native = { ...candidate, from: "", internetMessageId: undefined, providerMessageId: undefined, occurredAt: "2026-10-09T03:00:34.000Z" };
+  assert.equal(reconcileOutlookWithMonday(candidate, "buyer@example.test", contacts, [native], true).action, "duplicate");
+  assert.equal(reconcileOutlookWithMonday(candidate, "buyer@example.test", contacts, [{ ...native, subject: "Different enquiry" }], true).action, "eligible");
+});

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { previewOutlookGraph } from "./outlook-graph";
+import { previewOutlookGraph, scanOutlookGraph } from "./outlook-graph";
 
 function restoreEnv() {
   const old = {
@@ -89,4 +89,19 @@ test("rejects Graph continuation pointing to another mailbox", async () => {
     : Response.json({ value: [], "@odata.nextLink": "https://graph.microsoft.com/v1.0/users/other@example.test/mailFolders/inbox/messages?$skip=50" });
   try { await assert.rejects(() => previewOutlookGraph(24, 2), /Unsafe or repeated Graph pagination/); }
   finally { globalThis.fetch = previous; reset(); }
+});
+
+test("manual historical scan constrains both date bounds and rejects excessive ranges", async () => {
+  const reset = restoreEnv(); const prior = globalThis.fetch; const urls: string[] = [];
+  globalThis.fetch = async input => {
+    const url = String(input); urls.push(url);
+    return url.includes("/oauth2/") ? Response.json({ access_token: "testing" }) : Response.json({ value: [] });
+  };
+  try {
+    await scanOutlookGraph(24, 2, { startAt: "2026-07-01T00:00:00Z", endAt: "2026-07-02T00:00:00Z" });
+    const scans = urls.filter(x => x.startsWith("https://graph.microsoft.com"));
+    assert.equal(scans.length, 2);
+    assert.ok(scans.every(x => decodeURIComponent(x).includes("ge 2026-07-01T00:00:00Z and")));
+    await assert.rejects(() => scanOutlookGraph(24, 2, { startAt: "2026-07-01T00:00:00Z", endAt: "2026-07-10T00:00:00Z" }), /at most seven days/);
+  } finally { globalThis.fetch = prior; reset(); }
 });

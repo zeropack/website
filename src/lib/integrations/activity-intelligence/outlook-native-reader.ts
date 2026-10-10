@@ -57,6 +57,7 @@ export async function readMondayNativeMail(contactId: string): Promise<{
     });
     if (!idMatch) opaque = true;
   }
-  return opaque ? { complete: false, messages, reason: "Native email without stable RFC identifier; only positive duplicate matches permitted" }
-    : { complete: true, messages };
+  // A fully paginated timeline is complete even when native emails omit RFC IDs.
+  // Opaque entries remain in messages for best-effort comparison.
+  return { complete: true, messages, reason: opaque ? "Some native email IDs unavailable; best-effort duplicate check" : undefined };
 }

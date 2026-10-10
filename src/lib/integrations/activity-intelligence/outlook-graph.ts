@@ -38,7 +38,7 @@ export type OutlookPreviewItem = {
   disposition: "candidate" | "hold"; reason: string;
 };
 
-export async function previewOutlookGraph(lookbackHours = 24, maxPages = 2) {
+export async function scanOutlookGraph(lookbackHours = 24, maxPages = 2) {
   if (!Number.isInteger(lookbackHours) || lookbackHours < 1 || lookbackHours > 168) throw new Error("Invalid lookback");
   if (!Number.isInteger(maxPages) || maxPages < 1 || maxPages > 5) throw new Error("Invalid page budget");
   const token = await graphAppToken();
@@ -94,12 +94,18 @@ export async function previewOutlookGraph(lookbackHours = 24, maxPages = 2) {
     }
     if (next) throw new Error("Incomplete Graph mailbox scan; page budget exhausted");
   }
+  return { scanned, items };
+}
+
+/** Restricted public shape: only opaque IDs, never parties or message body. */
+export async function previewOutlookGraph(lookbackHours = 24, maxPages = 2) {
+  const { scanned, items } = await scanOutlookGraph(lookbackHours, maxPages);
   return {
-    mode: "dry_run", mailbox: MAILBOX, scanned, candidateCount: items.filter(x => x.disposition === "candidate").length,
+    mode: "dry_run" as const, mailbox: MAILBOX, scanned,
+    candidateCount: items.filter(x => x.disposition === "candidate").length,
     holdCount: items.filter(x => x.disposition === "hold").length,
-    // No message bodies or email addresses returned through the endpoint.
     items: items.map(x => ({ messageId: x.messageId, occurredAt: x.occurredAt,
       category: x.category, disposition: x.disposition, reason: x.reason })),
-    warning: "Read-only mailbox scan. No canonical Monday matching, native activity deduplication, CRM writes, or scheduling. Candidate does not mean eligible for import.",
+    warning: "Read-only mailbox scan; no canonical Monday matching, native activity deduplication, CRM writes or schedule. A candidate is NOT eligible for import.",
   };
 }

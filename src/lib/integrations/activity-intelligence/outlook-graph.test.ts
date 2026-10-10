@@ -101,7 +101,7 @@ test("manual historical scan constrains both date bounds and rejects excessive r
     await scanOutlookGraph(24, 2, { startAt: "2026-07-01T00:00:00Z", endAt: "2026-07-02T00:00:00Z" });
     const scans = urls.filter(x => x.startsWith("https://graph.microsoft.com"));
     assert.equal(scans.length, 2);
-    assert.ok(scans.every(x => decodeURIComponent(x).includes("ge 2026-07-01T00:00:00Z and")));
+    assert.ok(scans.every(x => new URL(x).searchParams.get("$filter")?.includes("ge 2026-07-01T00:00:00Z and")));
     await assert.rejects(() => scanOutlookGraph(24, 2, { startAt: "2026-07-01T00:00:00Z", endAt: "2026-07-10T00:00:00Z" }), /at most seven days/);
   } finally { globalThis.fetch = prior; reset(); }
 });

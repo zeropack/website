@@ -25,3 +25,9 @@ test("QBO notifications require specific recipient and quote/invoice reference",
 test("source keys preserve provenance", () => {
   assert.notEqual(recoveryLedgerKey("outlook_manual", "123"), recoveryLedgerKey("quickbooks_notification", "123"));
 });
+
+test("confirmed editorial traffic and system notifications are excluded", () => {
+  assert.equal(classifyOutlookRecovery({ ...base, from: "drew@surfrider.org.au", direction: "received", sourceFolder: "inbox" }).action, "skip");
+  assert.equal(classifyOutlookRecovery({ ...base, from: "australia+noreply@guardian.co.uk", direction: "received", sourceFolder: "inbox" }).action, "skip");
+  assert.equal(classifyOutlookRecovery({ ...base, from: "system@vercel.com", direction: "received", sourceFolder: "inbox" }).action, "skip");
+});

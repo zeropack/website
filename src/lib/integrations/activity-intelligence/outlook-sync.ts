@@ -14,7 +14,7 @@ const BATCH_LIMIT = 25;
 
 type GraphBody = { id?: string; body?: { content?: string }; bodyPreview?: string };
 type TimelineMutation = { data?: { create_timeline_item?: { id?: string } }; errors?: Array<{ message: string }> };
-export type SyncOptions = { mode: "incremental" | "manual"; email?: string; lookbackHours?: number; maxPages?: number; startAt?: string; endAt?: string; write: boolean };
+export type SyncOptions = { mode: "incremental" | "manual" | "audit"; email?: string; lookbackHours?: number; maxPages?: number; startAt?: string; endAt?: string; write: boolean };
 
 function excludesKnownAutomation(m: OutlookPreviewItem): boolean {
   if (m.direction !== "sent") return false;
@@ -62,6 +62,7 @@ async function writeActivity(contactId: string, m: OutlookPreviewItem, html: str
 
 /** Simple serial runner. Unmatched Contacts are ignored; failures never advance checkpoint. */
 export async function syncOutlookRecovery(options: SyncOptions) {
+  if (options.mode === "audit" && options.write) throw new Error("Audit is read-only");
   if (options.write && process.env.OUTLOOK_RECOVERY_WRITE_ENABLED !== "true")
     throw new Error("Recovery writes are disabled");
   const checkpoint = options.mode === "incremental" ? await readRecoveryCheckpoint() : null;
@@ -91,7 +92,7 @@ export async function syncOutlookRecovery(options: SyncOptions) {
     .sort((a, b) => Date.parse(a.occurredAt) - Date.parse(b.occurredAt));
   for (const m of eligible) {
     if (options.mode === "manual" && m.address.toLowerCase() !== options.email?.toLowerCase()) continue;
-    if (options.mode === "incremental" && excludesKnownAutomation(m)) { stats.ignored++; continue; }
+    if (options.mode !== "manual" && excludesKnownAutomation(m)) { stats.ignored++; continue; }
     const ids = exact.get(m.address.trim().toLowerCase()) || [];
     if (ids.length !== 1) { ids.length ? stats.ambiguous++ : stats.ignored++; continue; }
     if (processed >= BATCH_LIMIT) { stats.failed++; break; }

@@ -1,11 +1,11 @@
 import { MONDAY_API_VERSION } from "@/lib/integrations/klaviyo-monday/config";
 import type { MailSummary } from "./model";
 
-type Entry = { id?: string; content?: string | null; custom_activity_id?: string | null; type?: string | null; title?: string | null; created_at?: string | null; metadata?: string | Record<string, unknown> | null };
+type Entry = { id?: string; content?: string | null; custom_activity_id?: string | null; type?: string | null; title?: string | null; created_at?: string | null };
 type Page = { cursor?: string | null; timeline_items?: Entry[] };
 type Result = { data?: { timeline?: { timeline_items_page?: Page } }; errors?: Array<{ message: string }> };
 
-const query = `query($id: ID!) { timeline(id: $id) { timeline_items_page { cursor timeline_items { id content custom_activity_id type title created_at metadata } } } }`;
+const query = `query($id: ID!) { timeline(id: $id) { timeline_items_page { cursor timeline_items { id content custom_activity_id type title created_at } } } }`;
 
 /**
  * Read native Monday timeline entries for a single existing Contact.
@@ -30,26 +30,32 @@ export async function readMondayNativeMail(contactId: string): Promise<{
   if (page.cursor) return { complete: false, messages: [], reason: "Native Monday timeline pagination incomplete" };
   const messages: MailSummary[] = [];
   let opaque = false;
+  // These are existing production E&A activity types, not new schema.
+  const recoveredTypes = new Set([
+    "5596cef2-66b3-4dfe-8cce-c366d66cd4f2", // Email Received
+    "8b6c4544-b271-4cc6-a9fc-40811d6f8e9c", // Email Sent
+  ]);
   for (const item of page.timeline_items) {
-    if (item.custom_activity_id) continue;
-    const raw = item.metadata;
-    let metadata: Record<string, unknown> = {};
-    try {
-      metadata = typeof raw === "string" ? JSON.parse(raw) as Record<string, unknown>
-        : raw && typeof raw === "object" ? raw : {};
-    } catch { opaque = true; continue; }
-    if (item.type && item.type !== "email") continue;
-    const sender = typeof metadata.from === "string" ? metadata.from : "";
-    const to = Array.isArray(metadata.to) ? metadata.to.filter((x): x is string => typeof x === "string") : [];
     const text = item.content || "";
-    const idMatch = /(?:internet[- ]?message[- ]?id|message[- ]?id)\s*:\s*(<[^>]+>|[^\s]+)/i.exec(text);
-    const stableId = idMatch?.[1];
-    const direction = sender.trim().toLowerCase() === "hello@zeropack.co" ? "sent" : "received";
+    if (item.custom_activity_id) {
+      if (!recoveredTypes.has(item.custom_activity_id) || !item.title?.startsWith("Recovered Outlook:")) continue;
+      const marker = /Original Outlook Message ID:\s*([^<\s]+)/i.exec(text);
+      if (!marker) { opaque = true; continue; }
+      messages.push({
+        providerMessageId: marker[1], direction: item.custom_activity_id === "8b6c4544-b271-4cc6-a9fc-40811d6f8e9c" ? "sent" : "received",
+        from: "", to: [], subject: item.title, occurredAt: item.created_at || "",
+      });
+      continue;
+    }
+    // Native Monday E&A GraphQL does not expose sender/recipient metadata.
+    // A native message can be positively matched by an embedded RFC ID;
+    // otherwise it must remain opaque, never proof of absence.
+    const idMatch = /(?:internet[- ]?message[- ]?id|message[- ]?id)\s*:\s*(<[^>]+>|[^\s<]+)/i.exec(text);
     messages.push({
-      internetMessageId: stableId, direction, from: sender, to,
-      subject: item.title || "", occurredAt: item.created_at || "",
+      internetMessageId: idMatch?.[1],
+      direction: "received", from: "", to: [], subject: item.title || "", occurredAt: item.created_at || "",
     });
-    if (!stableId) opaque = true;
+    if (!idMatch) opaque = true;
   }
   return opaque ? { complete: false, messages, reason: "Native email without stable RFC identifier; only positive duplicate matches permitted" }
     : { complete: true, messages };

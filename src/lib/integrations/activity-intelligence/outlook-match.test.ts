@@ -15,7 +15,7 @@ test("holds absent or ambiguous Contact instead of creating CRM identity", () =>
 });
 test("holds incomplete native correspondence even with unique contact", () => {
   assert.equal(reconcileOutlookWithMonday(candidate, "buyer@example.test", contacts, null, false).action, "hold");
-  assert.equal(reconcileOutlookWithMonday(candidate, "buyer@example.test", contacts, [{...candidate, internetMessageId: undefined, providerMessageId: undefined, occurredAt: "2026-10-08T03:00:00.000Z"}], true).action, "hold");
+  assert.equal(reconcileOutlookWithMonday(candidate, "buyer@example.test", contacts, [{...candidate, internetMessageId: undefined, providerMessageId: undefined, occurredAt: "2026-10-08T03:00:00.000Z"}], true).action, "eligible");
 });
 test("native RFC id always takes priority over Outlook's mutable provider ID", () => {
   const native = {...candidate, providerMessageId: "different-Monday-provider-id"};
@@ -31,4 +31,9 @@ test("native metadata positive duplicate wins even if RFC history remains opaque
   assert.equal(reconcileOutlookWithMonday(candidate, "buyer@example.test", contacts, [native], false).action, "duplicate");
   assert.equal(reconcileOutlookWithMonday(candidate, "buyer@example.test", contacts, [{ ...native, occurredAt: "2026-10-08T03:00:00.000Z" }], false).action, "hold");
   assert.equal(reconcileOutlookWithMonday(candidate, "buyer@example.test", contacts, [{ ...native, from: "other@example.test" }], false).action, "hold");
+});
+
+test("opaque but fully read native emails do not indefinitely block matching Contact", () => {
+  const opaque = { ...candidate, internetMessageId: undefined, providerMessageId: undefined, from: "", subject: "" };
+  assert.equal(reconcileOutlookWithMonday(candidate, "buyer@example.test", contacts, [opaque], true).action, "eligible");
 });

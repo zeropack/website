@@ -3,7 +3,7 @@ import type {Draft,Field} from '../schema.ts';
 import type {Ref} from '../adapter.ts';
 export type EditorProps={draft:Draft;set:(key:Field,value:string)=>void;disabled?:boolean};
 export function TextField({draft,set,disabled,field,label,type='text',placeholder}:EditorProps & {field:Field;label:string;type?:'text'|'number';placeholder?:string}) {
- return <label className="field"><span>{label}</span><input aria-label={label} value={draft[field]} onChange={e=>set(field,e.target.value)} type={type} step={type==='number'?'any':undefined} min={type==='number'?'0':undefined} disabled={disabled} placeholder={placeholder}/></label>;
+ return <label className={type==='number'?'field number-field':'field'}><span>{label}</span><input aria-label={label} value={draft[field]} onChange={e=>set(field,e.target.value)} type={type} step={type==='number'?'any':undefined} min={type==='number'?'0':undefined} disabled={disabled} placeholder={placeholder}/></label>;
 }
 export function SelectField({draft,set,disabled,field,label,options}:EditorProps & {field:Field;label:string;options:Ref[]}) {
  const missing=draft[field]&&!options.some(o=>o.id===draft[field]);

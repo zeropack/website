@@ -20,3 +20,6 @@ input,select,textarea{font-size:14px;min-height:34px}button{font-size:14px}.smal
 .stack-fields>.address-field{display:block}.address-field textarea{width:100%;min-height:140px}.description-column>.field:last-child>span{display:none}.calculation-totals input{width:75%;justify-self:start}.specification-column .read-field input{max-width:145px;justify-self:start;text-align:right}.charges .field,.freight-size .field{grid-template-columns:minmax(0,1fr) minmax(78px,.85fr)}
 
 .identity-grid>.panel:last-child{display:flex;flex-direction:column}.identity-grid>.panel:last-child>.stack-fields{flex:1;grid-template-rows:1fr}.address-field textarea{height:100%}
+
+@media(min-width:1301px){.identity-grid{grid-template-columns:minmax(0,25fr) minmax(0,40fr) minmax(0,35fr)}}
+.apply-calculation{width:75%;display:flex;margin-left:auto}

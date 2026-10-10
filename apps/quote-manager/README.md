@@ -117,3 +117,7 @@ All nine calculated totals and the green cost summary remain visible before vali
 ### Currency display and concise labels
 
 Amount fields display currency outside focus (two decimals for totals/fees, four for unit prices). Editing shows the exact raw decimal; formatting never rounds or replaces the saved value. USD/AUD remain identified by field labels; Plate Fee is AUD. Exchange Rate retains the AUD-per-USD calculation basis. Calculated total controls are 25% narrower. Shipping address fills its panel without a visible label; its accessible name remains. Removed helper text and Internal notes uses the description heading style.
+
+### Header proportions and numeric grouping
+
+Wide desktop header panels use 25/40/35 proportions. Numeric fields show thousands separators outside focus; editing and saves retain raw decimal strings. Re-calculate is 75% wide, aligned right. Customer-requested labels Sell Incl Shipping AUD, Margin AUD and Total selling AUD replace the longer labels without changing formulas. Sell Incl Shipping remains a four-decimal unit-price reference using supplier quantity as its divisor.

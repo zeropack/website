@@ -91,7 +91,7 @@ export async function syncOutlookRecovery(options: SyncOptions) {
     .sort((a, b) => Date.parse(a.occurredAt) - Date.parse(b.occurredAt));
   for (const m of eligible) {
     if (options.mode === "manual" && m.address.toLowerCase() !== options.email?.toLowerCase()) continue;
-    if (excludesKnownAutomation(m)) { stats.ignored++; continue; }
+    if (options.mode === "incremental" && excludesKnownAutomation(m)) { stats.ignored++; continue; }
     const ids = exact.get(m.address.trim().toLowerCase()) || [];
     if (ids.length !== 1) { ids.length ? stats.ambiguous++ : stats.ignored++; continue; }
     if (processed >= BATCH_LIMIT) { stats.failed++; break; }

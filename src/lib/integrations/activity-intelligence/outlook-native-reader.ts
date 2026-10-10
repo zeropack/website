@@ -5,7 +5,7 @@ type Entry = { id?: string; content?: string | null; custom_activity_id?: string
 type Page = { cursor?: string | null; timeline_items?: Entry[] };
 type Result = { data?: { timeline?: { timeline_items_page?: Page } }; errors?: Array<{ message: string }> };
 
-const query = `query($id: ID!) { timeline(id: $id) { timeline_items_page { cursor timeline_items { id content custom_activity_id type title created_at } } } }`;
+const query = `query($id: ID!, $cursor: String) { timeline(id: $id) { timeline_items_page(limit: 100, cursor: $cursor) { cursor timeline_items { id content custom_activity_id type title created_at } } } }`;
 
 /**
  * Read native Monday timeline entries for a single existing Contact.
@@ -17,17 +17,28 @@ export async function readMondayNativeMail(contactId: string): Promise<{
 }> {
   if (!/^\d+$/.test(contactId)) throw new Error("Invalid Contact ID");
   if (!process.env.MONDAY_API_TOKEN) throw new Error("Missing Monday API token");
-  const response = await fetch("https://api.monday.com/v2", {
-    method: "POST",
-    headers: { Authorization: process.env.MONDAY_API_TOKEN, "Content-Type": "application/json", "API-Version": MONDAY_API_VERSION },
-    body: JSON.stringify({ query, variables: { id: contactId } }), cache: "no-store",
-  });
-  if (!response.ok) throw new Error(`Monday read failed: HTTP ${response.status}`);
-  const data = await response.json() as Result;
-  if (data.errors?.length) throw new Error("Monday timeline GraphQL error");
-  const page = data.data?.timeline?.timeline_items_page;
-  if (!page || !Array.isArray(page.timeline_items)) return { complete: false, messages: [], reason: "Native Monday timeline unavailable" };
-  if (page.cursor) return { complete: false, messages: [], reason: "Native Monday timeline pagination incomplete" };
+  const entries: Entry[] = [];
+  const seen = new Set<string>();
+  let cursor: string | null = null;
+  let complete = false;
+  for (let pageNumber = 0; pageNumber < 10; pageNumber++) {
+    const response: Response = await fetch("https://api.monday.com/v2", {
+      method: "POST",
+      headers: { Authorization: process.env.MONDAY_API_TOKEN, "Content-Type": "application/json", "API-Version": MONDAY_API_VERSION },
+      body: JSON.stringify({ query, variables: { id: contactId, cursor } }), cache: "no-store",
+    });
+    if (!response.ok) throw new Error(`Monday read failed: HTTP ${response.status}`);
+    const data = await response.json() as Result;
+    if (data.errors?.length) throw new Error("Monday timeline GraphQL error");
+    const page = data.data?.timeline?.timeline_items_page;
+    if (!page || !Array.isArray(page.timeline_items)) return { complete: false, messages: [], reason: "Native Monday timeline unavailable" };
+    entries.push(...page.timeline_items);
+    if (!page.cursor) { complete = true; break; }
+    if (seen.has(page.cursor)) return { complete: false, messages: [], reason: "Repeated Monday timeline cursor" };
+    seen.add(page.cursor);
+    cursor = page.cursor;
+  }
+  if (!complete) return { complete: false, messages: [], reason: "Native Monday timeline pagination incomplete" };
   const messages: MailSummary[] = [];
   let opaque = false;
   // These are existing production E&A activity types, not new schema.
@@ -35,7 +46,7 @@ export async function readMondayNativeMail(contactId: string): Promise<{
     "5596cef2-66b3-4dfe-8cce-c366d66cd4f2", // Email Received
     "8b6c4544-b271-4cc6-a9fc-40811d6f8e9c", // Email Sent
   ]);
-  for (const item of page.timeline_items) {
+  for (const item of entries) {
     const text = item.content || "";
     if (item.custom_activity_id) {
       if (!recoveredTypes.has(item.custom_activity_id) || !item.title?.startsWith("Recovered Outlook:")) continue;

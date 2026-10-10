@@ -35,6 +35,7 @@ export async function graphAppToken(): Promise<string> {
 
 export type OutlookPreviewItem = {
   messageId: string; occurredAt: string; category: string; address: string;
+  internetMessageId?: string | null; subject: string; direction: "sent" | "received"; from: string; to: string[];
   disposition: "candidate" | "hold"; reason: string;
 };
 
@@ -81,7 +82,8 @@ export async function scanOutlookGraph(lookbackHours = 24, maxPages = 2) {
         if (classified.action === "candidate" && classified.source !== "outlook_manual") continue;
         if (!m.id || !(m.internetMessageId || m.id)) continue;
         items.push({
-          messageId: m.id, occurredAt: (folder === "inbox" ? m.receivedDateTime : m.sentDateTime) || "",
+          messageId: m.id, internetMessageId: m.internetMessageId, subject: m.subject || "",
+          direction: envelope.direction, from: envelope.from, to: envelope.to, occurredAt: (folder === "inbox" ? m.receivedDateTime : m.sentDateTime) || "",
           category: classified.action === "candidate" ? classified.category : "unclassified",
           address: classified.action === "candidate" ? classified.recipient : "",
           disposition: classified.action === "candidate" ? "candidate" : "hold",

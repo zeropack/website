@@ -14,7 +14,7 @@ const BATCH_LIMIT = 25;
 
 type GraphBody = { id?: string; body?: { content?: string }; bodyPreview?: string };
 type TimelineMutation = { data?: { create_timeline_item?: { id?: string } }; errors?: Array<{ message: string }> };
-export type SyncOptions = { mode: "incremental" | "manual"; email?: string; lookbackHours?: number; maxPages?: number; write: boolean };
+export type SyncOptions = { mode: "incremental" | "manual"; email?: string; lookbackHours?: number; maxPages?: number; startAt?: string; endAt?: string; write: boolean };
 
 function excludesKnownAutomation(m: OutlookPreviewItem): boolean {
   if (m.direction !== "sent") return false;
@@ -68,13 +68,15 @@ export async function syncOutlookRecovery(options: SyncOptions) {
   if (options.mode === "incremental" && !checkpoint)
     throw new Error("Initial checkpoint is not configured; run a bounded manual sync first");
   const now = new Date();
-  const since = checkpoint ? Date.parse(checkpoint.lastSuccessfulAt) - OVERLAP_MS : now.getTime() - (options.lookbackHours || 24) * 3600000;
+  const window = options.mode === "manual" && options.startAt && options.endAt
+    ? { startAt: options.startAt, endAt: options.endAt } : undefined;
+  const since = window ? Date.parse(window.startAt) : checkpoint ? Date.parse(checkpoint.lastSuccessfulAt) - OVERLAP_MS : now.getTime() - (options.lookbackHours || 24) * 3600000;
   const lookbackHours = options.mode === "incremental"
     ? Math.min(168, Math.max(1, Math.ceil((now.getTime() - since) / 3600000)))
     : (options.lookbackHours || 24);
   if (checkpoint && now.getTime() - since > 168 * 3600000)
     throw new Error("Checkpoint is older than seven days; bounded manual catch-up required");
-  const [scan, contacts] = await Promise.all([scanOutlookGraph(lookbackHours, options.maxPages || 5), listMondayContacts()]);
+  const [scan, contacts] = await Promise.all([scanOutlookGraph(lookbackHours, options.maxPages || 5, window), listMondayContacts()]);
   const exact = new Map<string, string[]>();
   for (const c of contacts) {
     const address = c.email.trim().toLowerCase();

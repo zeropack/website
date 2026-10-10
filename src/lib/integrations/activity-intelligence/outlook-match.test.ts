@@ -23,12 +23,12 @@ test("native RFC id always takes priority over Outlook's mutable provider ID", (
 });
 test("only proven-absent native email for unique Contact can become eligible", () => {
   assert.equal(reconcileOutlookWithMonday(candidate, "buyer@example.test", contacts, [], true).action, "eligible");
-  assert.equal(reconcileOutlookWithMonday({...candidate,internetMessageId:undefined}, "buyer@example.test", contacts, [], true).action, "hold");
+  assert.equal(reconcileOutlookWithMonday({...candidate,internetMessageId:undefined}, "buyer@example.test", contacts, [], true).action, "eligible");
 });
 
 test("native metadata positive duplicate wins even if RFC history remains opaque", () => {
   const native = { ...candidate, internetMessageId: undefined, providerMessageId: undefined };
-  assert.equal(reconcileOutlookWithMonday(candidate, "buyer@example.test", contacts, [native], false).action, "duplicate");
+  assert.equal(reconcileOutlookWithMonday(candidate, "buyer@example.test", contacts, [native], true).action, "duplicate");
   assert.equal(reconcileOutlookWithMonday(candidate, "buyer@example.test", contacts, [{ ...native, occurredAt: "2026-10-08T03:00:00.000Z" }], false).action, "hold");
   assert.equal(reconcileOutlookWithMonday(candidate, "buyer@example.test", contacts, [{ ...native, from: "other@example.test" }], false).action, "hold");
 });

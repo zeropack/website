@@ -6,46 +6,36 @@ export type OutlookMatchDecision =
   | { action: "duplicate"; contactId: string; reason: string }
   | { action: "eligible"; contactId: string };
 
-/**
- * This gate must be called only after a complete authoritative Monday native
- * Email & Activities read. A null/partial native history is NEVER evidence
- * that a message was not already recorded.
+/** Exact Contact address, followed by simple, conservative duplicate suppression.
+ * Native Monday entries without RFC IDs do not block otherwise valid customer mail.
+ * Callers must still exclude Monday-originated, campaign, system and backlink sends.
  */
 export function reconcileOutlookWithMonday(
-  candidate: MailSummary,
-  externalAddress: string,
-  contacts: OutlookContactRef[],
-  nativeMessages: MailSummary[] | null,
-  nativeHistoryComplete: boolean,
+  candidate: MailSummary, externalAddress: string, contacts: OutlookContactRef[],
+  nativeMessages: MailSummary[] | null, nativeHistoryComplete: boolean,
 ): OutlookMatchDecision {
-  const address = externalAddress.trim().toLowerCase();
-  if (!address || address === "hello@zeropack.co") return { action: "hold", reason: "Missing/excluded external party" };
-  if (!candidate.internetMessageId) return { action: "hold", reason: "Missing stable RFC internetMessageId" };
-  if (!candidate.occurredAt || Number.isNaN(Date.parse(candidate.occurredAt))) {
-    return { action: "hold", reason: "Missing trusted email timestamp" };
-  }
-  const matches = [...new Set(contacts.filter(x => x.email.trim().toLowerCase() === address).map(x => x.id))];
-  if (matches.length !== 1) return { action: "hold", reason: matches.length ? "Ambiguous CRM Contact" : "No existing CRM Contact" };
-  // Positive matches can establish an existing native email even when Monday
-  // omits RFC IDs. A missing match NEVER establishes absence in that case.
-  if (nativeMessages?.some(x => sameEmail(candidate, x))) {
-    return { action: "duplicate", contactId: matches[0], reason: "Already in native Monday correspondence (stable ID)" };
-  }
-  const normalize = (value: string) => value.trim().toLowerCase().replace(/\s+/g, " ");
-  const precise = (native: MailSummary) =>
-    native.direction === candidate.direction &&
-    Boolean(native.from) && normalize(native.from) === normalize(candidate.from) &&
-    normalize(native.subject) === normalize(candidate.subject) &&
-    Date.parse(native.occurredAt) > 0 &&
-    Math.abs(Date.parse(native.occurredAt) - Date.parse(candidate.occurredAt)) <= 120000;
-  if (nativeMessages?.some(precise)) {
-    return { action: "duplicate", contactId: matches[0], reason: "Already in native Monday correspondence (sender/subject/time)" };
-  }
-  if (!nativeHistoryComplete || nativeMessages === null) {
-    return { action: "hold", reason: "Monday native correspondence history not proven complete" };
-  }
-  if (nativeMessages.some(x => !x.internetMessageId && !x.providerMessageId)) {
-    return { action: "hold", reason: "Native email without comparable identifier" };
-  }
-  return { action: "eligible", contactId: matches[0] };
+  const email = externalAddress.trim().toLowerCase();
+  if (!email || ["hello@zeropack.co", "hello@zeropack.au", "enquiries@zeropack.co"].includes(email))
+    return { action: "hold", reason: "Missing/excluded external party" };
+  if (!candidate.occurredAt || !Number.isFinite(Date.parse(candidate.occurredAt)))
+    return { action: "hold", reason: "Missing trusted timestamp" };
+  if (!candidate.internetMessageId && !candidate.providerMessageId)
+    return { action: "hold", reason: "Missing source identity" };
+  const ids = [...new Set(contacts.filter(x => x.email.trim().toLowerCase() === email).map(x => x.id))];
+  if (ids.length !== 1)
+    return { action: "hold", reason: ids.length ? "Ambiguous Contact" : "No existing Contact" };
+  // Fail closed if the authoritative timeline request itself failed or was partial.
+  if (nativeMessages === null || !nativeHistoryComplete)
+    return { action: "hold", reason: "Incomplete native timeline read" };
+  const normal = (s: string) => s.trim().toLowerCase().replace(/\s+/g, " ");
+  const matching = nativeMessages.some(m => {
+    if (sameEmail(candidate, m)) return true;
+    if (!m.occurredAt || !Number.isFinite(Date.parse(m.occurredAt))) return false;
+    if (m.direction !== candidate.direction || Math.abs(Date.parse(m.occurredAt) - Date.parse(candidate.occurredAt)) > 120000) return false;
+    // If Monday has native sender/subject metadata, use both; otherwise hold
+    // off on suppressing a valid customer message.
+    return Boolean(m.from && m.subject && normal(m.from) === normal(candidate.from) && normal(m.subject) === normal(candidate.subject));
+  });
+  if (matching) return { action: "duplicate", contactId: ids[0], reason: "Already recorded in Monday" };
+  return { action: "eligible", contactId: ids[0] };
 }

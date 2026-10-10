@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { execFileSync } from "node:child_process";
 import ts from "typescript";
 
-const files = ["model.ts", "model.test.ts", "preview.ts", "preview.test.ts", "monday-replay.ts", "monday-replay.test.ts", "activity-types.ts", "activity-types.test.ts", "outlook-source.ts", "outlook-source.test.ts", "outlook-graph.ts", "outlook-graph.test.ts"];
+const files = ["model.ts", "model.test.ts", "preview.ts", "preview.test.ts", "monday-replay.ts", "monday-replay.test.ts", "activity-types.ts", "activity-types.test.ts", "outlook-source.ts", "outlook-source.test.ts", "outlook-graph.ts", "outlook-graph.test.ts", "outlook-match.ts", "outlook-match.test.ts"];
 const root = join(process.cwd(), "src/lib/integrations/activity-intelligence");
 const temp = await mkdtemp(join(tmpdir(), "zp-activity-tests-"));
 try {

@@ -101,3 +101,7 @@ Certification rules use the current Drive Product & Packaging Knowledge Core and
 Sources:
 - https://docs.google.com/document/d/1l_TQBqDTZi2lUecYPfR64hGCFSSRoUT4eG1Gz5n7Udk/edit
 - https://docs.google.com/document/d/1GuqT4PUQz-vO6Q9apS4Ms3WU9QDRaX3UoFdp7YQU-SI/edit
+
+### Layout rollback — 10 October 2026
+
+Restored the staff form field arrangement and styling from commit 53b9f85 after layout review. Shipping amounts and insurance are separate fields, weight/CBM return above descriptions, artwork returns to Shipping details, and internal notes return to Packaging. All nine calculated totals and three saved prices remain present. Discard/Undo/Redo and Update beside Copy are retained, along with verified certification generation.

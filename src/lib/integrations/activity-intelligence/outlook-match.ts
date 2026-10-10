@@ -31,10 +31,12 @@ export function reconcileOutlookWithMonday(
   const matching = nativeMessages.some(m => {
     if (sameEmail(candidate, m)) return true;
     if (!m.occurredAt || !Number.isFinite(Date.parse(m.occurredAt))) return false;
-    if (m.direction !== candidate.direction || Math.abs(Date.parse(m.occurredAt) - Date.parse(candidate.occurredAt)) > 120000) return false;
-    // If Monday has native sender/subject metadata, use both; otherwise hold
-    // off on suppressing a valid customer message.
-    return Boolean(m.from && m.subject && normal(m.from) === normal(candidate.from) && normal(m.subject) === normal(candidate.subject));
+    if (Math.abs(Date.parse(m.occurredAt) - Date.parse(candidate.occurredAt)) > 120000) return false;
+    // Monday GraphQL omits native email sender metadata. Exact Contact +
+    // subject + close timestamp is sufficient for practical deduplication.
+    if (!m.from) return Boolean(m.subject && normal(m.subject) === normal(candidate.subject));
+    return m.direction === candidate.direction && Boolean(m.subject) &&
+      normal(m.from) === normal(candidate.from) && normal(m.subject) === normal(candidate.subject);
   });
   if (matching) return { action: "duplicate", contactId: ids[0], reason: "Already recorded in Monday" };
   return { action: "eligible", contactId: ids[0] };

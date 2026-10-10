@@ -1,11 +1,11 @@
 import { MONDAY_API_VERSION } from "@/lib/integrations/klaviyo-monday/config";
 import type { MailSummary } from "./model";
 
-type Entry = { id?: string; content?: string | null; custom_activity_id?: string | null };
+type Entry = { id?: string; content?: string | null; custom_activity_id?: string | null; type?: string | null; title?: string | null; created_at?: string | null; metadata?: string | Record<string, unknown> | null };
 type Page = { cursor?: string | null; timeline_items?: Entry[] };
 type Result = { data?: { timeline?: { timeline_items_page?: Page } }; errors?: Array<{ message: string }> };
 
-const query = `query($id: ID!) { timeline(id: $id) { timeline_items_page { cursor timeline_items { id content custom_activity_id } } } }`;
+const query = `query($id: ID!) { timeline(id: $id) { timeline_items_page { cursor timeline_items { id content custom_activity_id type title created_at metadata } } } }`;
 
 /**
  * Read native Monday timeline entries for a single existing Contact.
@@ -35,7 +35,7 @@ export async function readMondayNativeMail(contactId: string): Promise<{
     const text = item.content || "";
     const idMatch = /(?:internet[- ]?message[- ]?id|message[- ]?id)\s*:\s*(<[^>]+>|[^\s]+)/i.exec(text);
     if (!idMatch) {
-      return { complete: false, messages: [], reason: "Native timeline contains an opaque non-custom activity" };
+      return { complete: false, messages: [], reason: "Native correspondence cannot be identified by stable message ID; manual comparison needed" };
     }
     messages.push({
       internetMessageId: idMatch[1], direction: "received", from: "", to: [], subject: "", occurredAt: "",

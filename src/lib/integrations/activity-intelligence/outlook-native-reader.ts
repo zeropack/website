@@ -51,5 +51,6 @@ export async function readMondayNativeMail(contactId: string): Promise<{
     });
     if (!stableId) opaque = true;
   }
-  return opaque ? { complete: false, messages, reason: "Native email without stable RFC identifier; only positive duplicate matches permitted" }\n    : { complete: true, messages };
+  return opaque ? { complete: false, messages, reason: "Native email without stable RFC identifier; only positive duplicate matches permitted" }
+    : { complete: true, messages };
 }

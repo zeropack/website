@@ -72,6 +72,11 @@ export async function previewOutlookContactMatching(lookbackHours = 24, maxPages
     pendingOriginReview: reviews.filter(x => x.decision === "needs_origin_review").length,
     duplicates: reviews.filter(x => x.decision === "duplicate").length,
     held: reviews.filter(x => x.decision === "hold").length,
+    matchedContactIds: [...new Set(reviews.map(x => x.contactId).filter((x): x is string => Boolean(x)))],
+    reasonCounts: Object.entries(reviews.reduce<Record<string, number>>((counts, x) => {
+      counts[x.reason] = (counts[x.reason] || 0) + 1;
+      return counts;
+    }, {})).map(([reason, count]) => ({ reason, count })),
     reviews,
     warning: "NO items authorised for recovery or writing. Origin, CRM native correspondence completeness and execution QA are mandatory.",
   };

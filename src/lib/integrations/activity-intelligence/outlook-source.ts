@@ -49,10 +49,15 @@ export function classifyOutlookRecovery(message: OutlookEnvelope): OutlookRecove
     return { action: "skip", reason: "Backlink outreach; not customer CRM correspondence" };
   }
   if (message.direction === "sent" && message.sourceFolder === "sent") {
-    if (recipients.length !== 1) return { action: "hold", reason: "Multiple recipients require individual identity reconciliation" };
-    return { action: "candidate", source: "outlook_manual", category: "manual_sent", recipient: recipients[0] };
+    // A manual reply may copy the sending mailbox. Count only external parties.
+    const external = recipients.filter(x => !["hello@zeropack.co", "hello@zeropack.au", "enquiries@zeropack.co"].includes(x));
+    if (external.length !== 1) return { action: "hold", reason: "Multiple or missing external recipients require individual identity reconciliation" };
+    return { action: "candidate", source: "outlook_manual", category: "manual_sent", recipient: external[0] };
   }
   if (message.direction === "received" && message.sourceFolder === "inbox") {
+    if (["hello@zeropack.co", "hello@zeropack.au", "enquiries@zeropack.co"].includes(sender)) {
+      return { action: "skip", reason: "Self-sent inbox copy, not a received customer email" };
+    }
     return { action: "candidate", source: "outlook_manual", category: "customer_received", recipient: sender };
   }
   return { action: "hold", reason: "Cannot establish correspondence direction and origin" };

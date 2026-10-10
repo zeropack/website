@@ -15,7 +15,7 @@ test("holds absent or ambiguous Contact instead of creating CRM identity", () =>
 });
 test("holds incomplete native correspondence even with unique contact", () => {
   assert.equal(reconcileOutlookWithMonday(candidate, "buyer@example.test", contacts, null, false).action, "hold");
-  assert.equal(reconcileOutlookWithMonday(candidate, "buyer@example.test", contacts, [{...candidate, internetMessageId: undefined, providerMessageId: undefined}], true).action, "hold");
+  assert.equal(reconcileOutlookWithMonday(candidate, "buyer@example.test", contacts, [{...candidate, internetMessageId: undefined, providerMessageId: undefined, occurredAt: "2026-10-08T03:00:00.000Z"}], true).action, "hold");
 });
 test("native RFC id always takes priority over Outlook's mutable provider ID", () => {
   const native = {...candidate, providerMessageId: "different-Monday-provider-id"};

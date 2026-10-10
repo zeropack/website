@@ -39,11 +39,15 @@ export type OutlookPreviewItem = {
   disposition: "candidate" | "hold"; reason: string;
 };
 
-export async function scanOutlookGraph(lookbackHours = 24, maxPages = 2) {
+export async function scanOutlookGraph(lookbackHours = 24, maxPages = 2, window?: { startAt: string; endAt: string }) {
   if (!Number.isInteger(lookbackHours) || lookbackHours < 1 || lookbackHours > 168) throw new Error("Invalid lookback");
   if (!Number.isInteger(maxPages) || maxPages < 1 || maxPages > 5) throw new Error("Invalid page budget");
   const token = await graphAppToken();
-  const threshold = new Date(Date.now() - lookbackHours * 3600000).toISOString();
+  const threshold = window?.startAt || new Date(Date.now() - lookbackHours * 3600000).toISOString();
+  if (window && (!Number.isFinite(Date.parse(window.startAt)) || !Number.isFinite(Date.parse(window.endAt))
+    || Date.parse(window.endAt) <= Date.parse(window.startAt)
+    || Date.parse(window.endAt) - Date.parse(window.startAt) > 168 * 3600000))
+    throw new Error("Manual sync window must be valid and at most seven days");
   const items: OutlookPreviewItem[] = [];
   let scanned = 0;
   for (const folder of ALLOWED_FOLDERS) {
@@ -52,7 +56,9 @@ export async function scanOutlookGraph(lookbackHours = 24, maxPages = 2) {
     const url = new URL(base, GRAPH);
     url.searchParams.set("$top", "50");
     url.searchParams.set("$select", "id,internetMessageId,subject,from,toRecipients,sentDateTime,receivedDateTime,isDraft");
-    url.searchParams.set("$filter", `${stamp} ge ${threshold}`);
+    url.searchParams.set("$filter", window
+      ? `${stamp} ge ${threshold} and ${stamp} lt ${window.endAt}`
+      : `${stamp} ge ${threshold}`);
     let next: string | null = url.href;
     const visited = new Set<string>();
     for (let page = 0; next && page < maxPages; page++) {

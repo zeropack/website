@@ -62,3 +62,31 @@ test("preview fails closed without matching configured mailbox", async () => {
   try { await assert.rejects(() => previewOutlookGraph(), /configuration incomplete/); }
   finally { reset(); }
 });
+
+test("accepts Graph encoded mailbox continuation without leaving scoped path", async () => {
+  const reset = restoreEnv(); const previous = globalThis.fetch;
+  let pages = 0;
+  globalThis.fetch = async (input) => {
+    const url = String(input);
+    if (url.includes("/oauth2/")) return Response.json({ access_token: "testing" });
+    if (url.includes("/inbox/")) {
+      pages++;
+      if (pages === 1) return Response.json({ value: [], "@odata.nextLink": "https://graph.microsoft.com/v1.0/users/hello%40zeropack.co/mailFolders/inbox/messages?$skip=50" });
+    }
+    return Response.json({ value: [] });
+  };
+  try {
+    const result = await previewOutlookGraph(24, 2);
+    assert.equal(result.scanned, 0);
+    assert.equal(pages, 2);
+  } finally { globalThis.fetch = previous; reset(); }
+});
+
+test("rejects Graph continuation pointing to another mailbox", async () => {
+  const reset = restoreEnv(); const previous = globalThis.fetch;
+  globalThis.fetch = async input => String(input).includes("/oauth2/")
+    ? Response.json({ access_token: "testing" })
+    : Response.json({ value: [], "@odata.nextLink": "https://graph.microsoft.com/v1.0/users/other@example.test/mailFolders/inbox/messages?$skip=50" });
+  try { await assert.rejects(() => previewOutlookGraph(24, 2), /Unsafe or repeated Graph pagination/); }
+  finally { globalThis.fetch = previous; reset(); }
+});

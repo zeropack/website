@@ -26,16 +26,26 @@ export function reconcileOutlookWithMonday(
   }
   const matches = [...new Set(contacts.filter(x => x.email.trim().toLowerCase() === address).map(x => x.id))];
   if (matches.length !== 1) return { action: "hold", reason: matches.length ? "Ambiguous CRM Contact" : "No existing CRM Contact" };
+  // Positive matches can establish an existing native email even when Monday
+  // omits RFC IDs. A missing match NEVER establishes absence in that case.
+  if (nativeMessages?.some(x => sameEmail(candidate, x))) {
+    return { action: "duplicate", contactId: matches[0], reason: "Already in native Monday correspondence (stable ID)" };
+  }
+  const normalize = (value: string) => value.trim().toLowerCase().replace(/\s+/g, " ");
+  const precise = (native: MailSummary) =>
+    native.direction === candidate.direction &&
+    Boolean(native.from) && normalize(native.from) === normalize(candidate.from) &&
+    normalize(native.subject) === normalize(candidate.subject) &&
+    Date.parse(native.occurredAt) > 0 &&
+    Math.abs(Date.parse(native.occurredAt) - Date.parse(candidate.occurredAt)) <= 120000;
+  if (nativeMessages?.some(precise)) {
+    return { action: "duplicate", contactId: matches[0], reason: "Already in native Monday correspondence (sender/subject/time)" };
+  }
   if (!nativeHistoryComplete || nativeMessages === null) {
     return { action: "hold", reason: "Monday native correspondence history not proven complete" };
   }
-  // Monday native messages must include comparable stable message identifiers.
-  // Unknown native email identities cannot be interpreted as absence.
   if (nativeMessages.some(x => !x.internetMessageId && !x.providerMessageId)) {
     return { action: "hold", reason: "Native email without comparable identifier" };
-  }
-  if (nativeMessages.some(x => sameEmail(candidate, x))) {
-    return { action: "duplicate", contactId: matches[0], reason: "Already in native Monday correspondence" };
   }
   return { action: "eligible", contactId: matches[0] };
 }

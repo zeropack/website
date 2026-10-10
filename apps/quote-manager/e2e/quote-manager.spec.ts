@@ -16,3 +16,12 @@ test('undo, redo and discard restore draft edits and saving clears edit history'
 test('Update descriptions applies current country and thickness rules and can be undone',async({page})=>{
  page.on('dialog',d=>d.accept());await page.goto('/');await page.getByRole('button',{name:/TEST — Demo packaging quote/}).click();await page.getByRole('button',{name:'Update customer description',exact:true}).click();await expect(page.getByLabel('Customer description',{exact:true})).toHaveValue(/AS 5810 certified/);await page.getByLabel('Thickness (microns)',{exact:true}).fill('80');await page.getByRole('button',{name:'Update supplier description',exact:true}).click();await expect(page.getByLabel('Supplier description · Internal',{exact:true})).toHaveValue(/AS 4736 certified/);await page.getByRole('button',{name:'Undo',exact:true}).click();await expect(page.getByLabel('Supplier description · Internal',{exact:true})).toHaveValue('INTERNAL DEMO supplier specification');
 });
+
+test('incomplete drafts keep all calculated totals and green summary visible',async({page})=>{
+ await page.goto('/');
+ const totals=page.locator('.calculation-totals input');await expect(totals).toHaveCount(9);
+ for(const input of await totals.all()){await expect(input).toBeVisible();await expect(input).toHaveValue('—');}
+ await expect(page.getByLabel('Cost summary',{exact:true})).toBeVisible();await expect(page.locator('.cost-summary b')).toHaveText(['—','—','—','—']);
+ await page.getByRole('button',{name:/TEST — Demo packaging quote/}).click();await expect(page.getByLabel('Total USD',{exact:true})).toHaveValue('1000.00');await expect(page.locator('.cost-summary')).toContainText('$1,550.00');
+ await page.getByLabel('FX · AUD per USD',{exact:true}).fill('');await expect(totals).toHaveCount(9);await expect(page.getByLabel('Total USD',{exact:true})).toHaveValue('—');await expect(page.getByLabel('Cost summary',{exact:true})).toBeVisible();
+});

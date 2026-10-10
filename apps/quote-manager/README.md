@@ -109,3 +109,7 @@ Restored the staff form field arrangement and styling from commit 53b9f85 after 
 ### Adjusted reference layout — 10 October 2026
 
 The latest annotated reference moves artwork below Client project, weight/CBM above shipping charges, Apply calculation under Packaging, and notes below descriptions. Each label stays inline beside its own control, aligned to the right. Shipping amounts and both insurance outputs remain individually labeled fields. All nine calculated totals and saved price inputs remain. The green summary bar is restored below the columns with product cost, freight/import, landed cost, profit and product margin.
+
+### Incomplete costing visibility
+
+All nine calculated totals and the green cost summary remain visible before valid inputs are supplied and when a required input is cleared. Unavailable amounts use an em dash rather than zero or stale values. Completing inputs displays the calculated amounts. Apply remains disabled until a valid calculation exists. Browser regression coverage checks blank, populated and cleared-input states.

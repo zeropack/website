@@ -15,7 +15,7 @@ const query = `query($id: ID!) { timeline(id: $id) { timeline_items_page { curso
 export async function readMondayNativeMail(contactId: string): Promise<{
   complete: boolean; messages: MailSummary[]; reason?: string;
 }> {
-  if (!/^\\d+$/.test(contactId)) throw new Error("Invalid Contact ID");
+  if (!/^\d+$/.test(contactId)) throw new Error("Invalid Contact ID");
   if (!process.env.MONDAY_API_TOKEN) throw new Error("Missing Monday API token");
   const response = await fetch("https://api.monday.com/v2", {
     method: "POST",
@@ -33,7 +33,7 @@ export async function readMondayNativeMail(contactId: string): Promise<{
     if (item.custom_activity_id) continue; // a separate custom activity is not native correspondence
     // Never treat a regular note/call or opaque native email as proof of absence.
     const text = item.content || "";
-    const idMatch = /(?:internet[- ]?message[- ]?id|message[- ]?id)\\s*:\\s*(<[^>]+>|[^\\s]+)/i.exec(text);
+    const idMatch = /(?:internet[- ]?message[- ]?id|message[- ]?id)\s*:\s*(<[^>]+>|[^\s]+)/i.exec(text);
     if (!idMatch) {
       return { complete: false, messages: [], reason: "Native timeline contains an opaque non-custom activity" };
     }

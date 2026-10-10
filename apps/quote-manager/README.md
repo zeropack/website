@@ -84,8 +84,20 @@ Project creation was rejected by connected Vercel credentials (403), and the loc
 
 ### Staff form layout and company autofill
 
-The staff form follows the supplied Access layout: quote/customer/shipping header, packaging input rows, shipping/calculated totals, and supplier/customer descriptions with clipboard copy. Form inputs use 14px type; labels use 13px. Descriptions remain explicitly generated and manually editable. Copy uses the exact edited text and never sends anything to QBO. Supplier generation can include the selected company's recorded shipping address; generation adds no certification, disposal or DDP claims.
+The staff form follows the supplied Access layout: quote/customer/shipping header, packaging input rows, shipping/calculated totals, and supplier/customer descriptions with clipboard copy. Form inputs use 14px type; labels use 13px. Descriptions remain explicitly generated and manually editable. Copy uses the exact edited text and never sends anything to QBO. Supplier generation can include the selected company's recorded shipping address; generation uses the verified mailer country/thickness certification mapping described below and never adds DDP claims.
 
 Company selection chooses a primary contact only when it is verified through that Contact's canonical company relation; otherwise a single linked contact can be selected, while ambiguous contacts require a selection. References read the existing Primary Contact, Shipping Address, Business Address, Company Phone and Contacts First/Last Name, Email and Phone fields. Changing company clears stale contact values. Shipping Address is displayed as Monday's complete address string, never guessed into street/suburb/state/postcode fields. A Business Address is shown separately if no Shipping Address is recorded. These are current CRM details, not quote snapshots; there is no schema change or CRM write.
 
 Calculated Insurance USD and Insurance AUD are read-only. The legacy insurance seed is available under Insurance calculation. AUD insurance uses the saved AUD/USD exchange rate. Detailed totals distinguish product selling price from all-in selling price (product selling total plus freight/import costs divided by supplier quantity), and landed cost from selling price. Bank fees remain USD.
+
+### Discard, edit history and approved certification descriptions
+
+Discard restores the last saved draft without writing Monday. Undo/Redo tracks up to 100 whole-draft edit steps, including company/contact selection, calculations and description updates. A new edit clears redo; save, discard, new/duplicate/select quote and refresh clear history so it never crosses quote boundaries or reverses a persisted write.
+
+Update regenerates the respective description from current specifications, asking before replacing manually edited text. It is separate from costing calculation and Copy, which copies exact edited text.
+
+Certification rules use the current Drive Product & Packaging Knowledge Core and Claims & Evidence Policy (13 September 2026 approvals), plus Patrick's explicit 10 October 2026 confirmation that the country/thickness mapping is verified for this Quote Builder. For approved custom compostable mailer labels: positive thickness through 63 microns uses home compostability (Australia: AS 5810; UK: OK compost HOME); greater than 63 through 143 microns uses commercial compostability (Australia: AS 4736; UK: OK compost INDUSTRIAL). Country is identified only from an explicit supported country at the end of the current company Shipping Address. Unknown destinations, missing/out-of-range thickness and other packaging formats receive no automatic named certification; existing edited descriptions are preserved unless Update is selected. No manufacturer documents are bundled.
+
+Sources:
+- https://docs.google.com/document/d/1l_TQBqDTZi2lUecYPfR64hGCFSSRoUT4eG1Gz5n7Udk/edit
+- https://docs.google.com/document/d/1GuqT4PUQz-vO6Q9apS4Ms3WU9QDRaX3UoFdp7YQU-SI/edit

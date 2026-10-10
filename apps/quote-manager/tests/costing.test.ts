@@ -9,7 +9,7 @@ test('incomplete and zero quantities produce actionable errors',()=>{for(const p
 test('large insurance fails instead of reproducing silent Access integer overflow',()=>assert.throws(()=>calculate({...demoDraft(),usdUnit:'10000'}),/Integer range/));
 test('applying calculation does not overwrite snapshot or descriptions',()=>{const d=demoDraft();const changed=applyCosting(d,calculate(d));assert.equal(changed.fx,d.fx);assert.equal(changed.customerDesc,d.customerDesc);assert.equal(changed.pricingVersion,PRICING_VERSION)});
 test('customer DTO excludes supplier costs, FX and internal notes',()=>{const dto=customerQuotation(demoDraft());assert.deepEqual(Object.keys(dto),['reference','description','quantity','unitPriceAUD','artwork']);assert.ok(!JSON.stringify(dto).includes('INTERNAL'));assert.ok(!('fx' in dto));assert.ok(!('landed' in dto))});
-test('description generator does not add certification or DDP claims',()=>{const s=specificationDescription({...demoDraft(),packaging:'custom product'});assert.ok(!/certified|DDP|compostable/i.test(s));assert.match(s,/Qty 10,000/)});
+test('description generator needs a destination for named certification and never adds DDP claims',()=>{const s=specificationDescription({...demoDraft(),packaging:'custom product'});assert.ok(!/certified|DDP|compostable/i.test(s));assert.match(s,/Qty 10,000/)});
 
 test('insurance AUD and detailed totals derive from the saved FX snapshot',()=>{
  const d=demoDraft(),c=calculate(d);assert.equal(c.insuranceUSD,'30');assert.equal(c.insuranceAUD,'45.00');assert.equal(c.totalUSD,'1000.00');assert.equal(c.totalAUD,'1500.00');assert.equal(c.costUnitAUD,'0.1550');

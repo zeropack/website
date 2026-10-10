@@ -1,0 +1,45 @@
+import { MONDAY_API_VERSION } from "@/lib/integrations/klaviyo-monday/config";
+import type { MailSummary } from "./model";
+
+type Entry = { id?: string; content?: string | null; custom_activity_id?: string | null };
+type Page = { cursor?: string | null; timeline_items?: Entry[] };
+type Result = { data?: { timeline?: { timeline_items_page?: Page } }; errors?: Array<{ message: string }> };
+
+const query = `query($id: ID!) { timeline(id: $id) { timeline_items_page { cursor timeline_items { id content custom_activity_id } } } }`;
+
+/**
+ * Read native Monday timeline entries for a single existing Contact.
+ * Any native activity without comparable RFC message identity makes the
+ * correspondence inventory uncertain; the importing side must HOLD.
+ */
+export async function readMondayNativeMail(contactId: string): Promise<{
+  complete: boolean; messages: MailSummary[]; reason?: string;
+}> {
+  if (!/^\\d+$/.test(contactId)) throw new Error("Invalid Contact ID");
+  if (!process.env.MONDAY_API_TOKEN) throw new Error("Missing Monday API token");
+  const response = await fetch("https://api.monday.com/v2", {
+    method: "POST",
+    headers: { Authorization: process.env.MONDAY_API_TOKEN, "Content-Type": "application/json", "API-Version": MONDAY_API_VERSION },
+    body: JSON.stringify({ query, variables: { id: contactId } }), cache: "no-store",
+  });
+  if (!response.ok) throw new Error(`Monday read failed: HTTP ${response.status}`);
+  const data = await response.json() as Result;
+  if (data.errors?.length) throw new Error("Monday timeline GraphQL error");
+  const page = data.data?.timeline?.timeline_items_page;
+  if (!page || !Array.isArray(page.timeline_items)) return { complete: false, messages: [], reason: "Native Monday timeline unavailable" };
+  if (page.cursor) return { complete: false, messages: [], reason: "Native Monday timeline pagination incomplete" };
+  const messages: MailSummary[] = [];
+  for (const item of page.timeline_items) {
+    if (item.custom_activity_id) continue; // a separate custom activity is not native correspondence
+    // Never treat a regular note/call or opaque native email as proof of absence.
+    const text = item.content || "";
+    const idMatch = /(?:internet[- ]?message[- ]?id|message[- ]?id)\\s*:\\s*(<[^>]+>|[^\\s]+)/i.exec(text);
+    if (!idMatch) {
+      return { complete: false, messages: [], reason: "Native timeline contains an opaque non-custom activity" };
+    }
+    messages.push({
+      internetMessageId: idMatch[1], direction: "received", from: "", to: [], subject: "", occurredAt: "",
+    });
+  }
+  return { complete: true, messages };
+}

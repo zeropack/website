@@ -93,7 +93,6 @@ export async function syncOutlookRecovery(options: SyncOptions) {
     const ids = exact.get(m.address.trim().toLowerCase()) || [];
     if (ids.length !== 1) { ids.length ? stats.ambiguous++ : stats.ignored++; continue; }
     if (processed >= BATCH_LIMIT) { stats.failed++; break; }
-    processed++;
     const contactId = ids[0];
     try {
       // Fresh native history per write guarantees retries observe previously recovered IDs.
@@ -106,6 +105,7 @@ export async function syncOutlookRecovery(options: SyncOptions) {
       if (result.action === "duplicate") { stats.duplicates++; continue; }
       if (result.action !== "eligible") { stats.failed++; continue; }
       stats.eligible++;
+      processed++;
       if (!options.write) continue;
       token ||= await graphAppToken();
       const full = await readFullMessage(m, token);
@@ -113,6 +113,7 @@ export async function syncOutlookRecovery(options: SyncOptions) {
       await writeActivity(contactId, m, full.body?.content || escapeHtml(full.bodyPreview || ""));
       stats.written++;
     } catch (error) {
+      processed++;
       stats.failed++;
       console.error("[Outlook recovery] Per-message failure", { category: error instanceof Error ? error.message : "Unknown" });
     }

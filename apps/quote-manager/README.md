@@ -113,3 +113,7 @@ The latest annotated reference moves artwork below Client project, weight/CBM ab
 ### Incomplete costing visibility
 
 All nine calculated totals and the green cost summary remain visible before valid inputs are supplied and when a required input is cleared. Unavailable amounts use an em dash rather than zero or stale values. Completing inputs displays the calculated amounts. Apply remains disabled until a valid calculation exists. Browser regression coverage checks blank, populated and cleared-input states.
+
+### Currency display and concise labels
+
+Amount fields display currency outside focus (two decimals for totals/fees, four for unit prices). Editing shows the exact raw decimal; formatting never rounds or replaces the saved value. USD/AUD remain identified by field labels; Plate Fee is AUD. Exchange Rate retains the AUD-per-USD calculation basis. Calculated total controls are 25% narrower. Shipping address fills its panel without a visible label; its accessible name remains. Removed helper text and Internal notes uses the description heading style.

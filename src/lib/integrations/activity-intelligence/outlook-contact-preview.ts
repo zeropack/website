@@ -1,7 +1,19 @@
 import { listMondayContacts } from "@/lib/integrations/klaviyo-monday/clients";
 import { scanOutlookGraph } from "./outlook-graph";
+import { reconcileOutlookWithMonday } from "./outlook-match";
+import { readMondayNativeMail } from "./outlook-native-reader";
+import type { MailSummary } from "./model";
 
-/** Read-only identity triage. No message becomes write-eligible before native timeline QA. */
+type Review = {
+  messageId: string; contactId?: string;
+  decision: "hold" | "duplicate" | "needs_origin_review";
+  reason: string;
+};
+
+/**
+ * Strict, bounded read-only dry-run. Even proven-absent native correspondence
+ * requires a separate source-origin check before any future write is allowed.
+ */
 export async function previewOutlookContactMatching(lookbackHours = 24, maxPages = 2) {
   const [scan, contacts] = await Promise.all([scanOutlookGraph(lookbackHours, maxPages), listMondayContacts()]);
   const index = new Map<string, Set<string>>();
@@ -12,23 +24,55 @@ export async function previewOutlookContactMatching(lookbackHours = 24, maxPages
     ids.add(contact.id);
     index.set(address, ids);
   }
-  const reviews = scan.items.map(m => {
-    if (m.disposition !== "candidate") return { messageId: m.messageId, decision: "hold", reason: m.reason };
-    if (!m.address || m.address.toLowerCase() === "hello@zeropack.co") {
-      return { messageId: m.messageId, decision: "hold", reason: "Excluded self correspondence" };
+  const reviews: Review[] = [];
+  const nativeCache = new Map<string, Awaited<ReturnType<typeof readMondayNativeMail>>>();
+  // Bound native API lookups. Deferred candidates remain held, never implicitly cleared.
+  const MAX_NATIVE_CONTACTS = 5;
+  for (const message of scan.items) {
+    if (message.disposition !== "candidate") {
+      reviews.push({ messageId: message.messageId, decision: "hold", reason: message.reason });
+      continue;
     }
-    const ids = [...(index.get(m.address.trim().toLowerCase()) || [])];
-    if (ids.length !== 1) return { messageId: m.messageId, decision: "hold", reason: ids.length ? "Ambiguous Contact" : "No existing Contact" };
-    return {
-      messageId: m.messageId, contactId: ids[0], decision: "needs_native_qa",
-      reason: "Unique Contact; authoritative native Emails & Activities deduplication required",
+    const address = message.address.trim().toLowerCase();
+    if (!address || address === "hello@zeropack.co") {
+      reviews.push({ messageId: message.messageId, decision: "hold", reason: "Missing/excluded external party" });
+      continue;
+    }
+    const matches = [...(index.get(address) || [])];
+    if (matches.length !== 1) {
+      reviews.push({ messageId: message.messageId, decision: "hold", reason: matches.length ? "Ambiguous Contact" : "No existing Contact" });
+      continue;
+    }
+    const contactId = matches[0];
+    if (!nativeCache.has(contactId)) {
+      if (nativeCache.size >= MAX_NATIVE_CONTACTS) {
+        reviews.push({ messageId: message.messageId, decision: "hold", reason: "Native QA budget exhausted; deferred" });
+        continue;
+      }
+      nativeCache.set(contactId, await readMondayNativeMail(contactId));
+    }
+    const native = nativeCache.get(contactId)!;
+    const summary: MailSummary = {
+      internetMessageId: message.internetMessageId, providerMessageId: message.messageId,
+      direction: message.direction, from: message.from, to: message.to,
+      subject: message.subject, occurredAt: message.occurredAt,
     };
-  });
+    const result = reconcileOutlookWithMonday(summary, address, contacts, native.messages, native.complete);
+    if (result.action === "duplicate") {
+      reviews.push({ messageId: message.messageId, contactId, decision: "duplicate", reason: result.reason });
+    } else if (result.action === "eligible") {
+      reviews.push({ messageId: message.messageId, contactId, decision: "needs_origin_review",
+        reason: "Unique Contact and no comparable native message; human-verifiable manual/customer origin still required" });
+    } else {
+      reviews.push({ messageId: message.messageId, contactId, decision: "hold", reason: native.reason || result.reason });
+    }
+  }
   return {
     mode: "dry_run" as const, scanned: scan.scanned,
-    uniquelyMatched: reviews.filter(x => x.decision === "needs_native_qa").length,
+    pendingOriginReview: reviews.filter(x => x.decision === "needs_origin_review").length,
+    duplicates: reviews.filter(x => x.decision === "duplicate").length,
     held: reviews.filter(x => x.decision === "hold").length,
     reviews,
-    warning: "No correspondence cleared for recovery. Native Monday correspondence comparison and source-origin review remain mandatory.",
+    warning: "NO items authorised for recovery or writing. Origin, CRM native correspondence completeness and execution QA are mandatory.",
   };
 }

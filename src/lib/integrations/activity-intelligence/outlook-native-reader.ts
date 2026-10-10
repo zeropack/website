@@ -47,7 +47,7 @@ export async function readMondayNativeMail(contactId: string): Promise<{
       });
       continue;
     }
-    // Native Monday E&A GraphQL does not expose sender/recipient metadata.
+    // Notes, meetings and calls are not native email duplicates.\n    if (item.type && item.type !== "email") continue;\n    // Native Monday E&A GraphQL does not expose sender/recipient metadata.
     // A native message can be positively matched by an embedded RFC ID;
     // otherwise it must remain opaque, never proof of absence.
     const idMatch = /(?:internet[- ]?message[- ]?id|message[- ]?id)\s*:\s*(<[^>]+>|[^\s<]+)/i.exec(text);

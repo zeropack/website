@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js';
 import type {Draft} from './schema.ts';
 export const PRICING_VERSION = 'access-v1-bank-usd-20261010';
-export type Costing = {audUnit:string; insuranceUSD:string; productCostAUD:string; freightAUD:string; landedAUD:string; productSellUnitAUD:string; productSellAUD:string; allInUnitAUD:string; allInTotalAUD:string; profitAUD:string; marginPercent:string};
+export type Costing = {audUnit:string; totalUSD:string; totalAUD:string; costUnitAUD:string; insuranceUSD:string; insuranceAUD:string; productCostAUD:string; freightAUD:string; landedAUD:string; productSellUnitAUD:string; productSellAUD:string; allInUnitAUD:string; allInTotalAUD:string; profitAUD:string; marginPercent:string};
 const decimal = (value:string, field:string) => {
  if(!/^\d+(\.\d+)?$/.test(value)) throw new Error(`${field} requires a non-negative decimal number.`);
  const n=new Decimal(value); if(!n.isFinite()) throw new Error(`${field} is invalid.`); return n;
@@ -23,7 +23,7 @@ export function calculate(d: Draft): Costing {
  const freight=optional('shipping').plus(insurance).plus(optional('bank')).mul(fx).plus(optional('customs')).plus(optional('duty'));
  const productSellUnit=productCost.mul(optional('markup').div(100).plus(1)).div(sellQuantity).toDecimalPlaces(4,Decimal.ROUND_HALF_EVEN);
  const productSell=productSellUnit.mul(sellQuantity), allInTotal=freight.plus(productSell), profit=productSell.minus(productCost);
- return {audUnit:fixed(aud),insuranceUSD:fixed(insurance,0),productCostAUD:fixed(productCost,2),freightAUD:fixed(freight,2),landedAUD:fixed(productCost.plus(freight),2),productSellUnitAUD:fixed(productSellUnit),productSellAUD:fixed(productSell,2),allInUnitAUD:fixed(allInTotal.div(quantity)),allInTotalAUD:fixed(allInTotal,2),profitAUD:fixed(profit,2),marginPercent:fixed(productSell.gt(0)?profit.div(productSell).mul(100):new Decimal(0),2)};
+ return {audUnit:fixed(aud),totalUSD:fixed(totalUSD,2),totalAUD:fixed(aud.mul(sellQuantity),2),costUnitAUD:fixed(productCost.div(sellQuantity)),insuranceUSD:fixed(insurance,0),insuranceAUD:fixed(insurance.mul(fx),2),productCostAUD:fixed(productCost,2),freightAUD:fixed(freight,2),landedAUD:fixed(productCost.plus(freight),2),productSellUnitAUD:fixed(productSellUnit),productSellAUD:fixed(productSell,2),allInUnitAUD:fixed(allInTotal.div(quantity)),allInTotalAUD:fixed(allInTotal,2),profitAUD:fixed(profit,2),marginPercent:fixed(productSell.gt(0)?profit.div(productSell).mul(100):new Decimal(0),2)};
 }
 export function applyCosting(d:Draft,c:Costing):Draft {
  return {...d,audUnit:c.audUnit,insurance:c.insuranceUSD,landed:c.landedAUD,sellUnit:c.productSellUnitAUD,pricingVersion:PRICING_VERSION};

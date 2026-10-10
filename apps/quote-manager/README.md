@@ -81,3 +81,11 @@ Project creation was rejected by connected Vercel credentials (403), and the loc
 - Prototype save/reopen integration test under an approved write-enabled candidate; only mock saves and read-only live queries are verified in this change.
 - Commercial review of rounding, freight/customer price presentation, the existing bank-field label mismatch and representative historical totals before customer issuance.
 - Explicit approval before new Monday app promotion, website production merge or customer-visible release.
+
+### Staff form layout and company autofill
+
+The staff form follows the supplied Access layout: quote/customer/shipping header, packaging input rows, shipping/calculated totals, and supplier/customer descriptions with clipboard copy. Form inputs use 14px type; labels use 13px. Descriptions remain explicitly generated and manually editable. Copy uses the exact edited text and never sends anything to QBO. Supplier generation can include the selected company's recorded shipping address; generation adds no certification, disposal or DDP claims.
+
+Company selection chooses a primary contact only when it is verified through that Contact's canonical company relation; otherwise a single linked contact can be selected, while ambiguous contacts require a selection. References read the existing Primary Contact, Shipping Address, Business Address, Company Phone and Contacts First/Last Name, Email and Phone fields. Changing company clears stale contact values. Shipping Address is displayed as Monday's complete address string, never guessed into street/suburb/state/postcode fields. A Business Address is shown separately if no Shipping Address is recorded. These are current CRM details, not quote snapshots; there is no schema change or CRM write.
+
+Calculated Insurance USD and Insurance AUD are read-only. The legacy insurance seed is available under Insurance calculation. AUD insurance uses the saved AUD/USD exchange rate. Detailed totals distinguish product selling price from all-in selling price (product selling total plus freight/import costs divided by supplier quantity), and landed cost from selling price. Bank fees remain USD.

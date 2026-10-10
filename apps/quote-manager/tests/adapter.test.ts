@@ -35,3 +35,14 @@ test('fresh quote creation is private and scoped to prototype board',async()=>{l
 test('locked original blocks save even if draft status changed',async()=>{let mutations=0;const a=createMondayAdapter(async(q)=>{if(q===COLUMN_QUERY)return {data:metadata};if(q.startsWith('mutation'))mutations++;return {data:{items:[{...item(),board:{id:String(QUOTE_BOARD_ID)},column_values:[{id:C.status,type:'status',value:null,text:'Issued'}]}]}}},true);await assert.rejects(a.saveQuote(demoDraft(),'1','2026-10-10'),/locked/);assert.equal(mutations,0)});
 test('stale quotation cannot overwrite current record',async()=>{const a=createMondayAdapter(async(q)=>({data:q===COLUMN_QUERY?metadata:{items:[{...item(),board:{id:String(QUOTE_BOARD_ID)},column_values:[{id:C.status,type:'status',value:null,text:'Draft'}]}]}}),true);await assert.rejects(a.saveQuote(demoDraft(),'1','old'),/changed in Monday/)});
 test('mock draft save and reopen preserves manual descriptions and snapshot',async()=>{const a=createMockAdapter();const d={...demoDraft(),customerDesc:'Edited exact wording',fx:'1.54321'};const id=await a.saveQuote(d);const reopened=(await a.loadQuotes()).find(q=>q.id===id)!;assert.equal(reopened.values.customerDesc,d.customerDesc);assert.equal(reopened.values.fx,d.fx)});
+
+test('customer reference decoding retains verified contact links and canonical address',async()=>{
+ const {decodeRef}=await import('../src/adapter.ts');
+ const r=decodeRef({...item('11'),column_values:[{id:'board_relation_mm4nz01g',type:'board_relation',value:null,text:null,linked_item_ids:['22']},{id:'location_mm4nwpvd',type:'location',value:null,text:'10 Example Street, Adelaide SA 5000'},{id:'contact_email',type:'email',value:null,text:'person@example.com'},{id:'text_mm5n6d0w',type:'text',value:null,text:'Test'}]});
+ assert.deepEqual(r.primaryContactIds,['22']);assert.equal(r.shippingAddress,'10 Example Street, Adelaide SA 5000');assert.equal(r.email,'person@example.com');assert.equal(r.firstName,'Test');assert.equal(r.businessAddress,'');
+});
+test('company selection uses only a verified primary or unique linked contact',async()=>{
+ const {companyContact}=await import('../src/customer.ts');
+ const company=[{id:'1',name:'Test',primaryContactIds:['3']}],contacts=[{id:'2',name:'One',companyIds:['1']},{id:'3',name:'Two',companyIds:['1']}];
+ assert.equal(companyContact('1',company,contacts),'3');assert.equal(companyContact('1',[{id:'1',name:'Test'}],contacts),'');assert.equal(companyContact('1',company,[{id:'3',name:'Wrong company',companyIds:['9']}]),'');assert.equal(companyContact('1',company,[contacts[0]]),'2');
+});

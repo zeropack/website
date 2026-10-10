@@ -13,12 +13,15 @@ export async function POST(req: Request) {
   if (!body || typeof body !== "object" || Array.isArray(body))
     return NextResponse.json({ ok: false, error: "Invalid options" }, { status: 400 });
   const input = body as Record<string, unknown>;
-  if (input.mode !== "incremental" && input.mode !== "manual" && input.mode !== "initialize")
-    return NextResponse.json({ ok: false, error: "Mode must be incremental, manual or initialize" }, { status: 400 });
+  if (input.mode !== "incremental" && input.mode !== "manual" && input.mode !== "initialize" && input.mode !== "audit")
+    return NextResponse.json({ ok: false, error: "Mode must be incremental, manual, audit or initialize" }, { status: 400 });
   if (typeof input.write !== "boolean" || typeof input.maxPages !== "number"
     || !Number.isInteger(input.maxPages) || input.maxPages < 1 || input.maxPages > 5)
     return NextResponse.json({ ok: false, error: "Explicit write flag and maxPages (1-5) required" }, { status: 400 });
   const historicalWindow = typeof input.startAt === "string" && typeof input.endAt === "string";
+  if (input.mode === "audit" && (input.write !== false || typeof input.lookbackHours !== "number"
+    || !Number.isInteger(input.lookbackHours) || input.lookbackHours < 1 || input.lookbackHours > 168))
+    return NextResponse.json({ ok: false, error: "Audit must be read-only with lookbackHours (1-168)" }, { status: 400 });
   if (input.mode === "manual" && (typeof input.email !== "string"
     || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email)
     || (!historicalWindow && (typeof input.lookbackHours !== "number" || !Number.isInteger(input.lookbackHours)
@@ -37,7 +40,7 @@ export async function POST(req: Request) {
     const report = await syncOutlookRecovery({
       mode: input.mode, write: input.write, maxPages: input.maxPages,
       email: input.mode === "manual" ? String(input.email).toLowerCase() : undefined,
-      lookbackHours: input.mode === "manual" && !historicalWindow ? Number(input.lookbackHours) : undefined,
+      lookbackHours: (input.mode === "audit" || (input.mode === "manual" && !historicalWindow)) ? Number(input.lookbackHours) : undefined,
       startAt: input.mode === "manual" && historicalWindow ? String(input.startAt) : undefined,
       endAt: input.mode === "manual" && historicalWindow ? String(input.endAt) : undefined,
     });

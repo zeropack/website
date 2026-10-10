@@ -41,10 +41,10 @@ export function classifyOutlookRecovery(message: OutlookEnvelope): OutlookRecove
       documentId: (quote || invoice)![1],
     };
   }
-  if (/^(no-?reply|donotreply|notifications?)@/i.test(sender)) {
+  if (/^(no-?reply|donotreply|notifications?|system)@/i.test(sender) || sender === "australia+noreply@guardian.co.uk") {
     return { action: "skip", reason: "Automated notification" };
   }
-  if (message.direction === "sent" && message.sourceFolder === "sent") {
+  // Editorial/backlink conversations are outside customer CRM recovery.\n  if (sender === "drew@surfrider.org.au" || recipients.includes("drew@surfrider.org.au")) {\n    return { action: "skip", reason: "Backlink outreach; not customer CRM correspondence" };\n  }\n  if (message.direction === "sent" && message.sourceFolder === "sent") {
     if (recipients.length !== 1) return { action: "hold", reason: "Multiple recipients require individual identity reconciliation" };
     return { action: "candidate", source: "outlook_manual", category: "manual_sent", recipient: recipients[0] };
   }

@@ -105,3 +105,7 @@ Sources:
 ### Layout rollback — 10 October 2026
 
 Restored the staff form field arrangement and styling from commit 53b9f85 after layout review. Shipping amounts and insurance are separate fields, weight/CBM return above descriptions, artwork returns to Shipping details, and internal notes return to Packaging. All nine calculated totals and three saved prices remain present. Discard/Undo/Redo and Update beside Copy are retained, along with verified certification generation.
+
+### Adjusted reference layout — 10 October 2026
+
+The latest annotated reference moves artwork below Client project, weight/CBM above shipping charges, Apply calculation under Packaging, and notes below descriptions. Each label stays inline beside its own control, aligned to the right. Shipping amounts and both insurance outputs remain individually labeled fields. All nine calculated totals and saved price inputs remain. The green summary bar is restored below the columns with product cost, freight/import, landed cost, profit and product margin.

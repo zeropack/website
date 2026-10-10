@@ -29,17 +29,27 @@ export async function readMondayNativeMail(contactId: string): Promise<{
   if (!page || !Array.isArray(page.timeline_items)) return { complete: false, messages: [], reason: "Native Monday timeline unavailable" };
   if (page.cursor) return { complete: false, messages: [], reason: "Native Monday timeline pagination incomplete" };
   const messages: MailSummary[] = [];
+  let opaque = false;
   for (const item of page.timeline_items) {
-    if (item.custom_activity_id) continue; // a separate custom activity is not native correspondence
-    // Never treat a regular note/call or opaque native email as proof of absence.
+    if (item.custom_activity_id) continue;
+    const raw = item.metadata;
+    let metadata: Record<string, unknown> = {};
+    try {
+      metadata = typeof raw === "string" ? JSON.parse(raw) as Record<string, unknown>
+        : raw && typeof raw === "object" ? raw : {};
+    } catch { opaque = true; continue; }
+    if (item.type && item.type !== "email") continue;
+    const sender = typeof metadata.from === "string" ? metadata.from : "";
+    const to = Array.isArray(metadata.to) ? metadata.to.filter((x): x is string => typeof x === "string") : [];
     const text = item.content || "";
     const idMatch = /(?:internet[- ]?message[- ]?id|message[- ]?id)\s*:\s*(<[^>]+>|[^\s]+)/i.exec(text);
-    if (!idMatch) {
-      return { complete: false, messages: [], reason: "Native correspondence cannot be identified by stable message ID; manual comparison needed" };
-    }
+    const stableId = idMatch?.[1];
+    const direction = sender.trim().toLowerCase() === "hello@zeropack.co" ? "sent" : "received";
     messages.push({
-      internetMessageId: idMatch[1], direction: "received", from: "", to: [], subject: "", occurredAt: "",
+      internetMessageId: stableId, direction, from: sender, to,
+      subject: item.title || "", occurredAt: item.created_at || "",
     });
+    if (!stableId) opaque = true;
   }
-  return { complete: true, messages };
+  return opaque ? { complete: false, messages, reason: "Native email without stable RFC identifier; only positive duplicate matches permitted" }\n    : { complete: true, messages };
 }

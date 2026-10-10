@@ -57,7 +57,13 @@ export async function scanOutlookGraph(lookbackHours = 24, maxPages = 2) {
     const visited = new Set<string>();
     for (let page = 0; next && page < maxPages; page++) {
       const target: URL = new URL(next);
-      if (target.origin !== GRAPH || !target.pathname.startsWith(base) || visited.has(target.href)) {
+      // Graph may percent-encode mailbox characters or return the OData
+      // mailFolders('Inbox') spelling. Validate the decoded identity/folder
+      // rather than requiring byte-for-byte path equality.
+      const decodedPath = decodeURIComponent(target.pathname).toLowerCase();
+      const equivalent = decodedPath === base.toLowerCase()
+        || decodedPath === `/v1.0/users/${MAILBOX}/mailfolders('${folder === "inbox" ? "inbox" : "sentitems"}')/messages`;
+      if (target.origin !== GRAPH || !equivalent || visited.has(target.href)) {
         throw new Error("Unsafe or repeated Graph pagination");
       }
       visited.add(target.href);

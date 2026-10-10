@@ -1,7 +1,8 @@
 import { list, put } from "@vercel/blob";
 
 /** Durable, mailbox-scoped timestamp only. No customer data is stored in Blob. */
-const PATH = "internal/outlook-recovery/phase2-checkpoint.json";
+const ENV = process.env.VERCEL_ENV === "production" ? "production" : "preview";
+const PATH = `internal/outlook-recovery/${ENV}/phase2-checkpoint.json`;
 export type RecoveryCheckpoint = { lastSuccessfulAt: string; updatedAt: string };
 export async function readRecoveryCheckpoint(): Promise<RecoveryCheckpoint | null> {
   if (!process.env.BLOB_READ_WRITE_TOKEN) throw new Error("Missing durable checkpoint storage");

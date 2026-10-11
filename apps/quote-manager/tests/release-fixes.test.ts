@@ -56,11 +56,16 @@ test('supplier rename is displayed through stable Company ID without changing pe
  assert.equal(supplierCompany('Ambiguous',[{id:'1',name:'Ambiguous'},{id:'2',name:'Ambiguous'}]),undefined);
 });
 
-test('supplier wording matches requested single specification line',()=>{
+test('supplier wording matches requested multiline layout',()=>{
  const d={...demoDraft(),quantity:'2000',colour:'Black',size:'620mm x 480mm',style:'50mm flap with single adhesive',microns:'80',printing:'one colour printing on two sides'};
  assert.equal(supplierDescription(d,'Strada Coffee Pty Ltd','Australia, 3044'),`Can you please quote for:
 Company: Strada Coffee Pty Ltd
-2,000 - Customised Certified to AS 4736 - Commercially Compostable Black mail satchel: one colour printing on two sides - 620mm x 480mm and 50mm flap with single adhesive 80 mic thick
+2,000 - Customised Certified to AS 4736 - Commercially Compostable
+Black mail satchel
+one colour printing on two sides
+620mm x 480mm
+50mm flap with single adhesive
+80 mic thick
 
 Please include weights and cbm for shipping.`);
 });

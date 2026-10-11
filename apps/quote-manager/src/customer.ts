@@ -51,11 +51,9 @@ export function companyContact(companyId:string,companies:import('./adapter.ts')
 export function supplierDescription(d:Draft,companyName='',shippingAddress='') {
  if(!d.packaging.trim())return '';
  const cert=certification(d,shippingAddress);
- const product=['Customised',cert,d.colour,d.packaging].filter(Boolean).join(' ');
- const dimensions=[d.size,d.style].filter(Boolean).join(' and ');
- const detail=[dimensions,d.microns?`${d.microns} mic thick`:''].filter(Boolean).join(' ');
- const specification=`${d.quantity?`${Number(d.quantity).toLocaleString('en-AU')} - `:''}${product}${d.printing?`: ${d.printing}`:''}${detail?` - ${detail}`:''}`;
- return ['Can you please quote for:',companyName?`Company: ${companyName}`:'',specification,'','Please include weights and cbm for shipping.'].filter((v,i)=>v||i===3).join('\n');
+ const heading=[d.quantity?`${Number(d.quantity).toLocaleString('en-AU')} -`:'','Customised',cert].filter(Boolean).join(' ');
+ const lines=['Can you please quote for:',companyName?`Company: ${companyName}`:'',heading,[d.colour,d.packaging].filter(Boolean).join(' '),d.printing,d.size,d.style,d.microns?`${d.microns} mic thick`:''].filter(Boolean);
+ return [...lines,'','Please include weights and cbm for shipping.'].join('\n');
 }
 
 // Sources: current Product & Packaging Knowledge Core and Claims & Evidence Policy,

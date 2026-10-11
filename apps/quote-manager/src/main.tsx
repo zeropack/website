@@ -95,10 +95,10 @@ function App() {
    try{toSave=applyCosting(toSave,calculate(toSave))}catch{/* Incomplete drafts remain saveable without fabricated totals. */}
    writtenId=await a.saveQuote(toSave,current||undefined,original?.updated_at);
    // Keep the created ID immediately; a failed refresh must never turn retry into another create.
-   setCurrent(writtenId);resetDraft({...draft});setSaved({...draft});
+   setCurrent(writtenId);setSaved({...draft});
    const q=await a.loadQuotes();setQuotes(q);const row=q.find(q=>q.id===writtenId);
    if(!row)throw new Error('Saved quotation was not found on readback. Refresh records before further editing.');
-   resetDraft({...row.values});setSaved({...row.values});setNotice(automatic?(isLive?'Changes autosaved in Monday':'Demo changes autosaved'):(isLive?'Draft saved in Monday':'Demo draft saved for this preview session'));
+   dispatch({type:'saved',value:{...row.values}});setSaved({...row.values});setNotice(automatic?(isLive?'Changes autosaved in Monday':'Demo changes autosaved'):(isLive?'Draft saved in Monday':'Demo draft saved for this preview session'));
   } catch(e) {setAutosavePaused(true);if(writtenId)setReady(false);setError(`${writtenId?'Save completed, but readback failed. Refresh before retrying. ':''}${e instanceof Error?e.message:String(e)}`)}finally{saveInProgress.current=false;setSaving(false)}
  };
  useEffect(()=>{
@@ -152,7 +152,7 @@ function App() {
      <div className="cost-summary" aria-label="Cost summary"><div><span>Product cost AUD</span><b>{costing?money(costing.productCostAUD):'—'}</b></div><div><span>Freight & import costs AUD</span><b>{costing?money(costing.freightAUD):'—'}</b></div><div><span>Total landed AUD</span><b>{costing?money(costing.landedAUD):'—'}</b></div><div><span>Margin AUD</span><b>{costing?money(costing.profitAUD):'—'}</b><small>Product margin {costing?`${costing.marginPercent}%`:'—'}</small></div><div><span>Total landing sell AUD</span><b>{costing?money(costing.allInTotalAUD):'—'}</b></div></div>
      <div className="record-actions"><button className="archive-button" disabled={busy||!ready||!current||(isLive&&!writesEnabled)} onClick={()=>void archive()}>Archive quotation</button></div>
     </Panel>
-   </>}<footer><span>Zero Pack Quote Manager · v0.3.2</span><span>{isLive?'Private Monday workspace':'Demo changes reset when this page reloads'} · Draft only</span></footer></div>
+   </>}<footer><span>Zero Pack Quote Manager · v0.3.3</span><span>{isLive?'Private Monday workspace':'Demo changes reset when this page reloads'} · Draft only</span></footer></div>
   </section></div>
  </main>;
 }

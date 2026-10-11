@@ -1,4 +1,5 @@
 import { C, QUOTE_BOARD_ID, blank, dropdowns, relations, longs, statuses, numbers, type Draft, type Field } from './schema.ts';
+import {normalizeDecimal,isDecimal} from './numeric.ts';
 
 export type ColumnValue = { id: string; text: string | null; value: string | null; type: string; linked_item_ids?: string[]; values?: {id: number; label: string}[] };
 export type Item = { id: string; name: string; updated_at: string; column_values: ColumnValue[] };
@@ -52,7 +53,7 @@ export function validateDraft(d: Draft): void {
  if(!isEditable(d.status)) throw new Error('This quotation is locked; duplicate it into a new draft.');
  for(const k of numbers) {
   const v=d[k].trim();
-  if(v && (!/^\d+(\.\d+)?$/.test(v) || !Number.isFinite(Number(v)))) throw new Error(`${k} must be a finite, non-negative decimal number.`);
+  if(v && !isDecimal(v)) throw new Error(`${k} must be a finite, non-negative decimal number.`);
  }
  for(const k of ['quantity','sellQuantity'] as Field[]) if(d[k] && !Number.isSafeInteger(Number(d[k]))) throw new Error(`${k} must be a whole number.`);
  if(d.fx && Number(d.fx)<=0) throw new Error('Exchange rate must be greater than zero.');
@@ -67,7 +68,7 @@ export function toValues(d: Draft, creating=false): Record<string,unknown> {
   else if(dropdowns.includes(key)) out[col]=v?{labels:[v]}:{ids:[]};
   else if(statuses.includes(key)) out[col]=v?{label:v}:null;
   else if(longs.includes(key)) out[col]={text:v};
-  else if(numbers.includes(key)) out[col]=v||null;
+  else if(numbers.includes(key)) out[col]=v?normalizeDecimal(v):null;
   else out[col]=v;
  }
  if(creating) out[C.visibility]={label:'Private'};

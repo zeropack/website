@@ -1,6 +1,7 @@
 import {useState,type ReactNode} from 'react';
 import {flushSync} from 'react-dom';
 import {currencyValue,numberValue} from '../currency.ts';
+import {normalizeDecimal} from '../numeric.ts';
 import type {Draft,Field} from '../schema.ts';
 import type {Ref} from '../adapter.ts';
 export type EditorProps={draft:Draft;set:(key:Field,value:string)=>void;disabled?:boolean};
@@ -9,7 +10,7 @@ export function TextField({draft,set,disabled,field,label,type='text',placeholde
  const unitFields=['usdUnit','audUnit','sellUnit'];
  const currencies:Partial<Record<Field,'USD'|'AUD'>>={usdUnit:'USD',shipping:'USD',insurance:'USD',bank:'USD',transaction:'USD',duty:'AUD',customs:'AUD',audUnit:'AUD',landed:'AUD',sellUnit:'AUD'};
  const currency=currencies[field],numeric=type==='number',value=!focused&&numeric?(currency?currencyValue(draft[field],currency,unitFields.includes(field)?4:2):numberValue(draft[field])):draft[field];
- return <label className={type==='number'?'field number-field':'field'}><span>{label}</span><input aria-label={label} value={value} onFocus={e=>{if(numeric){flushSync(()=>setFocused(true));e.currentTarget.select()}else setFocused(true)}} onBlur={()=>setFocused(false)} onChange={e=>set(field,numeric?e.target.value.replace(/(?:USD|AUD|\$|,|\s)/g,''):e.target.value)} type={numeric?'text':type} inputMode={type==='number'?'decimal':undefined} step={type==='number'&&!currency?'any':undefined} min={type==='number'&&!currency?'0':undefined} disabled={disabled} placeholder={placeholder}/></label>;
+ return <label className={type==='number'?'field number-field':'field'}><span>{label}</span><input aria-label={label} value={value} onFocus={e=>{if(numeric){flushSync(()=>setFocused(true));e.currentTarget.select()}else setFocused(true)}} onBlur={()=>{if(numeric&&normalizeDecimal(draft[field])!==draft[field])set(field,normalizeDecimal(draft[field]));setFocused(false)}} onChange={e=>set(field,numeric?e.target.value.replace(/(?:USD|AUD|\$|,|\s)/g,'').replace(/^\.(\d)/,'0.$1'):e.target.value)} type={numeric?'text':type} inputMode={type==='number'?'decimal':undefined} step={type==='number'&&!currency?'any':undefined} min={type==='number'&&!currency?'0':undefined} disabled={disabled} placeholder={placeholder}/></label>;
 }
 export function SelectField({draft,set,disabled,field,label,options}:EditorProps & {field:Field;label:string;options:Ref[]}) {
  const missing=draft[field]&&!options.some(o=>o.id===draft[field]);

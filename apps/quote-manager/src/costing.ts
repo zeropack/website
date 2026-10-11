@@ -1,10 +1,11 @@
 import Decimal from 'decimal.js';
 import type {Draft} from './schema.ts';
-export const PRICING_VERSION = 'quote-v2-plate-usd-20261011';
+import {normalizeDecimal,isDecimal} from './numeric.ts';
+export const PRICING_VERSION = 'quote-v3-insurance-minimum-20261011';
 export type Costing = {audUnit:string; totalUSD:string; totalAUD:string; costUnitAUD:string; insuranceUSD:string; insuranceAUD:string; productCostAUD:string; freightAUD:string; landedAUD:string; productSellUnitAUD:string; productSellAUD:string; allInUnitAUD:string; allInTotalAUD:string; profitAUD:string; marginPercent:string};
 const decimal = (value:string, field:string) => {
- if(!/^\d+(\.\d+)?$/.test(value)) throw new Error(`${field} requires a non-negative decimal number.`);
- const n=new Decimal(value); if(!n.isFinite()) throw new Error(`${field} is invalid.`); return n;
+ if(!isDecimal(value)) throw new Error(`${field} requires a non-negative decimal number.`);
+ const n=new Decimal(normalizeDecimal(value)); if(!n.isFinite()) throw new Error(`${field} is invalid.`); return n;
 };
 const fixed=(n:Decimal, places=4)=>n.toDecimalPlaces(places,Decimal.ROUND_HALF_EVEN).toFixed(places);
 export function calculate(d: Draft): Costing {
@@ -17,7 +18,7 @@ export function calculate(d: Draft): Costing {
  // Access: shipins declared Integer, VBA coercion rounds half to even, then minimum logic.
  const shipins=optional('shipping').gt(0)?totalUSD.mul('0.003').toDecimalPlaces(0,Decimal.ROUND_HALF_EVEN):new Decimal(0);
  if(shipins.gt(32767)) throw new Error('Legacy insurance exceeds the Access Integer range. Review costing manually.');
- const insurance=shipins.lt(30)&&optional('insurance').gt(0)?new Decimal(30):shipins;
+ const insurance=optional('shipping').gt(0)?Decimal.max(30,shipins):new Decimal(0);
  const productCost=totalUSD.mul(fx);
  // User confirmed bank fees use legacy USD despite existing Monday column title.
  const freight=optional('shipping').plus(insurance).plus(optional('bank')).mul(fx).plus(optional('customs')).plus(optional('duty'));

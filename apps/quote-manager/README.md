@@ -35,19 +35,19 @@ Reference lists request only `contact_account` and company `status` values. Inac
 
 ## Access calculation basis
 
-User confirmed **legacy USD bank fees** on 10 October 2026. The existing Monday field title says Bank Fees AUD. This prototype stores the legacy USD input in that existing field, labels it USD in the application and records pricing version `access-v1-bank-usd-20261010`. No canonical schema is renamed. Other readers of the existing numeric field MUST use this pricing version to interpret it. Older records without a pricing version remain unverified.
+User confirmed **legacy USD bank fees** on 10 October 2026. The existing Monday field title says Bank Fees AUD. This prototype stores the legacy USD input in that existing field, labels it USD in the application and records pricing version `quote-v2-plate-usd-20261011`. No canonical schema is renamed. Other readers of the existing numeric field MUST use this pricing version to interpret it. Older records without a pricing version remain unverified.
 
-The calculation preserves these Access formulas:
+The calculation retains the Access rounding and quantity rules, with the user-approved USD plate-fee correction from 11 October 2026:
 
 1. Supplier AUD unit = USD unit × saved AUD-per-USD FX.
-2. Product cost = supplier AUD unit × sell quantity + transaction fee AUD.
-3. Insurance candidate = 0.3% × USD unit × sell quantity when shipping USD is positive, otherwise zero. Access declares `shipins` as Integer, so half-to-even integer rounding applies. When the candidate is below USD 30 and the entered insurance seed is positive, insurance is USD 30; otherwise use the candidate. This includes the unusual original zero-shipping/minimum interaction. Overflow now stops with an actionable error instead of silently retaining stale results.
+2. Total USD = supplier USD unit × sell quantity + plate fee USD. Total AUD and product cost = Total USD × saved FX. The plate fee is included exactly once. The existing Monday Transaction Fee AUD column is reused without a schema rename; this pricing version identifies its new USD interpretation. Pre-v2 stored plate amounts must be verified in USD before recalculation.
+3. Insurance candidate = 0.3% × Total USD (including plate fee) when shipping USD is positive, otherwise zero. Access declares `shipins` as Integer, so half-to-even integer rounding applies. When the candidate is below USD 30 and the entered insurance seed is positive, insurance is USD 30; otherwise use the candidate. This includes the unusual original zero-shipping/minimum interaction. Overflow now stops with an actionable error instead of silently retaining stale results.
 4. Freight/import = (shipping USD + calculated insurance USD + bank USD) × FX + customs fee AUD + duty AUD.
 5. Product sell unit = half-to-even rounding to four decimal places of product cost × (1 + markup / 100) ÷ sell quantity. Access stores markup as a fraction; the new UI explicitly accepts percent.
 6. Product selling total = rounded product sell unit × sell quantity.
 7. Access all-in unit reference = (product selling total + freight/import) ÷ supplier quantity. Supplier and sell quantities are deliberately distinct, matching the original form.
 
-`landed` stores combined product and freight/import costs. `sellUnit` stores the **product-only** selling unit price. All-in price is a separate reference, not a customer offer. Decimal math avoids binary floating-point drift; final currency totals display two decimals and unit prices four. Saved manual prices and descriptions stay unchanged until staff explicitly applies a calculation. No live FX lookup, automatic rate refresh, certification inference, delivery promises or fixed commercial fee defaults are introduced.
+`landed` stores combined product and freight/import costs. `sellUnit` stores the **product-only** selling unit price. All-in price is a separate reference, not a customer offer. Decimal math avoids binary floating-point drift; final currency totals display two decimals and unit prices four. Saved manual prices and descriptions stay unchanged until staff explicitly applies a calculation. New quotes default customs duty to AUD 120 and customs fees to AUD 116; existing records retain their values. New quote FX defaults to the latest published ECB USD/AUD reference rate via Frankfurter v2 multiplied by 1.05. The base reference rate and date appear beside the editable snapshot; base higher than snapshot is red, lower is green, equal neutral. Refresh updates the comparison only, never a saved or manually entered snapshot. Failure leaves manual input available. The 5% is a planning allowance, not a guaranteed bank spread. The source/date/base/allowance are retained in FX metadata. Only the currency pair is sent to the public API.
 
 ## Record safety and visibility
 
@@ -116,8 +116,10 @@ All nine calculated totals and the green cost summary remain visible before vali
 
 ### Currency display and concise labels
 
-Amount fields display currency outside focus (two decimals for totals/fees, four for unit prices). Editing shows the exact raw decimal; formatting never rounds or replaces the saved value. USD/AUD remain identified by field labels; Plate Fee is AUD. Exchange Rate retains the AUD-per-USD calculation basis. Calculated total controls are 25% narrower. Shipping address fills its panel without a visible label; its accessible name remains. Removed helper text and Internal notes uses the description heading style.
+Amount fields display currency outside focus (two decimals for totals/fees, four for unit prices). Editing shows the exact raw decimal; formatting never rounds or replaces the saved value. USD/AUD remain identified by field labels; Plate Fee is USD. Exchange Rate retains the AUD-per-USD calculation basis. Calculated total controls are 25% narrower. Shipping address fills its panel without a visible label; its accessible name remains. Removed helper text and Internal notes uses the description heading style.
 
 ### Header proportions and numeric grouping
 
 Wide desktop header panels use 25/40/35 proportions. Numeric fields show thousands separators outside focus; editing and saves retain raw decimal strings. Re-calculate is 75% wide, aligned right. Customer-requested labels Sell Incl Shipping AUD, Margin AUD and Total selling AUD replace the longer labels without changing formulas. Sell Incl Shipping remains a four-decimal unit-price reference using supplier quantity as its divisor.
+
+Margin AUD has a red background below AUD 500, with the usual text colour. Sell Incl Shipping AUD has a Copy button that copies the raw four-decimal number without a currency symbol or separators.

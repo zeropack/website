@@ -10,7 +10,7 @@ const capitalise=(s:string)=>s?`${s[0].toUpperCase()}${s.slice(1)}`:'';
 export type Destination={country:'Australia'|'United Kingdom';postcode:string};
 export function destination(address:string):Destination|undefined {
  const parts=address.split(/[,\n]/).map(s=>s.trim()).filter(Boolean);
- const au=parts.some(s=>/^(Australia|AU|AUS)(?:\s+\d{4})?$/i.test(s));
+ const au=parts.some(s=>/^(?:\d{4}\s+)?(Australia|AU|AUS)(?:\s+\d{4})?$/i.test(s));
  const uk=parts.some(s=>/^(United Kingdom|UK|Great Britain|GB)$/i.test(s));
  // A destination must be explicitly recorded, never inferred from city/postcode alone.
  if(au===uk)return undefined;

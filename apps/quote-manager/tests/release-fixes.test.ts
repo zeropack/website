@@ -75,3 +75,10 @@ NSW , 2204
 Australia`);
  assert.throws(()=>shippingQuote(demoDraft(),{id:'1',name:'No address'}),/shipping address/);
 });
+
+test('Monday postcode-before-country shipping address resolves AU certification and DDP',()=>{
+ const address='Factory 4, 39 Example Street Pascoe Vale VIC , 3044 Australia';
+ assert.deepEqual(destination(address),{country:'Australia',postcode:'3044'});
+ const d={...demoDraft(),microns:'80'};assert.match(specificationDescription(d,address),/Certified to AS 4736 - Commercially Compostable/);assert.match(specificationDescription(d,address),/Deliver to: Australia, 3044/);assert.match(supplierDescription(d,'Example company',address),/Certified to AS 4736/);
+ assert.equal(destination('3044 Australia Street'),undefined);
+});

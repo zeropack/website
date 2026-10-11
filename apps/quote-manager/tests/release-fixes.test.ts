@@ -81,4 +81,6 @@ test('Monday postcode-before-country shipping address resolves AU certification 
  assert.deepEqual(destination(address),{country:'Australia',postcode:'3044'});
  const d={...demoDraft(),microns:'80'};assert.match(specificationDescription(d,address),/Certified to AS 4736 - Commercially Compostable/);assert.match(specificationDescription(d,address),/Deliver to: Australia, 3044/);assert.match(supplierDescription(d,'Example company',address),/Certified to AS 4736/);
  assert.equal(destination('3044 Australia Street'),undefined);
+ assert.deepEqual(destination('1 Example Road, SW1A 1AA United Kingdom'),{country:'United Kingdom',postcode:'SW1A 1AA'});
+ assert.match(specificationDescription(d,'1 Example Road, SW1A 1AA United Kingdom'),/OK compost INDUSTRIAL/);
 });

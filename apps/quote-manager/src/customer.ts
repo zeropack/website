@@ -11,7 +11,7 @@ export type Destination={country:'Australia'|'United Kingdom';postcode:string};
 export function destination(address:string):Destination|undefined {
  const parts=address.split(/[,\n]/).map(s=>s.trim()).filter(Boolean);
  const au=parts.some(s=>/^(?:\d{4}\s+)?(Australia|AU|AUS)(?:\s+\d{4})?$/i.test(s));
- const uk=parts.some(s=>/^(United Kingdom|UK|Great Britain|GB)$/i.test(s));
+ const uk=parts.some(s=>/^(?:[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\s+)?(United Kingdom|UK|Great Britain|GB)$/i.test(s));
  // A destination must be explicitly recorded, never inferred from city/postcode alone.
  if(au===uk)return undefined;
  const postcode=au?address.match(/\b\d{4}\b(?=[^\d]*$)/)?.[0]??'':address.match(/\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/i)?.[0].toUpperCase()??'';

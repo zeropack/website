@@ -16,7 +16,7 @@ npm run test:e2e
 
 Default mode is **synthetic demo**. Demo writes exist only in browser memory and reset on page reload. Live CRM records, supplier prices and credentials must never be added to fixtures or committed to this public repository.
 
-`npm run build:monday` builds the Monday SDK mode with writes disabled. It must be opened as the installed board view for private board `5031824429`; standalone browsers cannot authenticate a Monday user session. The existing app is `12360227`, live version v2 (`18757871`), feature `zeropack_quotemanager::quotebuilder`. No app upload, release or promotion is automated.
+`npm run build:monday` builds the Monday SDK mode with writes disabled. It must be opened as the installed board view for private board `5031824429`; standalone browsers cannot authenticate a Monday user session. The existing app is `12360227`, live version v3 (`18761450`), feature `zeropack_quotemanager::quotebuilder`. No app upload, release or promotion is automated.
 
 An approved staff draft release explicitly sets `VITE_APP_MODE=monday` and `VITE_MONDAY_WRITES_ENABLED=true`. This is a capability flag, not an authorization mechanism. Monday's active user session and board permissions remain authoritative. Never set a Monday token as a Vite variable or add a token-based server proxy to the demo.
 
@@ -35,7 +35,7 @@ Reference lists request only `contact_account` and company `status` values. Inac
 
 ## Access calculation basis
 
-User confirmed **legacy USD bank fees** on 10 October 2026. The existing Monday field title says Bank Fees AUD. This prototype stores the legacy USD input in that existing field, labels it USD in the application and records pricing version `quote-v2-plate-usd-20261011`. No canonical schema is renamed. Other readers of the existing numeric field MUST use this pricing version to interpret it. Older records without a pricing version remain unverified.
+User confirmed **legacy USD bank fees** on 10 October 2026. The existing Monday field title says Bank Fees AUD. This prototype stores the legacy USD input in that existing field, labels it USD in the application and records pricing version `quote-v3-insurance-minimum-20261011` (retaining the v2 USD bank/plate interpretation). No canonical schema is renamed. Other readers of the existing numeric field MUST use this pricing version to interpret it. Older records without a pricing version remain unverified.
 
 The calculation retains the Access rounding and quantity rules, with the user-approved USD plate-fee correction from 11 October 2026:
 
@@ -47,7 +47,7 @@ The calculation retains the Access rounding and quantity rules, with the user-ap
 6. Product selling total = rounded product sell unit × sell quantity.
 7. Access all-in unit reference = (product selling total + freight/import) ÷ supplier quantity. Supplier and sell quantities are deliberately distinct, matching the original form.
 
-`landed` stores combined product and freight/import costs. `sellUnit` stores the **product-only** selling unit price. All-in price is a separate reference, not a customer offer. Decimal math avoids binary floating-point drift; final currency totals display two decimals and unit prices four. Saved manual prices and descriptions stay unchanged until staff explicitly applies a calculation. New quotes default customs duty to AUD 120 and customs fees to AUD 116; existing records retain their values. New quote FX defaults to the latest published ECB USD/AUD reference rate via Frankfurter v2 multiplied by 1.05. The base reference rate and date appear beside the editable snapshot; base higher than snapshot is red, lower is green, equal neutral. Refresh updates the comparison only, never a saved or manually entered snapshot. Failure leaves manual input available. The 5% is a planning allowance, not a guaranteed bank spread. The source/date/base/allowance are retained in FX metadata. Only the currency pair is sent to the public API.
+`landed` stores combined product and freight/import costs. `sellUnit` stores the **product-only** selling unit price. All-in price is a separate reference, not a customer offer. Decimal math avoids binary floating-point drift; final currency totals display two decimals and unit prices four. Saved manual prices stay unchanged until staff explicitly applies a calculation. Descriptions follow the automatic-update switches; saved descriptions are preserved on load. New quotes default customs duty to AUD 120 and customs fees to AUD 116; existing records retain their values. New quote FX defaults to the latest published ECB USD/AUD reference rate via Frankfurter v2 multiplied by 1.05. The base reference rate and date appear beside the editable snapshot; base higher than snapshot is red, lower is green, equal neutral. Refresh updates the comparison only, never a saved or manually entered snapshot. Failure leaves manual input available. The 5% is a planning allowance, not a guaranteed bank spread. The source/date/base/allowance are retained in FX metadata. Only the currency pair is sent to the public API.
 
 ## Record safety and visibility
 
@@ -78,7 +78,7 @@ Project creation was rejected by connected Vercel credentials (403), and the loc
 - Vercel project creation permission for permanent standalone protected Git previews.
 - Supplier contact identities/links: all nine expected Company records exist, but targeted relation and name/company-field searches found no confirmed matching contacts. Do not fabricate or duplicate contacts.
 - Commercial review of rounding, freight/customer price presentation, the existing bank-field label mismatch and representative historical totals before customer issuance.
-- Explicit approval before further Monday app promotions, website production merge or customer-visible release.
+- Explicit approval before website production merge or customer-visible release. Routine fixes to the installed private Monday app remain within the authorized staff release scope.
 
 ### Staff form layout and company autofill
 
@@ -122,9 +122,9 @@ Wide desktop header panels use 25/40/35 proportions. Numeric fields show thousan
 
 Margin AUD has a red background below AUD 500, with the usual text colour. Sell Incl Shipping AUD has a Copy button that copies the raw four-decimal number without a currency symbol or separators.
 
-## Monday release — 11 October 2026
+## Initial Monday release — 11 October 2026
 
-User-approved v2 is live in the private quotation board (`5031824429`), installed Quote Builder view `57626700`. App version `18757871`, feature `126138879`; Monday-hosted bundle: `bd54b9074bf3daae6f215b69a673b395.cdn2.monday.app`. Built from source commit `5f3be9b52271df37c2a6e562ad2daccc2a849a75` with `VITE_APP_MODE=monday VITE_MONDAY_WRITES_ENABLED=true`. ZIP SHA-256: `d030e527a0c51cefd44076ec0f8b255c972eefc6c5ad332af0be530ca696520b`. Existing scopes were retained; no new permissions were granted. Unit/type/build checks passed (37 tests), with 26 desktop/mobile browser checks on this source. The public website remains unmerged; customer portal work is separate.
+The initial user-approved v2 release ran in the private quotation board (`5031824429`), installed Quote Builder view `57626700`. App version `18757871`, feature `126138879`; Monday-hosted bundle: `bd54b9074bf3daae6f215b69a673b395.cdn2.monday.app`. Built from source commit `5f3be9b52271df37c2a6e562ad2daccc2a849a75` with `VITE_APP_MODE=monday VITE_MONDAY_WRITES_ENABLED=true`. ZIP SHA-256: `d030e527a0c51cefd44076ec0f8b255c972eefc6c5ad332af0be530ca696520b`. Existing scopes were retained; no new permissions were granted. Unit/type/build checks passed (37 tests), with 26 desktop/mobile browser checks on this source. The public website remains unmerged; customer portal work is separate.
 
 Embedded SDK verification passed create/read/update/read on `TEST — Monday release QA 2026-10-11`, using no CRM links. After refresh/reopen, the manual FX 1.5, USD total 1,050, landed AUD 2,036, margin AUD 473, all-in unit 0.2509, edited descriptions and notes remained intact. Live reference lists and daily FX lookup loaded in the installed view. The developer preview correctly rejects missing quotation-board context. Supplier contact verification and commercial issuance review remain open.
 
@@ -137,3 +137,9 @@ Numeric inputs accept .6250 and .0050, retain exact precision, and normalise to 
 Customer descriptions use the multiline product/size/style/thickness/printing/certification and DDP structure in the supplied Access doc_rptObjects.txt VBA. Approved AU/UK mailer certification thresholds remain unchanged; no blanket FSC, certification or compostability claims are copied onto unrelated products. Supplier quantity and specifications regenerate supplier text. Specification changes and generated descriptions are one undoable draft edit. Manually typing in a description pauses its generator; Update restores it. Copy remains exact and performs no external communication.
 
 Optional Autosave defaults off. Only its boolean preference is remembered locally, with no quote/customer/cost payload stored in cookies or browser storage. A new or duplicated draft must be saved manually once. Thereafter valid editable drafts save after 3 seconds without edits through the existing authenticated adapter. Timers cancel on discard, selection, duplicate, disabling or lock/read-only state. Writes are serialized; errors pause autosave until manual retry or explicit re-enable. Existing optimistic concurrency, private-board, permissions and readback-failure safeguards remain. The prototype still has no atomic Monday compare-and-swap or customer issuance workflow.
+
+## Refinement deployment — 11 October 2026
+
+Monday v3 (`18761450`), feature `126146266`, is live in the existing private quotation board. Bundle host: `6b7b37ec19c8cc2d11ecb852ffc02670.cdn2.monday.app`; source ZIP `17833442`. Source commit `af0fcd02c67d0950cf917a8c73aefbde39845255`, with `VITE_APP_MODE=monday VITE_MONDAY_WRITES_ENABLED=true`. ZIP SHA-256 `fb321f06f8722e7967bfd60d496617c575b86b97582e1fd4e78ce694ddbb721b`. Existing scopes and installation were retained. GitHub Actions run `38120992073` passed 43 unit checks, 36 desktop/mobile browser checks, TypeScript and both builds. Installed view confirms v0.3.1 and the current supplier Company name for the renamed Mianyang record.
+
+Installed SDK checks on the existing synthetic `TEST — Monday release QA 2026-10-11` quotation passed: .6250 normalised to $0.6250, insurance was $30.00, explicit recalculation and manual save succeeded, and a subsequent notes edit autosaved and read back successfully. Autosave was turned off after QA. No customer quotation or CRM record was changed.

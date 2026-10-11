@@ -16,7 +16,7 @@ npm run test:e2e
 
 Default mode is **synthetic demo**. Demo writes exist only in browser memory and reset on page reload. Live CRM records, supplier prices and credentials must never be added to fixtures or committed to this public repository.
 
-`npm run build:monday` builds the Monday SDK mode with writes disabled. It must be opened as the installed board view for private board `5031824429`; standalone browsers cannot authenticate a Monday user session. The existing app is `12360227`, live version v5 (`18763492`), feature `zeropack_quotemanager::quotebuilder`. No app upload, release or promotion is automated.
+`npm run build:monday` builds the Monday SDK mode with writes disabled. It must be opened as the installed board view for private board `5031824429`; standalone browsers cannot authenticate a Monday user session. The existing app is `12360227`, live version v6 (`18764749`), feature `zeropack_quotemanager::quotebuilder`. No app upload, release or promotion is automated.
 
 An approved staff draft release explicitly sets `VITE_APP_MODE=monday` and `VITE_MONDAY_WRITES_ENABLED=true`. This is a capability flag, not an authorization mechanism. Monday's active user session and board permissions remain authoritative. Never set a Monday token as a Vite variable or add a token-based server proxy to the demo.
 
@@ -90,7 +90,7 @@ Calculated Insurance USD and Insurance AUD are read-only. The hidden legacy insu
 
 ### Discard, edit history and approved certification descriptions
 
-Discard restores the last saved draft without writing Monday. Undo/Redo tracks up to 100 whole-draft edit steps, including company/contact selection, calculations and description updates. A new edit clears redo; save, discard, new/duplicate/select quote and refresh clear history so it never crosses quote boundaries or reverses a persisted write.
+Discard restores the last saved draft without writing Monday. Undo/Redo tracks up to 100 whole-draft edit steps, including company/contact selection, calculations and description updates. A new edit clears redo. Saves preserve undo/redo; undo can restore and save a prior value within the selected quote. Discard, new/duplicate/select quote and refresh clear history so it never crosses quote boundaries.
 
 Update regenerates the respective description from current specifications, asking before replacing manually edited text. It is separate from costing calculation and Copy, which copies exact edited text.
 
@@ -166,3 +166,15 @@ Monday v5 (`18763492`), feature `126150470`, uses the final v0.3.2 source `e340f
 Final source validation: GitHub Actions run `38123445713` passed 47 unit checks, 46 desktop/mobile browser checks, TypeScript and both builds. Certification wording remains within the verified mailer country/thickness mapping; country-like street names do not imply a country.
 
 Final installed v5 read-only verification on the existing Strada quote confirmed the requested single-line supplier specification, AS 4736 customer description and full DDP block with Australia, 3044. Total landing sell AUD matched the fifth summary value. Existing customer quote values were not written during verification.
+
+## Undo and supplier formatting — v0.3.3
+
+Automatic and manual saves normalize the current draft from authenticated readback without clearing either undo or redo. Up to 100 whole-draft edits are retained during the selected quotation's editing session; undo/redo changes can themselves autosave to the same record. A new edit clears redo. Selecting another quotation, starting/duplicating a draft, explicit Discard or page reload starts a new history. No quotation payload is persisted in browser storage. Existing save mutex, optimistic concurrency and readback-failure protections are unchanged.
+
+Supplier text separates the quantity/certification, colour/product, printing, size, flap/style and thickness onto individual lines, followed by a blank line and the shipping weights/CBM request. Company name and current country/thickness certification remain derived from canonical selected data.
+
+### v0.3.3 deployment record
+
+Monday v6 (`18764749`), feature `126153046`, is live in the existing private board installation. Bundle host `0547b12cc72cbaaec93aebd4f841c254.cdn2.monday.app`, source ZIP `17833724`. Tested source commit `73099f509c3f76754eeead34dfec8e0c9c69b632`. Write-enabled ZIP SHA-256 `0180b920b8478b1c7efa6fb42f727a906ac94e29f92a4866bc5fcbf38a1e671a`. GitHub Actions run `38124415067` passed 48 unit checks and 48 desktop/mobile browser checks, including edit → autosave → undo → autosave → redo → autosave, manual-save undo, and summary/archive/footer boundaries. TypeScript and demo/read-only Monday builds passed; the write-enabled release build passed locally. Existing scopes are unchanged and no public website production merge occurred.
+
+Installed v6 SDK verification passed on the existing synthetic TEST release quote: notes edit autosaved, Undo restored the baseline and autosaved it while keeping Redo, Redo restored the edit and autosaved, and switching away/back read the persisted redo value. Original test notes were then restored by manual save and autosave was turned off. The actual Strada quotation was read only to confirm the exact requested multiline supplier text; no customer or CRM record was changed.

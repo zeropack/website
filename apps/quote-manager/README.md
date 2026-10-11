@@ -16,7 +16,7 @@ npm run test:e2e
 
 Default mode is **synthetic demo**. Demo writes exist only in browser memory and reset on page reload. Live CRM records, supplier prices and credentials must never be added to fixtures or committed to this public repository.
 
-`npm run build:monday` builds the Monday SDK mode with writes disabled. It must be opened as the installed board view for private board `5031824429`; standalone browsers cannot authenticate a Monday user session. The existing app is `12360227`, live version v3 (`18761450`), feature `zeropack_quotemanager::quotebuilder`. No app upload, release or promotion is automated.
+`npm run build:monday` builds the Monday SDK mode with writes disabled. It must be opened as the installed board view for private board `5031824429`; standalone browsers cannot authenticate a Monday user session. The existing app is `12360227`, live version v5 (`18763492`), feature `zeropack_quotemanager::quotebuilder`. No app upload, release or promotion is automated.
 
 An approved staff draft release explicitly sets `VITE_APP_MODE=monday` and `VITE_MONDAY_WRITES_ENABLED=true`. This is a capability flag, not an authorization mechanism. Monday's active user session and board permissions remain authoritative. Never set a Monday token as a Vite variable or add a token-based server proxy to the demo.
 
@@ -151,3 +151,18 @@ The company selector above quote search scopes the searchable quote list. Recove
 Copy shipping quote uses weight, CBM, supplier quantity, packaging type, canonical company name and the stored shipping address. It only writes to the clipboard and does not send to suppliers. Missing/invalid details fail with a clear message. Total landing sell AUD is product selling total plus pass-through freight/import costs (allInTotalAUD), displayed after landed cost and right of margin in the green summary. No new board schema is required.
 
 Autosave is an accessible sliding switch in brand green. The redundant saved pricing/FX fields and insurance explanation were removed from the UI. The supplier description follows the requested single specification sentence, and both descriptions are always generated; no manual-update checkboxes remain. Saved descriptions are regenerated from current inputs on save, and valid costing snapshots are saved automatically even if Re-calculate was not clicked. Legacy release notes above describe previous versions only.
+
+### v0.3.2 deployment record
+
+Monday v4 (`18763024`), feature `126149515`, is live with the existing installation and scopes. Bundle host `0db4c591f5eb6cce15db6f490cc23d9e.cdn2.monday.app`, source ZIP `17833598`. Tested source commit `67a3e99d9319245d67443a34f0f09afc2d007eff`. Write-enabled ZIP SHA-256 `528fc839abf5d60298f076596b60c429598b840533709cff1093c1322e36216e`. GitHub Actions run `38123053130` passed 46 unit checks, 44 desktop/mobile browser checks (including archive, slider, shipping clipboard and footer boundary), TypeScript, demo build and the read-only Monday build. The separate write-enabled build also passed locally. No website production merge occurred.
+
+
+Live SDK verification on v4 passed creation and recoverable archive of `TEST — v0.3.2 archive QA` (no CRM links), with the record absent after readback. Combined company/quote filtering returned the expected existing record, and shipping clipboard copy succeeded in the embedded view. Existing customer data was not edited. Final live QA identified Monday addresses ending with postcode before country; destination recognition now accepts explicit `3044 Australia` and `SW1A 1AA United Kingdom` forms while still rejecting country-like street names and ambiguous/unknown destinations.
+
+### Address-format correction deployment
+
+Monday v5 (`18763492`), feature `126150470`, uses the final v0.3.2 source `e340f13d6fc70124bfef5112c1943b83499fc255`. Bundle host `6e9f6b940f71ba702c61bf114458bec8.cdn2.monday.app`, source ZIP `17833639`. Write-enabled ZIP SHA-256 `790f0adeda44e3b5a63c06a9773d67a20184952907680a550990dca4cab3a6d8`. 47 unit checks include both explicit postcode-country formats. The previously published v4 release is superseded; existing app scopes and customer records remain unchanged.
+
+Final source validation: GitHub Actions run `38123445713` passed 47 unit checks, 46 desktop/mobile browser checks, TypeScript and both builds. Certification wording remains within the verified mailer country/thickness mapping; country-like street names do not imply a country.
+
+Final installed v5 read-only verification on the existing Strada quote confirmed the requested single-line supplier specification, AS 4736 customer description and full DDP block with Australia, 3044. Total landing sell AUD matched the fifth summary value. Existing customer quote values were not written during verification.

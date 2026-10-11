@@ -16,9 +16,9 @@ npm run test:e2e
 
 Default mode is **synthetic demo**. Demo writes exist only in browser memory and reset on page reload. Live CRM records, supplier prices and credentials must never be added to fixtures or committed to this public repository.
 
-`npm run build:monday` builds the Monday SDK mode with writes disabled. It must be opened as the installed board view for private board `5031824429`; standalone browsers cannot authenticate a Monday user session. The existing app is `12360227`, version `18735087`, feature `zeropack_quotemanager:quotebuilder`. No app upload, release or promotion is automated.
+`npm run build:monday` builds the Monday SDK mode with writes disabled. It must be opened as the installed board view for private board `5031824429`; standalone browsers cannot authenticate a Monday user session. The existing app is `12360227`, live version v2 (`18757871`), feature `zeropack_quotemanager::quotebuilder`. No app upload, release or promotion is automated.
 
-A future approved staff draft build can explicitly set `VITE_APP_MODE=monday` and `VITE_MONDAY_WRITES_ENABLED=true`. This is a capability flag, not an authorization mechanism. Monday's active user session and board permissions remain authoritative. Never set a Monday token as a Vite variable or add a token-based server proxy to the demo.
+An approved staff draft release explicitly sets `VITE_APP_MODE=monday` and `VITE_MONDAY_WRITES_ENABLED=true`. This is a capability flag, not an authorization mechanism. Monday's active user session and board permissions remain authoritative. Never set a Monday token as a Vite variable or add a token-based server proxy to the demo.
 
 ## Components and ownership
 
@@ -76,11 +76,9 @@ Project creation was rejected by connected Vercel credentials (403), and the loc
 ## Remaining acceptance gates
 
 - Vercel project creation permission for permanent standalone protected Git previews.
-- Staff-context SDK verification in the installed draft board view, including actual app scopes and role permissions. Connector API success proves query validity, not installed-app permission.
 - Supplier contact identities/links: all nine expected Company records exist, but targeted relation and name/company-field searches found no confirmed matching contacts. Do not fabricate or duplicate contacts.
-- Prototype save/reopen integration test under an approved write-enabled candidate; only mock saves and read-only live queries are verified in this change.
 - Commercial review of rounding, freight/customer price presentation, the existing bank-field label mismatch and representative historical totals before customer issuance.
-- Explicit approval before new Monday app promotion, website production merge or customer-visible release.
+- Explicit approval before further Monday app promotions, website production merge or customer-visible release.
 
 ### Staff form layout and company autofill
 
@@ -123,3 +121,9 @@ Amount fields display currency outside focus (two decimals for totals/fees, four
 Wide desktop header panels use 25/40/35 proportions. Numeric fields show thousands separators outside focus; editing and saves retain raw decimal strings. Re-calculate is 75% wide, aligned right. Customer-requested labels Sell Incl Shipping AUD, Margin AUD and Total selling AUD replace the longer labels without changing formulas. Sell Incl Shipping remains a four-decimal unit-price reference using supplier quantity as its divisor.
 
 Margin AUD has a red background below AUD 500, with the usual text colour. Sell Incl Shipping AUD has a Copy button that copies the raw four-decimal number without a currency symbol or separators.
+
+## Monday release — 11 October 2026
+
+User-approved v2 is live in the private quotation board (`5031824429`), installed Quote Builder view `57626700`. App version `18757871`, feature `126138879`; Monday-hosted bundle: `bd54b9074bf3daae6f215b69a673b395.cdn2.monday.app`. Built from source commit `5f3be9b52271df37c2a6e562ad2daccc2a849a75` with `VITE_APP_MODE=monday VITE_MONDAY_WRITES_ENABLED=true`. ZIP SHA-256: `d030e527a0c51cefd44076ec0f8b255c972eefc6c5ad332af0be530ca696520b`. Existing scopes were retained; no new permissions were granted. Unit/type/build checks passed (37 tests), with 26 desktop/mobile browser checks on this source. The public website remains unmerged; customer portal work is separate.
+
+Embedded SDK verification passed create/read/update/read on `TEST — Monday release QA 2026-10-11`, using no CRM links. After refresh/reopen, the manual FX 1.5, USD total 1,050, landed AUD 2,036, margin AUD 473, all-in unit 0.2509, edited descriptions and notes remained intact. Live reference lists and daily FX lookup loaded in the installed view. The developer preview correctly rejects missing quotation-board context. Supplier contact verification and commercial issuance review remain open.

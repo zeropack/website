@@ -46,3 +46,12 @@ test('company selection uses only a verified primary or unique linked contact',a
  const company=[{id:'1',name:'Test',primaryContactIds:['3']}],contacts=[{id:'2',name:'One',companyIds:['1']},{id:'3',name:'Two',companyIds:['1']}];
  assert.equal(companyContact('1',company,contacts),'3');assert.equal(companyContact('1',[{id:'1',name:'Test'}],contacts),'');assert.equal(companyContact('1',company,[{id:'3',name:'Wrong company',companyIds:['9']}]),'');assert.equal(companyContact('1',company,[contacts[0]]),'2');
 });
+
+test('archive uses recoverable archive_item, checks board and rejects stale versions',async()=>{
+ const calls:string[]=[];
+ const adapter=(board=String(QUOTE_BOARD_ID),updated='2026-10-10',enabled=true)=>createMondayAdapter(async(q,v)=>{calls.push(q);return {data:q===COLUMN_QUERY?metadata:q.startsWith('mutation')?{archive_item:{id:v.item}}:{items:[{...item(),updated_at:updated,board:{id:board}}]}}},enabled);
+ await adapter().archiveQuote('1','2026-10-10');assert.match(calls.at(-1)!,/archive_item/);assert.ok(calls.every(q=>!q.includes('delete_item')));
+ calls.length=0;await assert.rejects(adapter('99').archiveQuote('1','2026-10-10'),/prototype board/);assert.ok(!calls.some(q=>q.startsWith('mutation')));
+ await assert.rejects(adapter(undefined,'new').archiveQuote('1','2026-10-10'),/changed in Monday/);
+ await assert.rejects(adapter(undefined,undefined,false).archiveQuote('1','2026-10-10'),/disabled/);
+});

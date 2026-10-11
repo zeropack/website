@@ -1,4 +1,5 @@
 import type {Draft} from './schema.ts';
+import {isDecimal} from './numeric.ts';
 // Explicit allowlist: never return supplier names, descriptions, costs, FX, notes or markup.
 // Future portal must produce this DTO server-side after authorization, never fetch internal drafts.
 export function customerQuotation(d:Draft) {
@@ -27,11 +28,19 @@ export function specificationDescription(d:Draft,shippingAddress='') {
  }
  return lines.join('\n');
 }
-// Specification changes and their generated descriptions form one undoable edit.
-// Free-text edits pause the corresponding generator until Update is selected.
-export function updateDescriptions(before:Draft,after:Draft,company:import('./adapter.ts').Ref|undefined,auto:{customer:boolean;supplier:boolean}):Draft {
+// Relevant specifications always regenerate both descriptions as one undoable edit.
+export function updateDescriptions(before:Draft,after:Draft,company:import('./adapter.ts').Ref|undefined):Draft {
  if(!DESCRIPTION_FIELDS.some(k=>before[k]!==after[k]))return after;
- return {...after,...(auto.customer?{customerDesc:specificationDescription(after,company?.shippingAddress)}:{}),...(auto.supplier?{supplierDesc:supplierDescription(after,company?.name,company?.shippingAddress)}:{})};
+ return generatedDescriptions(after,company);
+}
+export function generatedDescriptions(d:Draft,company:import('./adapter.ts').Ref|undefined):Draft {
+ return {...d,customerDesc:specificationDescription(d,company?.shippingAddress),supplierDesc:supplierDescription(d,company?.name,company?.shippingAddress)};
+}
+export function shippingQuote(d:Draft,company:import('./adapter.ts').Ref|undefined):string {
+ if(!company?.shippingAddress?.trim()||!d.weight||!d.cbm||!d.quantity||!d.packaging)throw new Error('Select a company with a shipping address and enter weight, CBM, supplier quantity and packaging type.');
+ if([d.weight,d.cbm,d.quantity].some(v=>!isDecimal(v))||!Number.isSafeInteger(Number(d.quantity)))throw new Error('Shipping weight, CBM and quantity must be valid non-negative numbers; quantity must be a whole number.');
+ const n=(s:string)=>Number(s).toLocaleString('en-AU',{maximumFractionDigits:8});
+ return `Can you quote for sending...\n${n(d.weight)}kgs, ${n(d.cbm)}cbm - ${n(d.quantity)} x ${d.packaging}\n${company.name}\n${company.shippingAddress}`;
 }
 
 export function companyContact(companyId:string,companies:import('./adapter.ts').Ref[],contacts:import('./adapter.ts').Ref[]):string {
@@ -41,8 +50,12 @@ export function companyContact(companyId:string,companies:import('./adapter.ts')
 }
 export function supplierDescription(d:Draft,companyName='',shippingAddress='') {
  if(!d.packaging.trim())return '';
- const specification=[d.packaging,d.size,d.style,d.microns?`${d.microns} mic thick`:'',d.colour,capitalise(d.printing),d.quantity?`Qty ${Number(d.quantity).toLocaleString('en-AU')}`:'',certification(d,shippingAddress)].filter(Boolean).join('\n');
- return ['Can you please quote for:',companyName?`Company: ${companyName}`:'',specification,'',shippingAddress?`Ship to: ${shippingAddress}`:'','Please include weights and CBM for shipping.'].filter((v,i)=>v||i===3).join('\n');
+ const cert=certification(d,shippingAddress);
+ const product=['Customised',cert,d.colour,d.packaging].filter(Boolean).join(' ');
+ const dimensions=[d.size,d.style].filter(Boolean).join(' and ');
+ const detail=[dimensions,d.microns?`${d.microns} mic thick`:''].filter(Boolean).join(' ');
+ const specification=`${d.quantity?`${Number(d.quantity).toLocaleString('en-AU')} - `:''}${product}${d.printing?`: ${d.printing}`:''}${detail?` - ${detail}`:''}`;
+ return ['Can you please quote for:',companyName?`Company: ${companyName}`:'',specification,'','Please include weights and cbm for shipping.'].filter((v,i)=>v||i===3).join('\n');
 }
 
 // Sources: current Product & Packaging Knowledge Core and Claims & Evidence Policy,

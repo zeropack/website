@@ -4,7 +4,7 @@ import {demoDraft} from '../src/mock.ts';
 import {calculate} from '../src/costing.ts';
 import {validateDraft,toValues} from '../src/adapter.ts';
 import {C} from '../src/schema.ts';
-import {destination,specificationDescription,updateDescriptions} from '../src/customer.ts';
+import {destination,specificationDescription,supplierDescription,shippingQuote,updateDescriptions} from '../src/customer.ts';
 import {supplierCompany,supplierOptions} from '../src/suppliers.ts';
 
 test('shorthand decimal prices calculate and serialize with a leading zero and full precision',()=>{
@@ -42,16 +42,36 @@ test('UK uses its approved certification and postcode, with no delivery promise 
  assert.doesNotMatch(specificationDescription(d,'London SW1A 1AA'),/certified|DDP|OK compost/);
  assert.doesNotMatch(specificationDescription({...d,packaging:'custom product'},'Australia'),/certified compostable|AS 4736/);
 });
-test('spec changes update both descriptions atomically while manual description mode is preserved',()=>{
+test('spec changes always update both descriptions atomically',()=>{
  const before=demoDraft(),company={id:'101',name:'Demo customer',shippingAddress:'Australia, 3044'};
- const after=updateDescriptions(before,{...before,microns:'80'},company,{customer:true,supplier:true});
+ const after=updateDescriptions(before,{...before,microns:'80'},company);
  assert.match(after.customerDesc,/AS 4736/);assert.match(after.supplierDesc,/80 mic thick/);
- const manual=updateDescriptions(before,{...before,microns:'80',customerDesc:'Custom manual wording'},company,{customer:false,supplier:true});
- assert.equal(manual.customerDesc,'Custom manual wording');assert.match(manual.supplierDesc,/80 mic thick/);
+ const manual=updateDescriptions(before,{...before,microns:'80',customerDesc:'Custom manual wording'},company);
+ assert.match(manual.customerDesc,/AS 4736/);assert.match(manual.supplierDesc,/80 mic thick/);
 });
 test('supplier rename is displayed through stable Company ID without changing persisted dropdown label',()=>{
  const label='Mianyang Jersey Mellon Electronic Commerce Co';const companies=[{id:'2877677987',name:'Renamed vendor'}];
  assert.equal(supplierCompany(label,companies)?.id,'2877677987');assert.deepEqual(supplierOptions([label],companies),[{id:label,name:'Renamed vendor'}]);
  assert.equal(supplierCompany(label,[{id:'9',name:label}]),undefined);
  assert.equal(supplierCompany('Ambiguous',[{id:'1',name:'Ambiguous'},{id:'2',name:'Ambiguous'}]),undefined);
+});
+
+test('supplier wording matches requested single specification line',()=>{
+ const d={...demoDraft(),quantity:'2000',colour:'Black',size:'620mm x 480mm',style:'50mm flap with single adhesive',microns:'80',printing:'one colour printing on two sides'};
+ assert.equal(supplierDescription(d,'Strada Coffee Pty Ltd','Australia, 3044'),`Can you please quote for:
+Company: Strada Coffee Pty Ltd
+2,000 - Customised Certified to AS 4736 - Commercially Compostable Black mail satchel: one colour printing on two sides - 620mm x 480mm and 50mm flap with single adhesive 80 mic thick
+
+Please include weights and cbm for shipping.`);
+});
+test('shipping request uses exact stored address and grouped quantities without DDP or prices',()=>{
+ const company={id:'1',name:'Flash Graphics',shippingAddress:'Unit 1, 14/18 Chapel Street\nMarrickville\nNSW , 2204\nAustralia'};
+ assert.equal(shippingQuote({...demoDraft(),weight:'110',cbm:'.2',quantity:'2000'},company),`Can you quote for sending...
+110kgs, 0.2cbm - 2,000 x mail satchel
+Flash Graphics
+Unit 1, 14/18 Chapel Street
+Marrickville
+NSW , 2204
+Australia`);
+ assert.throws(()=>shippingQuote(demoDraft(),{id:'1',name:'No address'}),/shipping address/);
 });

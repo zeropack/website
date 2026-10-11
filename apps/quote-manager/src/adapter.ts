@@ -142,5 +142,16 @@ export function createMondayAdapter(transport: Transport, writesEnabled=false) {
    {board:String(QUOTE_BOARD_ID),name:d.name.trim(),vals:JSON.stringify(toValues(d,true))});
   return r.create_item.id;
  }
- return {fetchColumns,loadQuotes,loadRefs,saveQuote};
+ async function archiveQuote(id:string,expectedUpdatedAt:string) {
+  if(!writesEnabled)throw new Error('Monday writes are disabled in this build.');
+  if(!/^\d+$/.test(id)||!expectedUpdatedAt)throw new Error('Reload the quotation before archiving.');
+  await fetchColumns();
+  const r=await gql<{items:(Item & {board:{id:string}})[]}>(`query($ids:[ID!]!){items(ids:$ids){${QUOTE_FIELDS} board{id}}}`,{ids:[id]});
+  const prior=r.items.find(i=>i.id===id);
+  if(!prior||prior.board.id!==String(QUOTE_BOARD_ID))throw new Error('Quotation is unavailable on the prototype board.');
+  if(prior.updated_at!==expectedUpdatedAt)throw new Error('This quotation changed in Monday. Reload before archiving.');
+  const result=await gql<{archive_item:{id:string}}>('mutation($item:ID!){archive_item(item_id:$item){id}}',{item:id});
+  if(result.archive_item?.id!==id)throw new Error('Archive was not confirmed by Monday. Refresh before retrying.');
+ }
+ return {fetchColumns,loadQuotes,loadRefs,saveQuote,archiveQuote};
 }

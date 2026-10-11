@@ -14,6 +14,7 @@ export function createMockAdapter() {
  const clone=()=>structuredClone(rows);
  return {
   fetchColumns:async()=>structuredClone(lookups),loadQuotes:async()=>clone(),loadRefs:async(board:number)=>structuredClone(references[board]??[]),
+  archiveQuote:async(id:string,expectedUpdatedAt:string)=>{const prior=rows.find(r=>r.id===id);if(!prior||prior.updated_at!==expectedUpdatedAt)throw new Error('Reload before archiving.');rows=rows.filter(r=>r.id!==id)},
   saveQuote:async(d:Draft,id?:string,expectedUpdatedAt?:string)=>{
    validateDraft(d); const prior=rows.find(r=>r.id===id);
    if(id&&(!prior||prior.updated_at!==expectedUpdatedAt)) throw new Error('Reload this quote before saving.');

@@ -4,7 +4,7 @@ import {demoDraft} from '../src/mock.ts';
 import {calculate} from '../src/costing.ts';
 import {validateDraft,toValues} from '../src/adapter.ts';
 import {C} from '../src/schema.ts';
-import {destination,specificationDescription,supplierDescription,shippingQuote,updateDescriptions} from '../src/customer.ts';
+import {destination,specificationDescription,supplierDescription,shippingDetails,updateDescriptions} from '../src/customer.ts';
 import {supplierCompany,supplierOptions} from '../src/suppliers.ts';
 
 test('shorthand decimal prices calculate and serialize with a leading zero and full precision',()=>{
@@ -69,16 +69,20 @@ one colour printing on two sides
 
 Please include weights and cbm for shipping.`);
 });
-test('shipping request uses exact stored address and grouped quantities without DDP or prices',()=>{
- const company={id:'1',name:'Flash Graphics',shippingAddress:'Unit 1, 14/18 Chapel Street\nMarrickville\nNSW , 2204\nAustralia'};
- assert.equal(shippingQuote({...demoDraft(),weight:'110',cbm:'.2',quantity:'2000'},company),`Can you quote for sending...
-110kgs, 0.2cbm - 2,000 x mail satchel
-Flash Graphics
-Unit 1, 14/18 Chapel Street
-Marrickville
-NSW , 2204
-Australia`);
- assert.throws(()=>shippingQuote(demoDraft(),{id:'1',name:'No address'}),/shipping address/);
+test('shipping details copy recipient, phone, company, exact address and weights without product quantities',()=>{
+ const company={id:'1',name:'Second Skin',companyPhone:'+61892019455',shippingAddress:'40 O’Malley Street Osborne Park WA , 6017 Australia'};
+ const contact={id:'2',name:'Christina Roberts',firstName:'Christina',lastName:'Roberts',companyIds:['1']};
+ const d={...demoDraft(),weight:'93',cbm:'.1',quantity:'',packaging:''};
+ assert.equal(shippingDetails(d,company,contact),`Please ship to:
+Christina Roberts
++61892019455
+Second Skin
+40 O’Malley Street Osborne Park WA , 6017 Australia
+93kgs, 0.1cbm`);
+ assert.doesNotMatch(shippingDetails(d,company,{...contact,companyIds:['9']}),/Christina/);
+ assert.match(shippingDetails(d,company,{...contact,phone:'+61400000000'}),/\+61400000000/);
+ assert.throws(()=>shippingDetails(d,{id:'1',name:'No address'}),/shipping address/);
+ assert.throws(()=>shippingDetails({...d,cbm:'bad'},company),/valid/);
 });
 
 test('Monday postcode-before-country shipping address resolves AU certification and DDP',()=>{

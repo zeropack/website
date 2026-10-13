@@ -5,13 +5,14 @@ import {blank,C,COMPANY_BOARD_ID,CONTACT_BOARD_ID,DEAL_BOARD_ID,PROJECT_BOARD_ID
 import {isEditable,duplicateDraft,createMondayAdapter,validateDraft,type Quote,type Ref} from './adapter.ts';
 import {createMockAdapter} from './mock.ts';
 import {calculate,applyCosting,PRICING_VERSION,type Costing} from './costing.ts';
-import {companyContact,updateDescriptions,generatedDescriptions,shippingQuote} from './customer.ts';
+import {companyContact,updateDescriptions,generatedDescriptions,shippingDetails} from './customer.ts';
 import {TextField,SelectField,TextArea,ReadField,Panel} from './components/Fields.tsx';
 import {CustomerPreview} from './components/CustomerPreview.tsx';
 import {historyReducer,startHistory,type HistoryAction} from './history.ts';
 import {fetchExchangeRate,newQuote,rateColour,type ExchangeRate} from './exchange-rate.ts';
 import {supplierCompany,supplierOptions} from './suppliers.ts';
-import {autosavePreference,rememberAutosave} from './autosave.ts';
+import {AUTOSAVE_DELAY_MS,isEditingDraftField,autosavePreference,rememberAutosave} from './autosave.ts';
+import {copyText} from './clipboard.ts';
 import brandLogo from './assets/zero-pack-registered-white.png';
 import './style.css';
 const isLive=import.meta.env.VITE_APP_MODE==='monday';
@@ -23,17 +24,18 @@ function App() {
  const[history,dispatch]=useReducer(historyReducer,newQuote(),startHistory);
  const [rate,setRate]=useState<ExchangeRate>(),[rateError,setRateError]=useState(''),[rateLoading,setRateLoading]=useState(true);
  const defaultFxEligible=useRef(true),saveInProgress=useRef(false);
+ const[editing,setEditing]=useState(false),[shippingCopyText,setShippingCopyText]=useState('');
  const[autosave,setAutosave]=useState(autosavePreference),[autosavePaused,setAutosavePaused]=useState(false),[refreshingRefs,setRefreshingRefs]=useState(false);
  const lastReferenceRefresh=useRef(0),referenceRefreshRunning=useRef(false);
  const draft=history.present;
  const setDraft=(value:Extract<HistoryAction,{type:'edit'}>['value'])=>dispatch({type:'edit',value});
- const resetDraft=(value:Draft)=>dispatch({type:'reset',value});
+ const resetDraft=(value:Draft)=>{dispatch({type:'reset',value});setShippingCopyText('')};
  const[lookups,setLookups]=useState<Record<string,string[]>>({}),[refs,setRefs]=useState<Record<string,Ref[]>>({}),[query,setQuery]=useState(''),[companyFilter,setCompanyFilter]=useState(''),[loading,setLoading]=useState(true),[saving,setSaving]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[ready,setReady]=useState(false),[preview,setPreview]=useState(false);
  const adapter=useRef<ReturnType<typeof createMondayAdapter>>(mock), generation=useRef(0);
  const dirty=JSON.stringify(draft)!==JSON.stringify(saved), locked=!!current&&!isEditable(quotes.find(q=>q.id===current)?.values.status??'');
  const busy=loading||saving;
  const set=(key:Field,value:string)=>{
-  if(key==='fx')defaultFxEligible.current=false;
+  setShippingCopyText('');if(key==='fx')defaultFxEligible.current=false;
    setDraft(d=>{
    const next=key==='company'?{...d,company:value,contact:companyContact(value,refs.company??[],refs.contact??[])}:{...d,[key]:value,...(key==='fx'?{fxSource:'Manual quote rate'}:{})};
    return updateDescriptions(d,next,(refs.company??[]).find(c=>c.id===next.company));
@@ -79,7 +81,7 @@ function App() {
  const newDraft=()=>{if(busy||!discard())return;const d=newQuote(rate);defaultFxEligible.current=!rate;setAutosavePaused(false);setCurrent('');resetDraft(d);setSaved(d);setPreview(false);setNotice('New draft')};
  const duplicate=()=>{if(busy)return;defaultFxEligible.current=false;const d=duplicateDraft(draft);setAutosavePaused(false);setCurrent('');resetDraft(d);setSaved({...blank(),status:'Draft',visibility:'Private'});setNotice('Copy ready — save to create a separate draft');setPreview(false)};
  const save=async(automatic=false)=>{
-  if(saveInProgress.current||busy||!ready||locked||(isLive&&!writesEnabled))return;
+  if(saveInProgress.current||busy||!ready||locked||(isLive&&!writesEnabled)||(automatic&&isEditingDraftField(document.activeElement)))return;
   saveInProgress.current=true;if(!automatic)setAutosavePaused(false);
   setSaving(true);setError('');setNotice('');let writtenId='';
   try {
@@ -102,11 +104,11 @@ function App() {
   } catch(e) {setAutosavePaused(true);if(writtenId)setReady(false);setError(`${writtenId?'Save completed, but readback failed. Refresh before retrying. ':''}${e instanceof Error?e.message:String(e)}`)}finally{saveInProgress.current=false;setSaving(false)}
  };
  useEffect(()=>{
-  if(!autosave||autosavePaused||!current||!dirty||busy||!ready||locked||(isLive&&!writesEnabled))return;
+  if(editing||!autosave||autosavePaused||!current||!dirty||busy||!ready||locked||(isLive&&!writesEnabled))return;
   try{validateDraft(draft)}catch{return}
-  const timer=window.setTimeout(()=>void save(true),3000);
+  const timer=window.setTimeout(()=>void save(true),AUTOSAVE_DELAY_MS);
   return()=>window.clearTimeout(timer);
- },[autosave,autosavePaused,current,draft,dirty,busy,ready,locked]);
+ },[autosave,autosavePaused,current,draft,dirty,busy,ready,locked,editing]);
  const supplierId=supplierCompany(draft.supplierDropdown,refs.company??[])?.id??'';
 
  const supplierContacts=(refs.supplierContact??[]).filter(c=>!!supplierId&&c.companyIds?.includes(supplierId));
@@ -132,14 +134,14 @@ function App() {
  return <main>
   <div className="banner"><img className="brand-logo" src={brandLogo} alt="Zero Pack" width={40} height={40}/><b>ZERO PACK <span>Quote Manager</span></b><div className="mode"><ShieldCheck size={14}/>{isLive?(writesEnabled?'Monday · Staff draft editor':'Monday · Read only'):'Demo preview · Synthetic data'}</div></div>
   <div className="workspace"><aside className="sidebar"><div className="sidebar-heading"><div><div className="eyebrow">WORKSPACE</div><h2>Quotations</h2></div><button className="small outline" disabled={busy} onClick={newDraft} aria-label="New quotation"><Plus size={18}/></button></div><label className="company-filter"><span>Company name</span><select aria-label="Filter quotations by company" value={companyFilter} onChange={e=>setCompanyFilter(e.target.value)}><option value="">All companies</option><option value="unassigned">Company not selected</option>{filterCompanies.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label><label className="search"><Search size={16}/><input aria-label="Search quotations" placeholder="Search quotations…" value={query} onChange={e=>setQuery(e.target.value)}/></label><div className="list-meta">{filtered.length} quotations</div><div className="quote-list">{filtered.map(q=><button disabled={busy} key={q.id} className={'quote '+(q.id===current?'active':'')} onClick={()=>select(q)}><strong>{q.name}</strong><small>{(refs.company??[]).find(c=>c.id===q.values.company)?.name||'Company not selected'}</small></button>)}{!loading&&!filtered.length&&<p className="muted">No quotations found.</p>}</div><button className="reload" disabled={busy} onClick={()=>{if(discard()){defaultFxEligible.current=!rate;setCurrent('');resetDraft(newQuote(rate));setSaved(newQuote(rate));void reload();void lookupRate()}}}><RefreshCw size={14}/> Refresh records</button><div className="sidebar-note">Staff workspace<br/>Private prototype board</div></aside>
-  <section className="main"><header className="top"><div><div className="eyebrow">QUOTATIONS <ChevronRight size={12}/> {current?'EDIT QUOTATION':'NEW DRAFT'}</div><h1>{draft.name||'Quote Builder'}</h1></div><div className="actions"><label className="switch-label"><input role="switch" type="checkbox" aria-label="Autosave after first save" checked={autosave} onChange={e=>{setAutosave(e.target.checked);rememberAutosave(e.target.checked);setAutosavePaused(false)}}/><span className="switch-track" aria-hidden="true"/>Autosave</label><button className="outline small" disabled={busy||locked||!history.past.length} onClick={()=>{dispatch({type:'undo'});setNotice('')}} aria-label="Undo"><Undo2 size={16}/>Undo</button><button className="outline small" disabled={busy||locked||!history.future.length} onClick={()=>{dispatch({type:'redo'});setNotice('')}} aria-label="Redo"><Redo2 size={16}/>Redo</button><button className="outline small" disabled={busy||!dirty} onClick={()=>{resetDraft({...saved});setError('');setNotice('Unsaved changes discarded')}}>Discard</button><button className="outline" disabled={busy} onClick={duplicate}><Copy size={16}/> Duplicate</button><button className="primary" disabled={busy||!ready||locked||(isLive&&!writesEnabled)} onClick={()=>void save()}><Save size={16}/>{saving?'Saving…':isLive?'Save Draft':'Save Demo'}</button></div></header>
-   <div className="messages" aria-live="polite">{loading&&<div className="message">Loading {isLive?'Monday records':'demo workspace'}…</div>}{error&&<div className="message error" role="alert">{error}</div>}{notice&&<div className="message success">{notice}</div>}{locked&&<div className="message warning">This quotation is locked. Duplicate it to start a new draft.</div>}{dirty&&<div className="dirty">● Unsaved changes{autosave?(!current?' · Save once to start autosave':autosavePaused?' · Autosave paused — save manually to retry':' · Autosave after 3 seconds without edits'):''}</div>}</div>
+  <section className="main" onFocusCapture={e=>{if(isEditingDraftField(e.target))setEditing(true)}} onBlurCapture={e=>{if(isEditingDraftField(e.target))setEditing(isEditingDraftField(e.relatedTarget))}}><header className="top"><div><div className="eyebrow">QUOTATIONS <ChevronRight size={12}/> {current?'EDIT QUOTATION':'NEW DRAFT'}</div><h1>{draft.name||'Quote Builder'}</h1></div><div className="actions"><label className="switch-label"><input role="switch" type="checkbox" aria-label="Autosave after first save" checked={autosave} onChange={e=>{setAutosave(e.target.checked);rememberAutosave(e.target.checked);setAutosavePaused(false)}}/><span className="switch-track" aria-hidden="true"/>Autosave</label><button className="outline small" disabled={busy||locked||!history.past.length} onClick={()=>{dispatch({type:'undo'});setNotice('')}} aria-label="Undo"><Undo2 size={16}/>Undo</button><button className="outline small" disabled={busy||locked||!history.future.length} onClick={()=>{dispatch({type:'redo'});setNotice('')}} aria-label="Redo"><Redo2 size={16}/>Redo</button><button className="outline small" disabled={busy||!dirty} onClick={()=>{resetDraft({...saved});setError('');setNotice('Unsaved changes discarded')}}>Discard</button><button className="outline" disabled={busy} onClick={duplicate}><Copy size={16}/> Duplicate</button><button className="primary" disabled={busy||!ready||locked||(isLive&&!writesEnabled)} onClick={()=>void save()}><Save size={16}/>{saving?'Saving…':isLive?'Save Draft':'Save Demo'}</button></div></header>
+   <div className="messages" aria-live="polite">{loading&&<div className="message">Loading {isLive?'Monday records':'demo workspace'}…</div>}{error&&<div className="message error" role="alert">{error}</div>}{notice&&<div className="message success">{notice}</div>}{locked&&<div className="message warning">This quotation is locked. Duplicate it to start a new draft.</div>}{dirty&&<div className="dirty">● Unsaved changes{autosave?(!current?' · Save once to start autosave':autosavePaused?' · Autosave paused — save manually to retry':' · Autosave after 60 seconds idle; paused while editing'):''}</div>}</div>
    <div className="tabs"><button className={!preview?'selected':''} onClick={()=>setPreview(false)}>Quote workspace</button><button className={preview?'selected':''} onClick={()=>setPreview(true)}>Customer description preview</button></div>
    <div className="content">{preview?<CustomerPreview draft={generated}/>:<>
     <div className="identity-grid">
      <Panel title="Quote details"><div className="stack-fields">{text('name','Quote reference')}{choice('status','Quote status',['Draft','Costing','Review','Ready to Issue','Declined','Expired'].map(v=>({id:v,name:v})))}{choice('deal','Deal',refs.deal??[])}{choice('project','Client project',refs.project??[])}{text('artwork','Artwork design reference')}</div></Panel>
      <Panel title="Customer"><div className="stack-fields">{choice('company','Customer company',refs.company??[])}{choice('contact','Customer contact',customerContacts)}<div className="fields cols2"><ReadField label="First name" value={contact?.firstName??''}/><ReadField label="Last name" value={contact?.lastName??''}/></div><ReadField label="Email" value={contact?.email??''}/><ReadField label="Contact number" value={contact?.phone||company?.companyPhone||''}/></div></Panel>
-     <Panel title="Shipping details"><div className="stack-fields"><label className="field address-field"><textarea aria-label="Shipping address" rows={3} value={company?.shippingAddress??''} readOnly placeholder="No shipping address recorded on this company"/></label>{!company?.shippingAddress&&company?.businessAddress&&<ReadField label="Business address · Shipping not confirmed" value={company.businessAddress}/>}<button className="outline shipping-copy" disabled={busy||!company?.shippingAddress||!draft.weight||!draft.cbm||!draft.quantity||!draft.packaging} onClick={async()=>{try{await navigator.clipboard.writeText(shippingQuote(draft,company));setNotice('Shipping quote copied')}catch(e){setError(e instanceof Error?e.message:'Clipboard access is unavailable.')}}}>Copy shipping quote</button></div></Panel>
+     <Panel title="Shipping details"><div className="stack-fields"><label className="field address-field"><textarea aria-label="Shipping address" rows={3} value={company?.shippingAddress??''} readOnly placeholder="No shipping address recorded on this company"/></label>{!company?.shippingAddress&&company?.businessAddress&&<ReadField label="Business address · Shipping not confirmed" value={company.businessAddress}/>}<button className="outline shipping-copy" disabled={busy||!company?.shippingAddress||!draft.weight||!draft.cbm} onClick={async()=>{let details='';try{setError('');details=shippingDetails(draft,company,contact);await copyText(details);setShippingCopyText('');setNotice('Shipping details copied')}catch(e){setShippingCopyText(details);setError(e instanceof Error?e.message:'Clipboard access is unavailable.')}}}>Copy shipping details</button>{shippingCopyText&&<label className="field"><textarea aria-label="Shipping details to copy" readOnly rows={6} value={shippingCopyText} onFocus={e=>e.currentTarget.select()}/></label>}</div></Panel>
     </div>
     <Panel title="Packaging specifications & costing" eyebrow="Staff only">
      <div className="quote-form-grid">
@@ -152,7 +154,7 @@ function App() {
      <div className="cost-summary" aria-label="Cost summary"><div><span>Product cost AUD</span><b>{costing?money(costing.productCostAUD):'—'}</b></div><div><span>Freight & import costs AUD</span><b>{costing?money(costing.freightAUD):'—'}</b></div><div><span>Total landed AUD</span><b>{costing?money(costing.landedAUD):'—'}</b></div><div><span>Margin AUD</span><b>{costing?money(costing.profitAUD):'—'}</b><small>Product margin {costing?`${costing.marginPercent}%`:'—'}</small></div><div><span>Total landing sell AUD</span><b>{costing?money(costing.allInTotalAUD):'—'}</b></div></div>
      <div className="record-actions"><button className="archive-button" disabled={busy||!ready||!current||(isLive&&!writesEnabled)} onClick={()=>void archive()}>Archive quotation</button></div>
     </Panel>
-   </>}<footer><span>Zero Pack Quote Manager · v0.3.3</span><span>{isLive?'Private Monday workspace':'Demo changes reset when this page reloads'} · Draft only</span></footer></div>
+   </>}<footer><span>Zero Pack Quote Manager · v0.3.4</span><span>{isLive?'Private Monday workspace':'Demo changes reset when this page reloads'} · Draft only</span></footer></div>
   </section></div>
  </main>;
 }

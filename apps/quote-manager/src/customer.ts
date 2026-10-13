@@ -36,11 +36,14 @@ export function updateDescriptions(before:Draft,after:Draft,company:import('./ad
 export function generatedDescriptions(d:Draft,company:import('./adapter.ts').Ref|undefined):Draft {
  return {...d,customerDesc:specificationDescription(d,company?.shippingAddress),supplierDesc:supplierDescription(d,company?.name,company?.shippingAddress)};
 }
-export function shippingQuote(d:Draft,company:import('./adapter.ts').Ref|undefined):string {
- if(!company?.shippingAddress?.trim()||!d.weight||!d.cbm||!d.quantity||!d.packaging)throw new Error('Select a company with a shipping address and enter weight, CBM, supplier quantity and packaging type.');
- if([d.weight,d.cbm,d.quantity].some(v=>!isDecimal(v))||!Number.isSafeInteger(Number(d.quantity)))throw new Error('Shipping weight, CBM and quantity must be valid non-negative numbers; quantity must be a whole number.');
+export function shippingDetails(d:Draft,company:import('./adapter.ts').Ref|undefined,contact?:import('./adapter.ts').Ref):string {
+ if(!company?.shippingAddress?.trim()||!d.weight||!d.cbm)throw new Error('Select a company with a shipping address and enter weight and CBM.');
+ if([d.weight,d.cbm].some(v=>!isDecimal(v)))throw new Error('Shipping weight and CBM must be valid non-negative numbers.');
+ const recipient=contact?.companyIds?.includes(company.id)?contact:undefined;
+ const name=recipient?[recipient.firstName,recipient.lastName].filter(Boolean).join(' ')||recipient.name:'';
+ const phone=recipient?.phone||company.companyPhone||'';
  const n=(s:string)=>Number(s).toLocaleString('en-AU',{maximumFractionDigits:8});
- return `Can you quote for sending...\n${n(d.weight)}kgs, ${n(d.cbm)}cbm - ${n(d.quantity)} x ${d.packaging}\n${company.name}\n${company.shippingAddress}`;
+ return ['Please ship to:',name,phone,company.name,company.shippingAddress.trim(),`${n(d.weight)}kgs, ${n(d.cbm)}cbm`].filter(Boolean).join('\n');
 }
 
 export function companyContact(companyId:string,companies:import('./adapter.ts').Ref[],contacts:import('./adapter.ts').Ref[]):string {

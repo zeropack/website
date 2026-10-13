@@ -4,7 +4,7 @@ export const howToDisposeOfCompostablePackaging: Article = {
   slug: "how-to-dispose-of-compostable-packaging",
   title: "How to Dispose of Compostable Packaging",
   metaTitle: "How to Dispose of Compostable Packaging | Zero Pack",
-  category: "Compostable packaging education",
+  category: "Compostable packaging disposal",
   description:
     "A practical disposal guide for anyone holding compostable packaging. It explains how to check the exact packaging instructions, distinguish home from industrial compostability, confirm whether local organics services accept the item, avoid conventional recycling unless it is explicitly accepted, and use general or residual waste when no accepted composting pathway can be confirmed.",
   publishedAt: "2026-10-13",
@@ -23,6 +23,7 @@ export const howToDisposeOfCompostablePackaging: Article = {
     "https://gwra1fss97zwjqtb.public.blob.vercel-storage.com/articles/ZP-GLOBAL-2026-001/hero-web.webp",
   heroAlt:
     "Person examining a plain flexible package with two unlabelled containers in the background.",
+  hideGuidePromo: true,
   primaryKeyword: "how to dispose of compostable packaging",
   secondaryKeywords: [
     "compostable packaging disposal",
@@ -48,10 +49,10 @@ export const howToDisposeOfCompostablePackaging: Article = {
   ],
   cta: {
     title: "Need more detail on home versus industrial compostability?",
-    text: "Read the full explainer, or explore custom compostable mailers.",
+    text: "Read the full explainer:",
     links: [
       {
-        label: "Home vs industrial compostability",
+        label: "Home Compostable vs Industrial Compostable Packaging",
         href: "/articles/home-compostable-vs-industrial-compostable-packaging/",
         variant: "secondary",
       },
@@ -65,7 +66,7 @@ export const howToDisposeOfCompostablePackaging: Article = {
   sections: [
     {
       id: "introduction",
-      heading: "How to dispose of compostable packaging",
+      heading: "How to Dispose of Compostable Packaging",
       paragraphs: [
         "If you are holding compostable packaging and wondering where it goes, start with the instructions or certification on the exact item.",
         "If it is confirmed home compostable, home composting may be appropriate. If it is industrial or commercially compostable only, it needs a suitable commercial composting or organics pathway that explicitly accepts that packaging.",
@@ -80,13 +81,11 @@ export const howToDisposeOfCompostablePackaging: Article = {
         "Zero Pack packaging marketed and sold as compostable is certified compostable packaging, but the exact certification and disposal pathway can vary by material and product.",
         "Look for the disposal instructions or certification that applies to the item you have.",
         "The most important distinction is whether the packaging is:",
+        "• home compostable; or",
+        "• industrial/commercially compostable.",
+        "Those pathways are not interchangeable.",
+        "A certification tells you what composting conditions the applicable packaging has been tested for. It does not automatically tell you whether your local council, municipal collection, organics service or composting facility accepts that item.",
       ],
-      bullets: [
-        "home compostable; or",
-        "industrial/commercially compostable.",
-      ],
-      note:
-        "Those pathways are not interchangeable. A certification tells you what composting conditions the applicable packaging has been tested for. It does not automatically tell you whether your local council, municipal collection, organics service or composting facility accepts that item.",
     },
     {
       id: "home-compostable",
@@ -94,21 +93,12 @@ export const howToDisposeOfCompostablePackaging: Article = {
       paragraphs: [
         "If the exact item is confirmed as home compostable, it is designed for a properly managed home-compost environment under the conditions covered by its certification or product instructions.",
         "Before adding it to your compost:",
-      ],
-      bullets: [
-        "check that the item itself is confirmed home compostable;",
-        "remove labels, tape or other attachments if they are not part of the compostable packaging or if the product instructions tell you to remove them;",
-        "For larger flexible pieces, tearing or cutting them into smaller pieces can help them break down more readily in a home compost system. This does not change the compostability classification or replace the product’s disposal instructions.",
-        "place the confirmed home-compostable material into an active, well-managed home-compost system.",
-      ],
-      subsections: [
-        {
-          heading: "Home compost conditions vary",
-          paragraphs: [
-            "Temperature, moisture, aeration, compost activity, climate and the size of the item can all affect how quickly material breaks down.",
-            "For that reason, there is no single decomposition timeframe that should be applied to every home compost system or every piece of compostable packaging.",
-          ],
-        },
+        "• check that the item itself is confirmed home compostable;",
+        "• remove labels, tape or other attachments if they are not part of the compostable packaging or if the product instructions tell you to remove them;",
+        "• For larger flexible pieces, tearing or cutting them into smaller pieces can help them break down more readily in a home compost system. This does not change the compostability classification or replace the product’s disposal instructions.",
+        "• place the confirmed home-compostable material into an active, well-managed home-compost system.",
+        "Home compost conditions vary. Temperature, moisture, aeration, compost activity, climate and the size of the item can all affect how quickly material breaks down.",
+        "For that reason, there is no single decomposition timeframe that should be applied to every home compost system or every piece of compostable packaging.",
       ],
     },
     {
@@ -118,7 +108,8 @@ export const howToDisposeOfCompostablePackaging: Article = {
         "Packaging certified only for industrial or commercial composting should not be put into a home compost system unless the exact product instructions also confirm home compostability.",
         "Industrial composting uses managed processing conditions that differ from a typical home compost system.",
         "Likewise, evidence for a home-compostable product should not be applied automatically to another packaging product with a different material, thickness, construction or certification.",
-        "If you want a deeper explanation of the two pathways, read [Home Compostable vs Industrial Compostable Packaging](https://www.zeropack.co/articles/home-compostable-vs-industrial-compostable-packaging/).",
+        "If you want a deeper explanation of the two pathways, read:",
+        "[Home Compostable vs Industrial Compostable Packaging](https://www.zeropack.co/articles/home-compostable-vs-industrial-compostable-packaging/)",
       ],
     },
     {
@@ -141,7 +132,8 @@ export const howToDisposeOfCompostablePackaging: Article = {
         "“Compostable” and “recyclable” describe different end-of-life pathways.",
         "Putting an item into recycling because it looks or feels similar to conventional plastic can contaminate a recycling stream where that material is not accepted.",
         "If your local recycling provider does not specifically accept the compostable packaging you have, keep it out of conventional recycling.",
-        "For more on the difference between environmental terms, read [Compostable vs Biodegradable Packaging: What the Difference Actually Means](https://www.zeropack.co/articles/compostable-vs-biodegradable-packaging/).",
+        "For more on the difference between environmental terms, read:",
+        "[Compostable vs Biodegradable Packaging: What the Difference Actually Means](https://www.zeropack.co/articles/compostable-vs-biodegradable-packaging/)",
       ],
     },
     {
@@ -169,16 +161,13 @@ export const howToDisposeOfCompostablePackaging: Article = {
       heading: "A simple disposal checklist",
       paragraphs: [
         "Before you throw away compostable packaging, ask:",
-      ],
-      numberedList: [
-        "What does the exact packaging instruction or certification say?",
-        "Is it home compostable or industrial/commercially compostable?",
-        "Does my local organics or composting service explicitly accept this type of packaging?",
-        "Does my local recycling service explicitly accept this exact item?",
-        "If I cannot confirm an accepted composting or organics route, have I kept it out of recycling and organics and used general/residual waste instead?",
-      ],
-      note:
+        "1. What does the exact packaging instruction or certification say?",
+        "2. Is it home compostable or industrial/commercially compostable?",
+        "3. Does my local organics or composting service explicitly accept this type of packaging?",
+        "4. Does my local recycling service explicitly accept this exact item?",
+        "5. If I cannot confirm an accepted composting or organics route, have I kept it out of recycling and organics and used general/residual waste instead?",
         "Following those steps helps keep the disposal instruction matched to the packaging you actually have and the waste system available where you live.",
+      ],
     },
     {
       id: "zero-pack-packaging",
@@ -187,7 +176,8 @@ export const howToDisposeOfCompostablePackaging: Article = {
         "Zero Pack packaging sold as compostable is certified compostable packaging.",
         "The exact certification can vary by packaging type, material and product specification, so use the instructions and certification that apply to the exact packaging in your hands rather than assuming every product follows the same composting pathway.",
         "If you received a Zero Pack mailer and want to understand the difference between home and industrial compostability, the explainer above is the best next read.",
-        "For businesses looking for custom compostable mailers: [Explore custom compostable mailers](https://www.zeropack.co/custom-compostable-mailers/).",
+        "For businesses looking for custom compostable mailers:",
+        "[Custom compostable mailers](https://www.zeropack.co/custom-compostable-mailers/)",
       ],
     },
     {

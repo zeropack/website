@@ -279,7 +279,10 @@ export function TrackingLookup() {
               </div>
               <h2 className="mt-6 font-heading text-2xl font-bold text-charcoal">Your delivery, clearly tracked</h2>
               <p className="mt-3 max-w-lg leading-7 text-charcoal/65">
-                Tracking updates are retrieved from the carrier feed and presented here in a simpler Zero Pack view.
+                Tracking information isn&apos;t available yet. This usually means your shipment has only recently started its journey and there haven&apos;t been any tracking updates.
+              </p>
+              <p className="mt-3 max-w-lg leading-7 text-charcoal/65">
+                If there&apos;s still no update after 48 hours, please contact us and we&apos;ll look into it for you.
               </p>
               <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {steps.map((step) => (

@@ -11,6 +11,7 @@ import {CustomerPreview} from './components/CustomerPreview.tsx';
 import {historyReducer,startHistory,type HistoryAction} from './history.ts';
 import {fetchExchangeRate,newQuote,rateColour,type ExchangeRate} from './exchange-rate.ts';
 import {supplierCompany,supplierOptions} from './suppliers.ts';
+import {dealMatchesCompany,projectMatchesCompany,relatedDeals,relatedProjects} from './related.ts';
 import {AUTOSAVE_DELAY_MS,isEditingDraftField,autosavePreference,rememberAutosave} from './autosave.ts';
 import {copyText} from './clipboard.ts';
 import brandLogo from './assets/zero-pack-registered-white.png';
@@ -37,7 +38,7 @@ function App() {
  const set=(key:Field,value:string)=>{
   setShippingCopyText('');if(key==='fx')defaultFxEligible.current=false;
    setDraft(d=>{
-   const next=key==='company'?{...d,company:value,contact:companyContact(value,refs.company??[],refs.contact??[])}:key==='supplierDropdown'?{...d,supplierDropdown:value,supplierContact:companyContact(supplierCompany(value,refs.company??[])?.id??'',refs.company??[],refs.supplierContact??[])}:{...d,[key]:value,...(key==='fx'?{fxSource:'Manual quote rate'}:{})};
+   const next=key==='company'?{...d,company:value,contact:companyContact(value,refs.company??[],refs.contact??[]),deal:(refs.deal??[]).some(r=>r.id===d.deal&&dealMatchesCompany(r,value,refs.contact??[],refs.project??[]))?d.deal:'',project:(refs.project??[]).some(r=>r.id===d.project&&projectMatchesCompany(r,value))?d.project:''}:key==='supplierDropdown'?{...d,supplierDropdown:value,supplierContact:companyContact(supplierCompany(value,refs.company??[])?.id??'',refs.company??[],refs.supplierContact??[])}:{...d,[key]:value,...(key==='fx'?{fxSource:'Manual quote rate'}:{})};
    return updateDescriptions(d,next,(refs.company??[]).find(c=>c.id===next.company));
   });setNotice('');
  };
@@ -59,7 +60,7 @@ function App() {
  const refreshReferences=async()=>{
   if(referenceRefreshRunning.current||!ready)return;
   const run=generation.current;referenceRefreshRunning.current=true;setRefreshingRefs(true);
-  try{const a=adapter.current;const[columns,companies,contacts]=await Promise.all([a.fetchColumns(),a.loadRefs(COMPANY_BOARD_ID),a.loadRefs(CONTACT_BOARD_ID)]);if(run!==generation.current)return;setLookups(columns);setRefs(r=>({...r,company:companies,contact:contacts,supplierContact:contacts}));lastReferenceRefresh.current=Date.now();}
+  try{const a=adapter.current;const[columns,companies,contacts,deals,projects]=await Promise.all([a.fetchColumns(),a.loadRefs(COMPANY_BOARD_ID),a.loadRefs(CONTACT_BOARD_ID),a.loadRefs(DEAL_BOARD_ID),a.loadRefs(PROJECT_BOARD_ID)]);if(run!==generation.current)return;setLookups(columns);setRefs(r=>({...r,company:companies,contact:contacts,supplierContact:contacts,deal:deals,project:projects}));lastReferenceRefresh.current=Date.now();}
   catch(e){setError(`Reference refresh failed: ${e instanceof Error?e.message:String(e)}`)}
   finally{referenceRefreshRunning.current=false;setRefreshingRefs(false)}
  };
@@ -88,6 +89,8 @@ function App() {
    const a=adapter.current,original=quotes.find(q=>q.id===current);
    // Canonical contact-company links must already exist. Never repair by inference here.
    if(draft.contact&&!(refs.contact??[]).find(r=>r.id===draft.contact)?.companyIds?.includes(draft.company)) throw new Error('Customer contact is not linked to the selected company. Verify the canonical link in Monday.');
+   if(draft.deal&&!(refs.deal??[]).some(r=>r.id===draft.deal&&dealMatchesCompany(r,draft.company,refs.contact??[],refs.project??[]))) throw new Error('The selected Deal is not linked to the customer company. Choose a relevant Deal.');
+   if(draft.project&&!(refs.project??[]).some(r=>r.id===draft.project&&projectMatchesCompany(r,draft.company))) throw new Error('The selected Client project is not linked to the customer company. Choose a relevant project.');
    if(draft.supplierContact) {
     const supplier=supplierCompany(draft.supplierDropdown,refs.company??[]);
     const contact=(refs.supplierContact??[]).find(r=>r.id===draft.supplierContact);
@@ -113,11 +116,12 @@ function App() {
 
  const supplierContacts=(refs.supplierContact??[]).filter(c=>!!supplierId&&c.companyIds?.includes(supplierId));
  const customerContacts=(refs.contact??[]).filter(c=>!!draft.company&&c.companyIds?.includes(draft.company));
+ const customerDeals=relatedDeals(draft.company,refs.deal??[],refs.contact??[],refs.project??[]),customerProjects=relatedProjects(draft.company,refs.project??[]);
  const company=(refs.company??[]).find(c=>c.id===draft.company),contact=customerContacts.find(c=>c.id===draft.contact);
  let costing:Costing|undefined,calculationError='';try{costing=calculate(draft)}catch(e){calculationError=e instanceof Error?e.message:String(e)}
  const editor={draft,set,disabled:locked||busy};
  const text=(field:Field,label:string,type:'text'|'number'='text')=><TextField key={field} {...editor} field={field} label={label} type={type}/>;
- const choice=(field:Field,label:string,options:Ref[])=><SelectField key={field} {...editor} field={field} label={label} options={options}/>;
+ const choice=(field:Field,label:string,options:Ref[],strict=false)=><SelectField key={field} {...editor} field={field} label={label} options={options} showRetained={!strict}/>;
  const dropdown=(field:Field,label:string)=>choice(field,label,(lookups[C[field]]??[]).map(v=>({id:v,name:v})));
  const generated=generatedDescriptions(draft,company);
  const quoteCompanyIds=new Set(quotes.map(q=>q.values.company));
@@ -139,7 +143,7 @@ function App() {
    <div className="tabs"><button className={!preview?'selected':''} onClick={()=>setPreview(false)}>Quote workspace</button><button className={preview?'selected':''} onClick={()=>setPreview(true)}>Customer description preview</button></div>
    <div className="content">{preview?<CustomerPreview draft={generated}/>:<>
     <div className="identity-grid">
-     <Panel title="Quote details"><div className="stack-fields">{text('name','Quote reference')}{choice('status','Quote status',QUOTE_STATUSES.map(v=>({id:v,name:v})))}{choice('deal','Deal',refs.deal??[])}{choice('project','Client project',refs.project??[])}{text('artwork','Artwork design reference')}</div></Panel>
+     <Panel title="Quote details"><div className="stack-fields">{text('name','Quote reference')}{choice('status','Quote status',QUOTE_STATUSES.map(v=>({id:v,name:v})))}{choice('deal','Deal',customerDeals,true)}{choice('project','Client project',customerProjects,true)}{(draft.deal&&!customerDeals.some(r=>r.id===draft.deal)||draft.project&&!customerProjects.some(r=>r.id===draft.project))&&<p className="hint warning-text">A saved Deal or Client project is not linked to this company. Choose a relevant record before saving.</p>}{text('artwork','Artwork design reference')}</div></Panel>
      <Panel title="Customer"><div className="stack-fields">{choice('company','Customer company',refs.company??[])}{choice('contact','Customer contact',customerContacts)}<div className="fields cols2"><ReadField label="First name" value={contact?.firstName??''}/><ReadField label="Last name" value={contact?.lastName??''}/></div><ReadField label="Email" value={contact?.email??''}/><ReadField label="Contact number" value={contact?.phone||company?.companyPhone||''}/></div></Panel>
      <Panel title="Shipping details"><div className="stack-fields"><label className="field address-field"><textarea aria-label="Shipping address" rows={3} value={company?.shippingAddress??''} readOnly placeholder="No shipping address recorded on this company"/></label>{!company?.shippingAddress&&company?.businessAddress&&<ReadField label="Business address · Shipping not confirmed" value={company.businessAddress}/>}<button className="outline shipping-copy" disabled={busy||!company?.shippingAddress||!draft.weight||!draft.cbm} onClick={async()=>{let details='';try{setError('');details=shippingDetails(draft,company,contact);await copyText(details);setShippingCopyText('');setNotice('Shipping details copied')}catch(e){setShippingCopyText(details);setError(e instanceof Error?e.message:'Clipboard access is unavailable.')}}}>Copy shipping details</button>{shippingCopyText&&<label className="field"><textarea aria-label="Shipping details to copy" readOnly rows={6} value={shippingCopyText} onFocus={e=>e.currentTarget.select()}/></label>}</div></Panel>
     </div>
@@ -154,7 +158,7 @@ function App() {
      <div className="cost-summary" aria-label="Cost summary"><div><span>Product cost AUD</span><b>{costing?money(costing.productCostAUD):'—'}</b></div><div><span>Freight & import costs AUD</span><b>{costing?money(costing.freightAUD):'—'}</b></div><div><span>Total landed AUD</span><b>{costing?money(costing.landedAUD):'—'}</b></div><div><span>Margin AUD</span><b>{costing?money(costing.profitAUD):'—'}</b><small>Product margin {costing?`${costing.marginPercent}%`:'—'}</small></div><div><span>Total landing sell AUD</span><b>{costing?money(costing.allInTotalAUD):'—'}</b></div></div>
      <div className="record-actions"><button className="archive-button" disabled={busy||!ready||!current||(isLive&&!writesEnabled)} onClick={()=>void archive()}>Archive quotation</button></div>
     </Panel>
-   </>}<footer><span>Zero Pack Quote Manager · v0.3.5</span><span>{isLive?'Private Monday workspace':'Demo changes reset when this page reloads'} · Draft only</span></footer></div>
+   </>}<footer><span>Zero Pack Quote Manager · v0.3.6</span><span>{isLive?'Private Monday workspace':'Demo changes reset when this page reloads'} · Draft only</span></footer></div>
   </section></div>
  </main>;
 }

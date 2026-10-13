@@ -4,15 +4,15 @@ import {normalizeDecimal,isDecimal} from './numeric.ts';
 export type ColumnValue = { id: string; text: string | null; value: string | null; type: string; linked_item_ids?: string[]; values?: {id: number; label: string}[] };
 export type Item = { id: string; name: string; updated_at: string; column_values: ColumnValue[] };
 export type Quote = {id: string; name: string; values: Draft; updated_at: string};
-export type Ref = {id: string; name: string; companyIds?: string[]; status?: string; primaryContactIds?:string[]; shippingAddress?:string; businessAddress?:string; companyPhone?:string; firstName?:string; lastName?:string; email?:string; phone?:string};
+export type Ref = {id: string; name: string; companyIds?: string[]; contactIds?: string[]; projectIds?: string[]; status?: string; primaryContactIds?:string[]; shippingAddress?:string; businessAddress?:string; companyPhone?:string; firstName?:string; lastName?:string; email?:string; phone?:string};
 export type Column = {id: string; type: string; settings_str: string};
 export type Transport = (query: string, variables: Record<string, unknown>) => Promise<{data?: unknown; errors?: {message: string}[]}>;
 export const VALUE_FIELDS = 'id text value type ... on BoardRelationValue { linked_item_ids } ... on DropdownValue { values { id label } }';
 export const QUOTE_FIELDS = `id name updated_at column_values { ${VALUE_FIELDS} }`;
-export const REF_FIELDS = 'id name updated_at column_values(ids:["contact_account","status","board_relation_mm4nz01g","location_mm4nwpvd","location_mm4na6br","phone_mm5gch4a","text_mm5n6d0w","text_mm4pxvbs","contact_email","contact_phone"]){id text value type ... on BoardRelationValue{linked_item_ids}}';
+export const REF_FIELDS = 'id name updated_at column_values(ids:["contact_account","deal_contact","board_relation_mm67vcvr","board_relation_mm6471v8","status","board_relation_mm4nz01g","location_mm4nwpvd","location_mm4na6br","phone_mm5gch4a","text_mm5n6d0w","text_mm4pxvbs","contact_email","contact_phone"]){id text value type ... on BoardRelationValue{linked_item_ids}}';
 export function decodeRef(i:Item):Ref {
  const col=(id:string)=>i.column_values.find(c=>c.id===id),text=(id:string)=>col(id)?.text??'';
- return {id:i.id,name:i.name,companyIds:col('contact_account')?.linked_item_ids??[],status:text('status'),primaryContactIds:col('board_relation_mm4nz01g')?.linked_item_ids??[],shippingAddress:text('location_mm4nwpvd'),businessAddress:text('location_mm4na6br'),companyPhone:text('phone_mm5gch4a'),firstName:text('text_mm5n6d0w'),lastName:text('text_mm4pxvbs'),email:text('contact_email'),phone:text('contact_phone')};
+ return {id:i.id,name:i.name,companyIds:[...(col('contact_account')?.linked_item_ids??[]),...(col('board_relation_mm6471v8')?.linked_item_ids??[])],contactIds:col('deal_contact')?.linked_item_ids??[],projectIds:col('board_relation_mm67vcvr')?.linked_item_ids??[],status:text('status'),primaryContactIds:col('board_relation_mm4nz01g')?.linked_item_ids??[],shippingAddress:text('location_mm4nwpvd'),businessAddress:text('location_mm4na6br'),companyPhone:text('phone_mm5gch4a'),firstName:text('text_mm5n6d0w'),lastName:text('text_mm4pxvbs'),email:text('contact_email'),phone:text('contact_phone')};
 }
 export const COLUMN_QUERY = 'query($ids:[ID!]!){boards(ids:$ids){id board_kind columns{id type settings_str}}}';
 export const FIRST_QUERY = `query($ids:[ID!]!,$limit:Int!){boards(ids:$ids){id items_page(limit:$limit){cursor items{${QUOTE_FIELDS}}}}}`;

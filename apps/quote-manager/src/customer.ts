@@ -62,7 +62,10 @@ export function supplierDescription(d:Draft,companyName='',shippingAddress='') {
 // Sources: current Product & Packaging Knowledge Core and Claims & Evidence Policy,
 // 13 September 2026 approvals; country/thickness mapping confirmed by Patrick 10 October 2026.
 export function certification(d:Draft,address:string):string {
- if(!['mail satchel','compostable mailer','custom compostable mailer','custom compostable mailers'].includes(d.packaging.trim().toLowerCase()))return '';
+ // The packaging type is the material/construction qualifier for the verified flexible range.
+ // Paper, recycled, rigid and unspecified custom products cannot inherit this rule.
+ const flexible=['mail satchel','compostable mailer','custom compostable mailer','custom compostable mailers','padded bubble mail satchel','t-shirt handle shopping bag','four-finger shopping bag','garment bag','food-grade grocery bag','open-ended bag','lay flat tubing','pallet wrap','garbage bag','ziplock bag','vacuum bag','sachet packet','bubble wrap','air pillows','stand up pouch','bubble sheets'];
+ if(!flexible.includes(d.packaging.trim().toLowerCase()))return '';
  const thickness=Number(d.microns);
  if(!d.microns.trim()||!Number.isFinite(thickness)||thickness<=0||thickness>143)return '';
  const home=thickness<=63;

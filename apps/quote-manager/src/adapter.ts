@@ -46,7 +46,9 @@ export function columnOptions(columns: Column[]): Record<string,string[]> {
   return [c.id, labels.filter(Boolean)];
  }));
 }
-export const EDITABLE_STATUSES = ['Draft','Costing','Review','Ready to Issue','Declined','Expired'];
+export const QUOTE_STATUSES = ['Quoting','Declined','Lost','No Response','Ordered','Accepted','Sent','Completed'];
+// Historical draft-workflow labels are retained for records created before this release.
+export const EDITABLE_STATUSES = [...QUOTE_STATUSES.filter(s=>s!=='Completed'),'Draft','Costing','Review','Ready to Issue','Expired'];
 export const isEditable = (status: string) => EDITABLE_STATUSES.includes(status);
 export function validateDraft(d: Draft): void {
  if(!d.name.trim()) throw new Error('Quote reference is required.');
@@ -75,7 +77,7 @@ export function toValues(d: Draft, creating=false): Record<string,unknown> {
  return out;
 }
 export function duplicateDraft(d: Draft): Draft {
- return {...d,name:`${d.name||'Untitled'} — Copy`,status:'Draft',visibility:'Private',legacy:'',qboId:'',qboUrl:''};
+ return {...d,name:`${d.name||'Untitled'} — Copy`,status:'Quoting',visibility:'Private',legacy:'',qboId:'',qboUrl:''};
 }
 type Page = {cursor: string | null; items: Item[]};
 export function createMondayAdapter(transport: Transport, writesEnabled=false) {
@@ -134,11 +136,11 @@ export function createMondayAdapter(transport: Transport, writesEnabled=false) {
    if(!isEditable(decode(prior).values.status)) throw new Error('This quotation is locked; duplicate it instead.');
    if(prior.updated_at!==expectedUpdatedAt) throw new Error('This quotation changed in Monday. Reload before saving.');
    // Monday has no conditional mutation; this optimistic read does not eliminate a simultaneous edit race.
-   await gql('mutation($board:ID!,$item:ID!,$vals:JSON!){change_multiple_column_values(board_id:$board,item_id:$item,column_values:$vals){id}}',
+   await gql('mutation($board:ID!,$item:ID!,$vals:JSON!){change_multiple_column_values(board_id:$board,item_id:$item,column_values:$vals,create_labels_if_missing:true){id}}',
     {board:String(QUOTE_BOARD_ID),item:id,vals:JSON.stringify({...toValues(d),name:d.name.trim()})});
    return id;
   }
-  const r=await gql<{create_item:{id:string}}>('mutation($board:ID!,$name:String!,$vals:JSON!){create_item(board_id:$board,item_name:$name,column_values:$vals){id}}',
+  const r=await gql<{create_item:{id:string}}>('mutation($board:ID!,$name:String!,$vals:JSON!){create_item(board_id:$board,item_name:$name,column_values:$vals,create_labels_if_missing:true){id}}',
    {board:String(QUOTE_BOARD_ID),name:d.name.trim(),vals:JSON.stringify(toValues(d,true))});
   return r.create_item.id;
  }

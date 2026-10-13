@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createMondayAdapter,decode,columnOptions,toValues,duplicateDraft,validateDraft,FIRST_QUERY,NEXT_QUERY,COLUMN_QUERY,type Item,type Transport} from '../src/adapter.ts';
+import {createMondayAdapter,decode,columnOptions,toValues,duplicateDraft,validateDraft,QUOTE_STATUSES,FIRST_QUERY,NEXT_QUERY,COLUMN_QUERY,type Item,type Transport} from '../src/adapter.ts';
 import {C,blank,QUOTE_BOARD_ID} from '../src/schema.ts';
 import {demoDraft,createMockAdapter} from '../src/mock.ts';
 const item=(id='1'):Item=>({id,name:'TEST quote',updated_at:'2026-10-10',column_values:[]});
@@ -28,7 +28,8 @@ test('repeated cursor rejects partial results',async()=>{let calls=0;const a=cre
 test('GraphQL partial errors are surfaced',async()=>{await assert.rejects(createMondayAdapter(async()=>({data:{boards:[]},errors:[{message:'Permission denied'}]})).loadQuotes(),/Permission denied/)});
 test('private board and known schema are required',async()=>{await assert.rejects(createMondayAdapter(async()=>({data:{boards:[{...metadata.boards[0],board_kind:'public'}]}})).fetchColumns(),/private/)});
 test('writes disabled by default',async()=>{await assert.rejects(createMondayAdapter(async()=>({data:{}})).saveQuote(demoDraft()),/disabled/)});
-test('duplicate clears external/legacy IDs and visibility',()=>{const d=duplicateDraft({...demoDraft(),qboId:'secret',qboUrl:'private',legacy:'4',status:'Issued',visibility:'Published'});assert.equal(d.status,'Draft');assert.equal(d.visibility,'Private');assert.equal(d.qboId,'');assert.equal(d.qboUrl,'');assert.equal(d.legacy,'')});
+test('duplicate clears external/legacy IDs and visibility',()=>{const d=duplicateDraft({...demoDraft(),qboId:'secret',qboUrl:'private',legacy:'4',status:'Issued',visibility:'Published'});assert.equal(d.status,'Quoting');assert.equal(d.visibility,'Private');assert.equal(d.qboId,'');assert.equal(d.qboUrl,'');assert.equal(d.legacy,'')});
+test('quote statuses follow the supplied database order',()=>assert.deepEqual(QUOTE_STATUSES,['Quoting','Declined','Lost','No Response','Ordered','Accepted','Sent','Completed']));
 test('save serialization preserves snapshot and omits managed external fields',()=>{const d=demoDraft();const v=toValues(d,true);assert.equal(v[C.fx],'1.5');assert.deepEqual(v[C.visibility],{label:'Private'});assert.ok(!(C.qboId in v));assert.ok(!(C.legacy in v));assert.deepEqual(v[C.company],{item_ids:[101]});assert.deepEqual(toValues({...d,company:'',packaging:''})[C.company],{item_ids:[]});assert.deepEqual(toValues({...d,packaging:''})[C.packaging],{ids:[]})});
 test('reject invalid numbers, negative values, fractional quantities and zero FX',()=>{for(const patch of [{usdUnit:'NaN'},{shipping:'-1'},{quantity:'1.5'},{fx:'0'},{bank:'Infinity'}])assert.throws(()=>validateDraft({...demoDraft(),...patch}))});
 test('fresh quote creation is private and scoped to prototype board',async()=>{let vars:Record<string,unknown>={};const a=createMondayAdapter(async(q,v)=>{if(q===COLUMN_QUERY)return {data:metadata};vars=v;return {data:{create_item:{id:'22'}}}},true);assert.equal(await a.saveQuote(demoDraft()),'22');assert.equal(vars.board,String(QUOTE_BOARD_ID));assert.equal(JSON.parse(String(vars.vals))[C.visibility].label,'Private')});

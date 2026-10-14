@@ -7,15 +7,17 @@ export function customerQuotation(d:Draft) {
 }
 export const DESCRIPTION_FIELDS: (keyof Draft)[]=['packaging','size','microns','style','colour','printing','company','shipping','quantity'];
 const capitalise=(s:string)=>s?`${s[0].toUpperCase()}${s.slice(1)}`:'';
-export type Destination={country:'Australia'|'United Kingdom';postcode:string};
+export type Destination={country:'Australia'|'United Kingdom'|'United States';postcode:string};
 export function destination(address:string):Destination|undefined {
  const parts=address.split(/[,\n]/).map(s=>s.trim()).filter(Boolean);
  const au=parts.some(s=>/^(?:\d{4}\s+)?(Australia|AU|AUS)(?:\s+\d{4})?$/i.test(s));
  const uk=parts.some(s=>/^(?:[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\s+)?(United Kingdom|UK|Great Britain|GB)$/i.test(s));
+ const us=parts.some(s=>/^(?:(?:[A-Z]{2}\s+)?\d{5}(?:-\d{4})?\s+)?(?:United States(?: of America)?|USA|US)(?:\s+\d{5}(?:-\d{4})?)?$/i.test(s)
+  || /\b\d{5}(?:-\d{4})?\s+(?:United States(?: of America)?|USA|US)$/i.test(s));
  // A destination must be explicitly recorded, never inferred from city/postcode alone.
- if(au===uk)return undefined;
- const postcode=au?address.match(/\b\d{4}\b(?=[^\d]*$)/)?.[0]??'':address.match(/\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/i)?.[0].toUpperCase()??'';
- return {country:au?'Australia':'United Kingdom',postcode};
+ if(Number(au)+Number(uk)+Number(us)!==1)return undefined;
+ const postcode=au?address.match(/\b\d{4}\b(?=[^\d]*$)/)?.[0]??'':uk?address.match(/\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/i)?.[0].toUpperCase()??'':address.match(/\b\d{5}(?:-\d{4})?\b(?=[^\d]*$)/)?.[0]??'';
+ return {country:au?'Australia':uk?'United Kingdom':'United States',postcode};
 }
 export function specificationDescription(d:Draft,shippingAddress='') {
  if(!d.packaging.trim())return '';
@@ -60,7 +62,8 @@ export function supplierDescription(d:Draft,companyName='',shippingAddress='') {
 }
 
 // Sources: current Product & Packaging Knowledge Core and Claims & Evidence Policy,
-// 13 September 2026 approvals; country/thickness mapping confirmed by Patrick 10 October 2026.
+// 13 September 2026 approvals; AU/UK mapping confirmed 10 October 2026,
+// US ASTM D 6400 flexible packaging through 70 microns confirmed 14 October 2026.
 export function certification(d:Draft,address:string):string {
  // The packaging type is the material/construction qualifier for the verified flexible range.
  // Paper, recycled, rigid and unspecified custom products cannot inherit this rule.
@@ -68,8 +71,10 @@ export function certification(d:Draft,address:string):string {
  if(!flexible.includes(d.packaging.trim().toLowerCase()))return '';
  const thickness=Number(d.microns);
  if(!d.microns.trim()||!Number.isFinite(thickness)||thickness<=0||thickness>143)return '';
+ const country=destination(address)?.country;
+ if(country==='United States')return thickness<=70?'Certified to ASTM D 6400 - Industrially Compostable':'';
  const home=thickness<=63;
- if(destination(address)?.country==='Australia')return home?'Certified to AS 5810 - Home Compostable':'Certified to AS 4736 - Commercially Compostable';
- if(destination(address)?.country==='United Kingdom')return home?'Certified OK compost HOME':'OK compost INDUSTRIAL';
+ if(country==='Australia')return home?'Certified to AS 5810 - Home Compostable':'Certified to AS 4736 - Commercially Compostable';
+ if(country==='United Kingdom')return home?'Certified OK compost HOME':'OK compost INDUSTRIAL';
  return '';
 }

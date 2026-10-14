@@ -4,7 +4,7 @@ import {demoDraft} from '../src/mock.ts';
 import {calculate} from '../src/costing.ts';
 import {validateDraft,toValues} from '../src/adapter.ts';
 import {C} from '../src/schema.ts';
-import {destination,specificationDescription,supplierDescription,shippingDetails,updateDescriptions} from '../src/customer.ts';
+import {certification,destination,specificationDescription,supplierDescription,shippingDetails,updateDescriptions} from '../src/customer.ts';
 import {supplierCompany,supplierOptions} from '../src/suppliers.ts';
 
 test('shorthand decimal prices calculate and serialize with a leading zero and full precision',()=>{
@@ -41,6 +41,24 @@ test('UK uses its approved certification and postcode, with no delivery promise 
  assert.equal(destination('Adelaide SA 5000'),undefined);assert.equal(destination('Australia, United Kingdom'),undefined);
  assert.doesNotMatch(specificationDescription(d,'London SW1A 1AA'),/certified|DDP|OK compost/);
  assert.doesNotMatch(specificationDescription({...d,packaging:'custom product'},'Australia'),/certified compostable|AS 4736/);
+});
+test('US soft packaging through 70 microns uses ASTM D 6400 in both descriptions and delivery destination',()=>{
+ const address='100 Main Street, New York NY 10001, United States of America';
+ const d={...demoDraft(),packaging:'mail satchel',microns:'70',colour:'Black'};
+ assert.deepEqual(destination(address),{country:'United States',postcode:'10001'});
+ assert.equal(certification(d,address),'Certified to ASTM D 6400 - Industrially Compostable');
+ assert.match(specificationDescription(d,address),/Certified to ASTM D 6400 - Industrially Compostable\n\nDDP Delivery Included:[\s\S]*Deliver to: United States, 10001/);
+ assert.match(supplierDescription(d,'US customer',address),/Customised Certified to ASTM D 6400 - Industrially Compostable/);
+ assert.equal(certification({...d,microns:'63'},address),'Certified to ASTM D 6400 - Industrially Compostable');
+ assert.equal(certification({...d,microns:'70.1'},address),'');
+ assert.doesNotMatch(specificationDescription({...d,microns:'70.1'},address),/certified compostable|ASTM/);
+ assert.equal(certification({...d,packaging:'cardboard box'},address),'');
+ assert.deepEqual(destination('100 Main Street, NY 10001 USA'),{country:'United States',postcode:'10001'});
+ assert.deepEqual(destination('100 Main Street, CA 94105-1234 US'),{country:'United States',postcode:'94105-1234'});
+ assert.equal(destination('New York NY 10001'),undefined);
+ assert.equal(destination('10001 United States Avenue'),undefined);
+ assert.equal(destination('United States, Australia'),undefined);
+ assert.equal(certification(d,'New York NY 10001'),'');
 });
 test('spec changes always update both descriptions atomically',()=>{
  const before=demoDraft(),company={id:'101',name:'Demo customer',shippingAddress:'Australia, 3044'};

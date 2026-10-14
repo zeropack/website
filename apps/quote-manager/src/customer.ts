@@ -1,0 +1,84 @@
+import type {Draft} from './schema.ts';
+import {isDecimal} from './numeric.ts';
+// Explicit allowlist: never return supplier names, descriptions, costs, FX, notes or markup.
+// Future portal must produce this DTO server-side after authorization, never fetch internal drafts.
+export function customerQuotation(d:Draft) {
+ return {reference:d.name,description:d.customerDesc,quantity:d.sellQuantity,unitPriceAUD:d.sellUnit,artwork:d.artwork};
+}
+export const DESCRIPTION_FIELDS: (keyof Draft)[]=['packaging','size','microns','style','colour','printing','company','shipping','quantity'];
+const capitalise=(s:string)=>s?`${s[0].toUpperCase()}${s.slice(1)}`:'';
+export type Destination={country:'Australia'|'United Kingdom'|'United States';postcode:string};
+export function destination(address:string,locationCountry=''):Destination|undefined {
+ const parts=address.split(/[,\n]/).map(s=>s.trim()).filter(Boolean);
+ const au=parts.some(s=>/^(?:\d{4}\s+)?(Australia|AU|AUS)(?:\s+\d{4})?$/i.test(s));
+ const uk=parts.some(s=>/^(?:[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\s+)?(United Kingdom|UK|Great Britain|GB)$/i.test(s));
+ const us=parts.some(s=>/^(?:(?:[A-Z]{2}\s+)?\d{5}(?:-\d{4})?\s+)?(?:United States(?: of America)?|USA|US)(?:\s+\d{5}(?:-\d{4})?)?$/i.test(s)
+  || /\b\d{5}(?:-\d{4})?\s+(?:United States(?: of America)?|USA|US)$/i.test(s));
+ // A typed Monday Location country is canonical even when its rendered address omits the country.
+ // A ZIP/state alone is never a country; conflicting or unsupported country data fails closed.
+ const explicit=Number(au)+Number(uk)+Number(us);
+ const country=({AU:'Australia',AUS:'Australia',GB:'United Kingdom',UK:'United Kingdom',US:'United States',USA:'United States'} as Record<string,Destination['country']>)[locationCountry.trim().toUpperCase()];
+ if(explicit>1||(locationCountry.trim()&&!country)||(country&&explicit&&!(au&&country==='Australia'||uk&&country==='United Kingdom'||us&&country==='United States'))||(!country&&!explicit))return undefined;
+ const resolved=country??(au?'Australia':uk?'United Kingdom':'United States');
+ const postcode=resolved==='Australia'?address.match(/\b\d{4}\b(?=[^\d]*$)/)?.[0]??'':resolved==='United Kingdom'?address.match(/\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/i)?.[0].toUpperCase()??'':address.match(/\b\d{5}(?:-\d{4})?\b(?=[^\d]*$)/)?.[0]??'';
+ return {country:resolved,postcode};
+}
+export function specificationDescription(d:Draft,shippingAddress='',locationCountry='') {
+ if(!d.packaging.trim())return '';
+ const cert=certification(d,shippingAddress,locationCountry),dest=destination(shippingAddress,locationCountry);
+ const product=['Custom-designed',d.colour,cert?'certified compostable':'',d.packaging].filter(Boolean).join(' ');
+ const size=[d.size,d.style].filter(Boolean).join(' and ');
+ const lines=[product,size,d.microns?`${d.microns} mic thick`:'',capitalise(d.printing),cert].filter(Boolean);
+ if(Number(d.shipping)>0&&dest){
+  lines.push('','DDP Delivery Included: Final delivery cost will be confirmed based on the delivery address and final shipment weight and dimensions.','','Includes:',`Deliver to: ${dest.country}${dest.postcode?`, ${dest.postcode}`:''}`,'Freight, insurance and all applicable import and customs duties, fees and taxes.');
+ }
+ return lines.join('\n');
+}
+// Relevant specifications always regenerate both descriptions as one undoable edit.
+export function updateDescriptions(before:Draft,after:Draft,company:import('./adapter.ts').Ref|undefined):Draft {
+ if(!DESCRIPTION_FIELDS.some(k=>before[k]!==after[k]))return after;
+ return generatedDescriptions(after,company);
+}
+export function generatedDescriptions(d:Draft,company:import('./adapter.ts').Ref|undefined):Draft {
+ return {...d,customerDesc:specificationDescription(d,company?.shippingAddress,company?.shippingCountry),supplierDesc:supplierDescription(d,company?.name,company?.shippingAddress,company?.shippingCountry)};
+}
+export function shippingDetails(d:Draft,company:import('./adapter.ts').Ref|undefined,contact?:import('./adapter.ts').Ref):string {
+ if(!company?.shippingAddress?.trim()||!d.weight||!d.cbm)throw new Error('Select a company with a shipping address and enter weight and CBM.');
+ if([d.weight,d.cbm].some(v=>!isDecimal(v)))throw new Error('Shipping weight and CBM must be valid non-negative numbers.');
+ const recipient=contact?.companyIds?.includes(company.id)?contact:undefined;
+ const name=recipient?[recipient.firstName,recipient.lastName].filter(Boolean).join(' ')||recipient.name:'';
+ const phone=recipient?.phone||company.companyPhone||'';
+ const n=(s:string)=>Number(s).toLocaleString('en-AU',{maximumFractionDigits:8});
+ return ['Please ship to:',name,phone,company.name,company.shippingAddress.trim(),`${n(d.weight)}kgs, ${n(d.cbm)}cbm`].filter(Boolean).join('\n');
+}
+
+export function companyContact(companyId:string,companies:import('./adapter.ts').Ref[],contacts:import('./adapter.ts').Ref[]):string {
+ const company=companies.find(c=>c.id===companyId),linked=contacts.filter(c=>c.companyIds?.includes(companyId));
+ const primary=linked.filter(c=>company?.primaryContactIds?.includes(c.id));
+ return primary.length===1?primary[0].id:primary.length===0&&linked.length===1?linked[0].id:'';
+}
+export function supplierDescription(d:Draft,companyName='',shippingAddress='',locationCountry='') {
+ if(!d.packaging.trim())return '';
+ const cert=certification(d,shippingAddress,locationCountry);
+ const heading=[d.quantity?`${Number(d.quantity).toLocaleString('en-AU')} -`:'','Customised',cert].filter(Boolean).join(' ');
+ const lines=['Can you please quote for:',companyName?`Company: ${companyName}`:'',heading,[d.colour,d.packaging].filter(Boolean).join(' '),d.printing,d.size,d.style,d.microns?`${d.microns} mic thick`:''].filter(Boolean);
+ return [...lines,'','Please include weights and cbm for shipping.'].join('\n');
+}
+
+// Sources: current Product & Packaging Knowledge Core and Claims & Evidence Policy,
+// 13 September 2026 approvals; AU/UK mapping confirmed 10 October 2026,
+// US ASTM D 6400 flexible packaging through 70 microns confirmed 14 October 2026.
+export function certification(d:Draft,address:string,locationCountry=''):string {
+ // The packaging type is the material/construction qualifier for the verified flexible range.
+ // Paper, recycled, rigid and unspecified custom products cannot inherit this rule.
+ const flexible=['mail satchel','compostable mailer','custom compostable mailer','custom compostable mailers','padded bubble mail satchel','t-shirt handle shopping bag','four-finger shopping bag','garment bag','food-grade grocery bag','open-ended bag','lay flat tubing','pallet wrap','garbage bag','ziplock bag','vacuum bag','sachet packet','bubble wrap','air pillows','stand up pouch','bubble sheets'];
+ if(!flexible.includes(d.packaging.trim().toLowerCase()))return '';
+ const thickness=Number(d.microns);
+ if(!d.microns.trim()||!Number.isFinite(thickness)||thickness<=0||thickness>143)return '';
+ const country=destination(address,locationCountry)?.country;
+ if(country==='United States')return thickness<=70?'Certified to ASTM D 6400 - Industrially Compostable':'';
+ const home=thickness<=63;
+ if(country==='Australia')return home?'Certified to AS 5810 - Home Compostable':'Certified to AS 4736 - Commercially Compostable';
+ if(country==='United Kingdom')return home?'Certified OK compost HOME':'OK compost INDUSTRIAL';
+ return '';
+}

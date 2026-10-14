@@ -39,8 +39,8 @@ test('mock draft save and reopen preserves manual descriptions and snapshot',asy
 
 test('customer reference decoding retains verified contact links and canonical address',async()=>{
  const {decodeRef}=await import('../src/adapter.ts');
- const r=decodeRef({...item('11'),column_values:[{id:'board_relation_mm4nz01g',type:'board_relation',value:null,text:null,linked_item_ids:['22']},{id:'location_mm4nwpvd',type:'location',value:null,text:'10 Example Street, Adelaide SA 5000'},{id:'contact_email',type:'email',value:null,text:'person@example.com'},{id:'text_mm5n6d0w',type:'text',value:null,text:'Test'}]});
- assert.deepEqual(r.primaryContactIds,['22']);assert.equal(r.shippingAddress,'10 Example Street, Adelaide SA 5000');assert.equal(r.email,'person@example.com');assert.equal(r.firstName,'Test');assert.equal(r.businessAddress,'');
+ const r=decodeRef({...item('11'),column_values:[{id:'board_relation_mm4nz01g',type:'board_relation',value:null,text:null,linked_item_ids:['22']},{id:'location_mm4nwpvd',type:'location',value:null,text:'10 Example Street, Adelaide SA 5000',country_short:'AU'},{id:'contact_email',type:'email',value:null,text:'person@example.com'},{id:'text_mm5n6d0w',type:'text',value:null,text:'Test'}]});
+ assert.deepEqual(r.primaryContactIds,['22']);assert.equal(r.shippingAddress,'10 Example Street, Adelaide SA 5000');assert.equal(r.shippingCountry,'AU');assert.equal(r.email,'person@example.com');assert.equal(r.firstName,'Test');assert.equal(r.businessAddress,'');
 });
 test('company selection uses only a verified primary or unique linked contact',async()=>{
  const {companyContact}=await import('../src/customer.ts');

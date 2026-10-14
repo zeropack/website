@@ -158,7 +158,7 @@ function App() {
      <div className="cost-summary" aria-label="Cost summary"><div><span>Product cost AUD</span><b>{costing?money(costing.productCostAUD):'—'}</b></div><div><span>Freight & import costs AUD</span><b>{costing?money(costing.freightAUD):'—'}</b></div><div><span>Total landed AUD</span><b>{costing?money(costing.landedAUD):'—'}</b></div><div><span>Margin AUD</span><b>{costing?money(costing.profitAUD):'—'}</b><small>Product margin {costing?`${costing.marginPercent}%`:'—'}</small></div><div><span>Total landing sell AUD</span><b>{costing?money(costing.allInTotalAUD):'—'}</b></div></div>
      <div className="record-actions"><button className="archive-button" disabled={busy||!ready||!current||(isLive&&!writesEnabled)} onClick={()=>void archive()}>Archive quotation</button></div>
     </Panel>
-   </>}<footer><span>Zero Pack Quote Manager · v0.3.7</span><span>{isLive?'Private Monday workspace':'Demo changes reset when this page reloads'} · Draft only</span></footer></div>
+   </>}<footer><span>Zero Pack Quote Manager · v0.3.8</span><span>{isLive?'Private Monday workspace':'Demo changes reset when this page reloads'} · Draft only</span></footer></div>
   </section></div>
  </main>;
 }

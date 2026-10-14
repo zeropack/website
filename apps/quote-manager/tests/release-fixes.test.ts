@@ -4,7 +4,7 @@ import {demoDraft} from '../src/mock.ts';
 import {calculate} from '../src/costing.ts';
 import {validateDraft,toValues} from '../src/adapter.ts';
 import {C} from '../src/schema.ts';
-import {certification,destination,specificationDescription,supplierDescription,shippingDetails,updateDescriptions} from '../src/customer.ts';
+import {certification,destination,generatedDescriptions,specificationDescription,supplierDescription,shippingDetails,updateDescriptions} from '../src/customer.ts';
 import {supplierCompany,supplierOptions} from '../src/suppliers.ts';
 
 test('shorthand decimal prices calculate and serialize with a leading zero and full precision',()=>{
@@ -59,6 +59,14 @@ test('US soft packaging through 70 microns uses ASTM D 6400 in both descriptions
  assert.equal(destination('10001 United States Avenue'),undefined);
  assert.equal(destination('United States, Australia'),undefined);
  assert.equal(certification(d,'New York NY 10001'),'');
+ const company={id:'2879721039',name:'US customer',shippingAddress:'826 Kern St Missoula, MT 59801',shippingCountry:'US'};
+ assert.deepEqual(destination(company.shippingAddress,company.shippingCountry),{country:'United States',postcode:'59801'});
+ const generated=generatedDescriptions({...d,microns:'60'},company);
+ assert.match(generated.customerDesc,/Certified to ASTM D 6400 - Industrially Compostable[\s\S]*Deliver to: United States, 59801/);
+ assert.match(generated.supplierDesc,/Customised Certified to ASTM D 6400 - Industrially Compostable/);
+ assert.equal(destination(company.shippingAddress),undefined);
+ assert.equal(destination('100 Main Street, Australia','US'),undefined);
+ assert.equal(destination(company.shippingAddress,'CA'),undefined);
 });
 test('spec changes always update both descriptions atomically',()=>{
  const before=demoDraft(),company={id:'101',name:'Demo customer',shippingAddress:'Australia, 3044'};

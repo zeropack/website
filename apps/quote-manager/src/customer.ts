@@ -8,20 +8,24 @@ export function customerQuotation(d:Draft) {
 export const DESCRIPTION_FIELDS: (keyof Draft)[]=['packaging','size','microns','style','colour','printing','company','shipping','quantity'];
 const capitalise=(s:string)=>s?`${s[0].toUpperCase()}${s.slice(1)}`:'';
 export type Destination={country:'Australia'|'United Kingdom'|'United States';postcode:string};
-export function destination(address:string):Destination|undefined {
+export function destination(address:string,locationCountry=''):Destination|undefined {
  const parts=address.split(/[,\n]/).map(s=>s.trim()).filter(Boolean);
  const au=parts.some(s=>/^(?:\d{4}\s+)?(Australia|AU|AUS)(?:\s+\d{4})?$/i.test(s));
  const uk=parts.some(s=>/^(?:[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\s+)?(United Kingdom|UK|Great Britain|GB)$/i.test(s));
  const us=parts.some(s=>/^(?:(?:[A-Z]{2}\s+)?\d{5}(?:-\d{4})?\s+)?(?:United States(?: of America)?|USA|US)(?:\s+\d{5}(?:-\d{4})?)?$/i.test(s)
   || /\b\d{5}(?:-\d{4})?\s+(?:United States(?: of America)?|USA|US)$/i.test(s));
- // A destination must be explicitly recorded, never inferred from city/postcode alone.
- if(Number(au)+Number(uk)+Number(us)!==1)return undefined;
- const postcode=au?address.match(/\b\d{4}\b(?=[^\d]*$)/)?.[0]??'':uk?address.match(/\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/i)?.[0].toUpperCase()??'':address.match(/\b\d{5}(?:-\d{4})?\b(?=[^\d]*$)/)?.[0]??'';
- return {country:au?'Australia':uk?'United Kingdom':'United States',postcode};
+ // A typed Monday Location country is canonical even when its rendered address omits the country.
+ // A ZIP/state alone is never a country; conflicting or unsupported country data fails closed.
+ const explicit=Number(au)+Number(uk)+Number(us);
+ const country=({AU:'Australia',AUS:'Australia',GB:'United Kingdom',UK:'United Kingdom',US:'United States',USA:'United States'} as Record<string,Destination['country']>)[locationCountry.trim().toUpperCase()];
+ if(explicit>1||(locationCountry.trim()&&!country)||(country&&explicit&&!(au&&country==='Australia'||uk&&country==='United Kingdom'||us&&country==='United States'))||(!country&&!explicit))return undefined;
+ const resolved=country??(au?'Australia':uk?'United Kingdom':'United States');
+ const postcode=resolved==='Australia'?address.match(/\b\d{4}\b(?=[^\d]*$)/)?.[0]??'':resolved==='United Kingdom'?address.match(/\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/i)?.[0].toUpperCase()??'':address.match(/\b\d{5}(?:-\d{4})?\b(?=[^\d]*$)/)?.[0]??'';
+ return {country:resolved,postcode};
 }
-export function specificationDescription(d:Draft,shippingAddress='') {
+export function specificationDescription(d:Draft,shippingAddress='',locationCountry='') {
  if(!d.packaging.trim())return '';
- const cert=certification(d,shippingAddress),dest=destination(shippingAddress);
+ const cert=certification(d,shippingAddress,locationCountry),dest=destination(shippingAddress,locationCountry);
  const product=['Custom-designed',d.colour,cert?'certified compostable':'',d.packaging].filter(Boolean).join(' ');
  const size=[d.size,d.style].filter(Boolean).join(' and ');
  const lines=[product,size,d.microns?`${d.microns} mic thick`:'',capitalise(d.printing),cert].filter(Boolean);
@@ -36,7 +40,7 @@ export function updateDescriptions(before:Draft,after:Draft,company:import('./ad
  return generatedDescriptions(after,company);
 }
 export function generatedDescriptions(d:Draft,company:import('./adapter.ts').Ref|undefined):Draft {
- return {...d,customerDesc:specificationDescription(d,company?.shippingAddress),supplierDesc:supplierDescription(d,company?.name,company?.shippingAddress)};
+ return {...d,customerDesc:specificationDescription(d,company?.shippingAddress,company?.shippingCountry),supplierDesc:supplierDescription(d,company?.name,company?.shippingAddress,company?.shippingCountry)};
 }
 export function shippingDetails(d:Draft,company:import('./adapter.ts').Ref|undefined,contact?:import('./adapter.ts').Ref):string {
  if(!company?.shippingAddress?.trim()||!d.weight||!d.cbm)throw new Error('Select a company with a shipping address and enter weight and CBM.');
@@ -53,9 +57,9 @@ export function companyContact(companyId:string,companies:import('./adapter.ts')
  const primary=linked.filter(c=>company?.primaryContactIds?.includes(c.id));
  return primary.length===1?primary[0].id:primary.length===0&&linked.length===1?linked[0].id:'';
 }
-export function supplierDescription(d:Draft,companyName='',shippingAddress='') {
+export function supplierDescription(d:Draft,companyName='',shippingAddress='',locationCountry='') {
  if(!d.packaging.trim())return '';
- const cert=certification(d,shippingAddress);
+ const cert=certification(d,shippingAddress,locationCountry);
  const heading=[d.quantity?`${Number(d.quantity).toLocaleString('en-AU')} -`:'','Customised',cert].filter(Boolean).join(' ');
  const lines=['Can you please quote for:',companyName?`Company: ${companyName}`:'',heading,[d.colour,d.packaging].filter(Boolean).join(' '),d.printing,d.size,d.style,d.microns?`${d.microns} mic thick`:''].filter(Boolean);
  return [...lines,'','Please include weights and cbm for shipping.'].join('\n');
@@ -64,14 +68,14 @@ export function supplierDescription(d:Draft,companyName='',shippingAddress='') {
 // Sources: current Product & Packaging Knowledge Core and Claims & Evidence Policy,
 // 13 September 2026 approvals; AU/UK mapping confirmed 10 October 2026,
 // US ASTM D 6400 flexible packaging through 70 microns confirmed 14 October 2026.
-export function certification(d:Draft,address:string):string {
+export function certification(d:Draft,address:string,locationCountry=''):string {
  // The packaging type is the material/construction qualifier for the verified flexible range.
  // Paper, recycled, rigid and unspecified custom products cannot inherit this rule.
  const flexible=['mail satchel','compostable mailer','custom compostable mailer','custom compostable mailers','padded bubble mail satchel','t-shirt handle shopping bag','four-finger shopping bag','garment bag','food-grade grocery bag','open-ended bag','lay flat tubing','pallet wrap','garbage bag','ziplock bag','vacuum bag','sachet packet','bubble wrap','air pillows','stand up pouch','bubble sheets'];
  if(!flexible.includes(d.packaging.trim().toLowerCase()))return '';
  const thickness=Number(d.microns);
  if(!d.microns.trim()||!Number.isFinite(thickness)||thickness<=0||thickness>143)return '';
- const country=destination(address)?.country;
+ const country=destination(address,locationCountry)?.country;
  if(country==='United States')return thickness<=70?'Certified to ASTM D 6400 - Industrially Compostable':'';
  const home=thickness<=63;
  if(country==='Australia')return home?'Certified to AS 5810 - Home Compostable':'Certified to AS 4736 - Commercially Compostable';

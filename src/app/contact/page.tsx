@@ -3,6 +3,7 @@ import { CalendlyEmbed } from "@/components/CalendlyEmbed";
 import { CTAButton } from "@/components/CTAButton";
 import { KlaviyoEmbed } from "@/components/KlaviyoEmbed";
 import { TrackedOutbound } from "@/components/TrackedOutbound";
+import { SocialLinks } from "@/components/SocialLinks";
 import { CONTACT_EMAIL, QUOTE_FORM_HREF } from "@/lib/site";
 import { buildMarketPageMetadata, getRequestMarket } from "@/lib/requestMarket";
 
@@ -133,6 +134,10 @@ export default async function Page() {
               >
                 {CONTACT_EMAIL}
               </TrackedOutbound>
+            </div>
+            <div className="mt-8">
+              <h3 className="font-heading text-lg font-semibold text-charcoal">Follow Zero Pack</h3>
+              <SocialLinks className="mt-3" />
             </div>
           </div>
 

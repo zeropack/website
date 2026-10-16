@@ -2,6 +2,7 @@ import { JsonLd } from "./JsonLd";
 import { CONTACT_EMAIL, SITE_NAME } from "@/lib/site";
 import { buildMarketUrl, MARKET_ROUTES } from "@/lib/marketRouting";
 import { getRequestMarket } from "@/lib/requestMarket";
+import { SOCIAL_PROFILES } from "@/lib/socialProfiles";
 
 export async function SEOWebSite() {
   const market = await getRequestMarket();
@@ -39,6 +40,7 @@ export function SEOOrganization() {
       "https://www.zeropack.co",
       "https://www.zeropack.au",
       "https://www.zeropack.co.uk",
+      ...SOCIAL_PROFILES.map((profile) => profile.href),
     ],
   };
   return <JsonLd data={data} />;

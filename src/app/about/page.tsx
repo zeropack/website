@@ -3,6 +3,7 @@ import Image from "next/image";
 import { CTAButton } from "@/components/CTAButton";
 import { CustomPackagingProofBar } from "@/components/CustomPackagingProofBar";
 import { FounderStorySection } from "@/components/FounderStorySection";
+import { SocialLinks } from "@/components/SocialLinks";
 import { aboutZeroPack } from "@/content/about/about";
 import packagingCollage from "@/content/images/custom/Zero Pack Collage - 1024 x 1024.png";
 import { QUOTE_FORM_HREF } from "@/lib/site";
@@ -90,6 +91,20 @@ export default function Page() {
       </section>
 
       <FounderStorySection />
+
+      <section aria-labelledby="about-social-heading" className="bg-stone py-10 sm:py-14">
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+          <div>
+            <h2 id="about-social-heading" className="font-heading text-2xl font-semibold text-charcoal">
+              Connect with Zero Pack
+            </h2>
+            <p className="mt-3 leading-relaxed text-charcoal/70">
+              Follow Zero Pack for packaging ideas, company updates and more.
+            </p>
+          </div>
+          <SocialLinks className="shrink-0" />
+        </div>
+      </section>
 
       <section className="bg-white py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BrandLogo } from "./BrandLogo";
 import { NewsletterSignup } from "./NewsletterSignup";
 import { MarketSwitcher } from "./MarketSwitcher";
+import { SocialLinks } from "./SocialLinks";
 import { TREND_PACKAGING_FUNNEL_HREF } from "@/lib/site";
 
 const groups = [
@@ -47,6 +48,7 @@ export function Footer() {
             <p className="mt-3 text-sm text-white/80">
               Custom compostable packaging, made for brands that care what they send out.
             </p>
+            <SocialLinks tone="dark" className="mt-5" />
             <MarketSwitcher />
           </div>
 

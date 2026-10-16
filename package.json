@@ -4,11 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run test:activity-intelligence && node scripts/sync-approved-assets.mjs && next build",
+    "build": "npm run test:activity-intelligence && npm run test:mailerlite && node scripts/sync-approved-assets.mjs && next build",
     "start": "next start",
     "lint": "eslint",
     "validate:sizing": "node scripts/run-sizing-validation.mjs",
-    "test:activity-intelligence": "node scripts/test-activity-intelligence.mjs"
+    "test:activity-intelligence": "node scripts/test-activity-intelligence.mjs",
+    "test:mailerlite": "node scripts/test-mailerlite.mjs"
   },
   "dependencies": {
     "@next/third-parties": "^16.2.6",

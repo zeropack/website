@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
+import { safeReconcileMailerLite } from "@/lib/integrations/mailerlite/reconcile";
 
 import {
   type ReconcileMode,
@@ -6,6 +7,7 @@ import {
 import { reconcileKlaviyoMondayWithAcquisition } from "@/lib/integrations/klaviyo-monday/reconcile-with-acquisition";
 
 const PRODUCTION_LIFECYCLE_CUTOVER_AT = "2026-08-20T08:35:00.000Z";
+export const maxDuration = 300;
 
 function lifecycleLookbackHours(): number {
   const configured = Number(process.env.MONDAY_LIFECYCLE_LOOKBACK_HOURS || "72");
@@ -59,6 +61,9 @@ export async function GET(req: Request) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
 
+  // Reuse the commissioned Cloudflare cadence and daily Vercel fallback, even
+  // if the independent Klaviyo reconciliation fails during this invocation.
+  after(safeReconcileMailerLite);
   try {
     const result = await run("apply");
     return NextResponse.json(result, {

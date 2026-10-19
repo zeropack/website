@@ -51,6 +51,7 @@ export const QUOTE_STATUSES = ['Quoting','Declined','Lost','No Response','Ordere
 export const EDITABLE_STATUSES = [...QUOTE_STATUSES.filter(s=>s!=='Completed'),'Draft','Costing','Review','Ready to Issue','Expired'];
 export const isEditable = (status: string) => EDITABLE_STATUSES.includes(status);
 export function validateDraft(d: Draft): void {
+ if(d.compostability&&!['Home','Industry'].includes(d.compostability)) throw new Error('Compostability must be Home or Industry.');
  if(!d.name.trim()) throw new Error('Quote reference is required.');
  if(!isEditable(d.status)) throw new Error('This quotation is locked; duplicate it into a new draft.');
  for(const k of numbers) {
@@ -157,3 +158,4 @@ export function createMondayAdapter(transport: Transport, writesEnabled=false) {
  }
  return {fetchColumns,loadQuotes,loadRefs,saveQuote,archiveQuote};
 }
+

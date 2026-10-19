@@ -119,3 +119,40 @@ test('Monday postcode-before-country shipping address resolves AU certification 
  assert.deepEqual(destination('1 Example Road, SW1A 1AA United Kingdom'),{country:'United Kingdom',postcode:'SW1A 1AA'});
  assert.match(specificationDescription(d,'1 Example Road, SW1A 1AA United Kingdom'),/OK compost INDUSTRIAL/);
 });
+
+
+test('explicit Industry overrides thin Home classification in both AU and UK descriptions',()=>{
+ const home={...demoDraft(),compostability:'Home',microns:'30'};
+ for(const [country,homeText,industryText] of [['Australia','AS 5810','AS 4736'],['United Kingdom','OK compost HOME','OK compost INDUSTRIAL']]){
+  const company={id:'101',name:'Test company',shippingAddress:country};
+  const changed=updateDescriptions(home,{...home,compostability:'Industry'},company);
+  assert.match(changed.customerDesc,new RegExp(industryText));assert.match(changed.supplierDesc,new RegExp(industryText));
+  const restored=updateDescriptions(changed,{...changed,compostability:'Home'},company);
+  assert.match(restored.customerDesc,new RegExp(homeText));assert.match(restored.supplierDesc,new RegExp(homeText));
+ }
+});
+test('Home cannot create a named claim outside its approved thickness or US coverage',()=>{
+ const d={...demoDraft(),compostability:'Home',microns:'60'};
+ assert.equal(certification(d,'United States'),'');assert.equal(certification({...d,microns:'80'},'Australia'),'');
+ assert.match(certification({...d,compostability:'Industry'},'United States'),/ASTM D 6400/);
+ assert.equal(certification({...d,compostability:'Industry',microns:'71'},'United States'),'');
+ assert.equal(certification({...d,compostability:'Unexpected'},'Australia'),'');
+ assert.throws(()=>validateDraft({...d,compostability:'Unexpected'}),/Compostability/);
+});
+test('new quotes default Home and the selected choice survives Monday serialization and decoding',async()=>{
+ const {newQuote}=await import('../src/exchange-rate.ts');const {decode,duplicateDraft}=await import('../src/adapter.ts');
+ assert.equal(newQuote().compostability,'Home');
+ for(const choice of ['Home','Industry']){
+  const d={...demoDraft(),compostability:choice};assert.deepEqual(toValues(d)[C.compostability],{labels:[choice]});
+  const row=decode({id:'1',name:'TEST',updated_at:'2026-10-19',column_values:[{id:C.compostability,type:'dropdown',text:choice,value:null,values:[{id:1,label:choice}]}]});
+  assert.equal(row.values.compostability,choice);assert.equal(duplicateDraft(d).compostability,choice);
+ }
+});
+test('legacy quotes keep their previous classification until a manual choice is saved',async()=>{
+ const {quoteCompostability}=await import('../src/customer.ts');
+ const d={...demoDraft(),compostability:'',microns:'60'};
+ assert.equal(quoteCompostability(d,'Australia'),'Home');assert.equal(quoteCompostability({...d,microns:'80'},'Australia'),'Industry');
+ assert.equal(quoteCompostability(d,'United States'),'Industry');
+ assert.equal(quoteCompostability({...d,customerDesc:'Certified to AS 4736 - Commercially Compostable'},'Australia'),'Industry');
+ assert.equal(quoteCompostability({...d,compostability:'Home'},'United States'),'Home');
+});

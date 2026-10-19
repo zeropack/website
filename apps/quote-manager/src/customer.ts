@@ -5,7 +5,7 @@ import {isDecimal} from './numeric.ts';
 export function customerQuotation(d:Draft) {
  return {reference:d.name,description:d.customerDesc,quantity:d.sellQuantity,unitPriceAUD:d.sellUnit,artwork:d.artwork};
 }
-export const DESCRIPTION_FIELDS: (keyof Draft)[]=['packaging','size','microns','style','colour','printing','company','shipping','quantity'];
+export const DESCRIPTION_FIELDS: (keyof Draft)[]=['packaging','size','microns','compostability','style','colour','printing','company','shipping','quantity'];
 const capitalise=(s:string)=>s?`${s[0].toUpperCase()}${s.slice(1)}`:'';
 export type Destination={country:'Australia'|'United Kingdom'|'United States';postcode:string};
 export function destination(address:string,locationCountry=''):Destination|undefined {
@@ -40,7 +40,8 @@ export function updateDescriptions(before:Draft,after:Draft,company:import('./ad
  return generatedDescriptions(after,company);
 }
 export function generatedDescriptions(d:Draft,company:import('./adapter.ts').Ref|undefined):Draft {
- return {...d,customerDesc:specificationDescription(d,company?.shippingAddress,company?.shippingCountry),supplierDesc:supplierDescription(d,company?.name,company?.shippingAddress,company?.shippingCountry)};
+ const selected={...d,compostability:quoteCompostability(d,company?.shippingAddress,company?.shippingCountry)};
+ return {...selected,customerDesc:specificationDescription(selected,company?.shippingAddress,company?.shippingCountry),supplierDesc:supplierDescription(selected,company?.name,company?.shippingAddress,company?.shippingCountry)};
 }
 export function shippingDetails(d:Draft,company:import('./adapter.ts').Ref|undefined,contact?:import('./adapter.ts').Ref):string {
  if(!company?.shippingAddress?.trim()||!d.weight||!d.cbm)throw new Error('Select a company with a shipping address and enter weight and CBM.');
@@ -65,6 +66,21 @@ export function supplierDescription(d:Draft,companyName='',shippingAddress='',lo
  return [...lines,'','Please include weights and cbm for shipping.'].join('\n');
 }
 
+// Only legacy quotes without a saved choice use the previous classification. New drafts explicitly use Home.
+export function quoteCompostability(d:Draft,address='',locationCountry=''):string {
+ if(d.compostability)return d.compostability;
+ const previous=[d.customerDesc,d.supplierDesc].join(' ');
+ if(/AS 4736|OK compost INDUSTRIAL|ASTM D ?6400|Industrially Compostable|Commercially Compostable/i.test(previous))return 'Industry';
+ if(/AS 5810|OK compost HOME|Home Compostable/i.test(previous))return 'Home';
+ return destination(address,locationCountry)?.country==='United States'||Number(d.microns)>63?'Industry':'Home';
+}
+export function compostabilityWarning(d:Draft,address='',locationCountry=''):string {
+ if(quoteCompostability(d,address,locationCountry)!=='Home')return '';
+ if(destination(address,locationCountry)?.country==='United States')return 'US certification is verified for Industry only. Select Industry to use ASTM D 6400 wording.';
+ if(Number(d.microns)>63)return 'Home certification is verified through 63 microns. This specification has no automatic Home certification wording.';
+ return '';
+}
+
 // Sources: current Product & Packaging Knowledge Core and Claims & Evidence Policy,
 // 13 September 2026 approvals; AU/UK mapping confirmed 10 October 2026,
 // US ASTM D 6400 flexible packaging through 70 microns confirmed 14 October 2026.
@@ -76,9 +92,13 @@ export function certification(d:Draft,address:string,locationCountry=''):string 
  const thickness=Number(d.microns);
  if(!d.microns.trim()||!Number.isFinite(thickness)||thickness<=0||thickness>143)return '';
  const country=destination(address,locationCountry)?.country;
- if(country==='United States')return thickness<=70?'Certified to ASTM D 6400 - Industrially Compostable':'';
- const home=thickness<=63;
+ const choice=quoteCompostability(d,address,locationCountry);
+ if(!['Home','Industry'].includes(choice))return '';
+ const home=choice==='Home';
+ if(country==='United States')return !home&&thickness<=70?'Certified to ASTM D 6400 - Industrially Compostable':'';
+ if(home&&thickness>63)return '';
  if(country==='Australia')return home?'Certified to AS 5810 - Home Compostable':'Certified to AS 4736 - Commercially Compostable';
  if(country==='United Kingdom')return home?'Certified OK compost HOME':'OK compost INDUSTRIAL';
  return '';
 }
+

@@ -26,11 +26,9 @@ test('AU customer wording matches approved multiline example including delivery 
 One colour printing on two sides
 Certified to AS 4736 - Commercially Compostable
 
-DDP Delivery Included: Final delivery cost will be confirmed based on the delivery address and final shipment weight and dimensions.
-
-Includes:
+DDP Delivery Included
 Deliver to: Australia, 3044
-Freight, insurance and all applicable import and customs duties, fees and taxes.`);
+Includes: Door-to-door freight, insurance, customs clearance and all applicable import duties, fees and taxes.`);
 });
 test('UK uses its approved certification and postcode, with no delivery promise when shipping is absent',()=>{
  const d={...demoDraft(),microns:'80'};
@@ -47,7 +45,7 @@ test('US soft packaging through 70 microns uses ASTM D 6400 in both descriptions
  const d={...demoDraft(),packaging:'mail satchel',microns:'70',colour:'Black'};
  assert.deepEqual(destination(address),{country:'United States',postcode:'10001'});
  assert.equal(certification(d,address),'Certified to ASTM D 6400 - Industrially Compostable');
- assert.match(specificationDescription(d,address),/Certified to ASTM D 6400 - Industrially Compostable\n\nDDP Delivery Included:[\s\S]*Deliver to: United States, 10001/);
+ assert.match(specificationDescription(d,address),/Certified to ASTM D 6400 - Industrially Compostable\n\nDDP Delivery Included[\s\S]*Deliver to: United States, 10001/);
  assert.match(supplierDescription(d,'US customer',address),/Customised Certified to ASTM D 6400 - Industrially Compostable/);
  assert.equal(certification({...d,microns:'63'},address),'Certified to ASTM D 6400 - Industrially Compostable');
  assert.equal(certification({...d,microns:'70.1'},address),'');

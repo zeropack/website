@@ -15,14 +15,16 @@ export const C = {
   sellUnit:'numeric_mm807qhm',customerDesc:'long_text_mm80gcmd',supplierDesc:'long_text_mm8045f7',
   pricingVersion:'text_mm80aph1',fxSource:'text_mm80qh91',notes:'long_text_mm806pr6',visibility:'color_mm804dbz',
   qboId:'text_mm80knsp',qboUrl:'link_mm80342x',weight:'numeric_mm80kkse',cbm:'numeric_mm80g7sz',
-  artwork:'text_mm80grd8'
+  artwork:'text_mm80grd8',moreDetails:'long_text_mm8am81s',
+  cartonCount:'numeric_mm8a3m69',cartonHeight:'numeric_mm8a8dx0',cartonWidth:'numeric_mm8aszjn',cartonLength:'numeric_mm8a5r7h',cartonWeight:'numeric_mm8ant1',
+  shippingIncluded:'dropdown_mm8ayw9y',shippingMethod:'dropdown_mm8amsvj',dutiesIncluded:'dropdown_mm8ahaqq'
 } as const;
 export type Field = keyof typeof C;
 export type Draft = Record<Field,string>;
 export const blank = ():Draft => Object.fromEntries(Object.keys(C).map(k=>[k,''])) as Draft;
-export const numbers:Field[]=['microns','quantity','sellQuantity','usdUnit','fx','audUnit','shipping','insurance','transaction','bank','duty','customs','markup','landed','sellUnit','weight','cbm'];
-export const dropdowns:Field[]=['compostability','packaging','style','colour','printing','supplierDropdown'];
+export const numbers:Field[]=['cartonCount','cartonHeight','cartonWidth','cartonLength','cartonWeight','microns','quantity','sellQuantity','usdUnit','fx','audUnit','shipping','insurance','transaction','bank','duty','customs','markup','landed','sellUnit','weight','cbm'];
+export const dropdowns:Field[]=['shippingIncluded','shippingMethod','dutiesIncluded','compostability','packaging','style','colour','printing','supplierDropdown'];
 export const relations:Field[]=['company','contact','deal','project','supplierContact'];
-export const longs:Field[]=['notes','customerDesc','supplierDesc'];
+export const longs:Field[]=['moreDetails','notes','customerDesc','supplierDesc'];
 export const statuses:Field[]=['status','visibility'];
 

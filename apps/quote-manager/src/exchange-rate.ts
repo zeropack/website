@@ -14,7 +14,7 @@ export async function fetchExchangeRate():Promise<ExchangeRate>{
  if(!response.ok)throw new Error('Exchange-rate lookup unavailable.');
  return parseExchangeRate(await response.json());
 }
-export function newQuote(rate?:ExchangeRate):Draft{return {...blank(),status:'Quoting',visibility:'Private',compostability:'Home',bank:'20',duty:'120',customs:'116',fx:rate?.adjusted??'',fxSource:rate?.source??''};}
+export function newQuote(rate?:ExchangeRate):Draft{return {...blank(),status:'Quoting',visibility:'Private',compostability:'Home',shippingIncluded:'Yes',shippingMethod:'DDP',dutiesIncluded:'Yes',bank:'20',duty:'120',customs:'116',fx:rate?.adjusted??'',fxSource:rate?.source??''};}
 export function rateColour(selected:string,rate?:ExchangeRate):string {
  if(!rate||!/^\d+(\.\d+)?$/.test(selected)||new Decimal(selected).lte(0))return '';
  const comparison=new Decimal(rate.base).cmp(selected);return comparison>0?'rate-higher':comparison<0?'rate-lower':'';

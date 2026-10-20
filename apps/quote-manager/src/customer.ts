@@ -1,11 +1,12 @@
 import type {Draft} from './schema.ts';
+import {customerShippingLines,cartonDescription,withShippingDefaults} from './shipping.ts';
 import {isDecimal} from './numeric.ts';
 // Explicit allowlist: never return supplier names, descriptions, costs, FX, notes or markup.
 // Future portal must produce this DTO server-side after authorization, never fetch internal drafts.
 export function customerQuotation(d:Draft) {
  return {reference:d.name,description:d.customerDesc,quantity:d.sellQuantity,unitPriceAUD:d.sellUnit,artwork:d.artwork};
 }
-export const DESCRIPTION_FIELDS: (keyof Draft)[]=['packaging','size','microns','compostability','style','colour','printing','company','shipping','quantity'];
+export const DESCRIPTION_FIELDS: (keyof Draft)[]=['packaging','size','microns','compostability','style','colour','printing','company','shipping','quantity','moreDetails','shippingIncluded','shippingMethod','dutiesIncluded','cartonCount','cartonHeight','cartonWidth','cartonLength','cartonWeight'];
 const capitalise=(s:string)=>s?`${s[0].toUpperCase()}${s.slice(1)}`:'';
 export type Destination={country:'Australia'|'United Kingdom'|'United States';postcode:string};
 export function destination(address:string,locationCountry=''):Destination|undefined {
@@ -29,9 +30,8 @@ export function specificationDescription(d:Draft,shippingAddress='',locationCoun
  const product=['Custom-designed',d.colour,cert?'certified compostable':'',d.packaging].filter(Boolean).join(' ');
  const size=[d.size,d.style].filter(Boolean).join(' and ');
  const lines=[product,size,d.microns?`${d.microns} mic thick`:'',capitalise(d.printing),cert].filter(Boolean);
- if(Number(d.shipping)>0&&dest){
-  lines.push('','DDP Delivery Included: Final delivery cost will be confirmed based on the delivery address and final shipment weight and dimensions.','','Includes:',`Deliver to: ${dest.country}${dest.postcode?`, ${dest.postcode}`:''}`,'Freight, insurance and all applicable import and customs duties, fees and taxes.');
- }
+ if(d.moreDetails.trim())lines.push('',d.moreDetails.trim());
+ const shipping=customerShippingLines(d,dest);if(shipping.length)lines.push('',...shipping);
  return lines.join('\n');
 }
 // Relevant specifications always regenerate both descriptions as one undoable edit.
@@ -40,7 +40,7 @@ export function updateDescriptions(before:Draft,after:Draft,company:import('./ad
  return generatedDescriptions(after,company);
 }
 export function generatedDescriptions(d:Draft,company:import('./adapter.ts').Ref|undefined):Draft {
- const selected={...d,compostability:quoteCompostability(d,company?.shippingAddress,company?.shippingCountry)};
+ const selected={...withShippingDefaults(d),compostability:quoteCompostability(d,company?.shippingAddress,company?.shippingCountry)};
  return {...selected,customerDesc:specificationDescription(selected,company?.shippingAddress,company?.shippingCountry),supplierDesc:supplierDescription(selected,company?.name,company?.shippingAddress,company?.shippingCountry)};
 }
 export function shippingDetails(d:Draft,company:import('./adapter.ts').Ref|undefined,contact?:import('./adapter.ts').Ref):string {
@@ -50,7 +50,7 @@ export function shippingDetails(d:Draft,company:import('./adapter.ts').Ref|undef
  const name=recipient?[recipient.firstName,recipient.lastName].filter(Boolean).join(' ')||recipient.name:'';
  const phone=recipient?.phone||company.companyPhone||'';
  const n=(s:string)=>Number(s).toLocaleString('en-AU',{maximumFractionDigits:8});
- return ['Please ship to:',name,phone,company.name,company.shippingAddress.trim(),`${n(d.weight)}kgs, ${n(d.cbm)}cbm`].filter(Boolean).join('\n');
+ return ['Please ship to:',name,phone,company.name,company.shippingAddress.trim(),`${n(d.weight)}kgs, ${n(d.cbm)}cbm`,cartonDescription(d)].filter(Boolean).join('\n');
 }
 
 export function companyContact(companyId:string,companies:import('./adapter.ts').Ref[],contacts:import('./adapter.ts').Ref[]):string {
@@ -63,6 +63,7 @@ export function supplierDescription(d:Draft,companyName='',shippingAddress='',lo
  const cert=certification(d,shippingAddress,locationCountry);
  const heading=[d.quantity?`${Number(d.quantity).toLocaleString('en-AU')} -`:'','Customised',cert].filter(Boolean).join(' ');
  const lines=['Can you please quote for:',companyName?`Company: ${companyName}`:'',heading,[d.colour,d.packaging].filter(Boolean).join(' '),d.printing,d.size,d.style,d.microns?`${d.microns} mic thick`:''].filter(Boolean);
+ if(d.moreDetails.trim())lines.push('',d.moreDetails.trim());
  return [...lines,'','Please include weights and cbm for shipping.'].join('\n');
 }
 

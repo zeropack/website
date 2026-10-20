@@ -1,14 +1,15 @@
 import { C, QUOTE_BOARD_ID, blank, dropdowns, relations, longs, statuses, numbers, type Draft, type Field } from './schema.ts';
+import {withShippingDefaults,SHIPPING_METHODS} from './shipping.ts';
 import {normalizeDecimal,isDecimal} from './numeric.ts';
 
 export type ColumnValue = { id: string; text: string | null; value: string | null; type: string; linked_item_ids?: string[]; country_short?: string | null; values?: {id: number; label: string}[] };
-export type Item = { id: string; name: string; updated_at: string; column_values: ColumnValue[] };
-export type Quote = {id: string; name: string; values: Draft; updated_at: string};
+export type Item = { id: string; name: string; updated_at: string; created_at?:string; column_values: ColumnValue[] };
+export type Quote = {id: string; name: string; values: Draft; updated_at: string; created_at?:string};
 export type Ref = {id: string; name: string; companyIds?: string[]; contactIds?: string[]; projectIds?: string[]; status?: string; primaryContactIds?:string[]; shippingAddress?:string; shippingCountry?:string; businessAddress?:string; companyPhone?:string; firstName?:string; lastName?:string; email?:string; phone?:string};
 export type Column = {id: string; type: string; settings_str: string};
 export type Transport = (query: string, variables: Record<string, unknown>) => Promise<{data?: unknown; errors?: {message: string}[]}>;
 export const VALUE_FIELDS = 'id text value type ... on BoardRelationValue { linked_item_ids } ... on DropdownValue { values { id label } }';
-export const QUOTE_FIELDS = `id name updated_at column_values { ${VALUE_FIELDS} }`;
+export const QUOTE_FIELDS = `id name created_at updated_at column_values { ${VALUE_FIELDS} }`;
 export const REF_FIELDS = 'id name updated_at column_values(ids:["contact_account","deal_contact","board_relation_mm67vcvr","board_relation_mm6471v8","status","board_relation_mm4nz01g","location_mm4nwpvd","location_mm4na6br","phone_mm5gch4a","text_mm5n6d0w","text_mm4pxvbs","contact_email","contact_phone"]){id text value type ... on BoardRelationValue{linked_item_ids} ... on LocationValue{country_short}}';
 export function decodeRef(i:Item):Ref {
  const col=(id:string)=>i.column_values.find(c=>c.id===id),text=(id:string)=>col(id)?.text??'';
@@ -34,7 +35,7 @@ export function decode(item: Item): Quote {
    draft[key] = labels[0] ?? '';
   } else draft[key] = col.text ?? '';
  }
- return {id: item.id, name: item.name, updated_at: item.updated_at, values: draft};
+ return {id: item.id, name: item.name, updated_at: item.updated_at, created_at:item.created_at, values: withShippingDefaults(draft)};
 }
 export function columnOptions(columns: Column[]): Record<string,string[]> {
  return Object.fromEntries(columns.map(c => {
@@ -58,7 +59,9 @@ export function validateDraft(d: Draft): void {
   const v=d[k].trim();
   if(v && !isDecimal(v)) throw new Error(`${k} must be a finite, non-negative decimal number.`);
  }
- for(const k of ['quantity','sellQuantity'] as Field[]) if(d[k] && !Number.isSafeInteger(Number(d[k]))) throw new Error(`${k} must be a whole number.`);
+ for(const k of ['shippingIncluded','dutiesIncluded'] as const)if(d[k]&&!['Yes','No'].includes(d[k]))throw new Error(`${k} must be Yes or No.`);
+ if(d.shippingMethod&&!SHIPPING_METHODS.includes(d.shippingMethod as typeof SHIPPING_METHODS[number]))throw new Error('Choose DDP, FOB, EXW or Domestic.');
+ for(const k of ['cartonCount','quantity','sellQuantity'] as Field[]) if(d[k] && !Number.isSafeInteger(Number(d[k]))) throw new Error(`${k} must be a whole number.`);
  if(d.fx && Number(d.fx)<=0) throw new Error('Exchange rate must be greater than zero.');
  for(const k of relations) if(d[k] && (!/^\d+$/.test(d[k]) || !Number.isSafeInteger(Number(d[k])))) throw new Error(`${k} must be an existing Monday item ID.`);
 }
@@ -159,3 +162,9 @@ export function createMondayAdapter(transport: Transport, writesEnabled=false) {
  return {fetchColumns,loadQuotes,loadRefs,saveQuote,archiveQuote};
 }
 
+
+// Creation date keeps older quotes from jumping to the top on autosave. Missing dates use updated_at.
+export function newestQuotes(quotes:Quote[]):Quote[] {
+ const timestamp=(q:Quote)=>{const created=Date.parse(q.created_at??'');return Number.isFinite(created)?created:Date.parse(q.updated_at)||0};
+ return [...quotes].sort((a,b)=>timestamp(b)-timestamp(a)||b.id.localeCompare(a.id,undefined,{numeric:true}));
+}

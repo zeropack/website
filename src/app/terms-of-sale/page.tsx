@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LegalMarketNotice } from "@/components/LegalMarketNotice";
 import { buildMarketPageMetadata, getRequestMarket } from "@/lib/requestMarket";
 
-const updated = "17 September 2026";
+const updated = "20 October 2026";
 
 export async function generateMetadata(): Promise<Metadata> {
   const market = await getRequestMarket();
@@ -99,8 +99,12 @@ export default function Page() {
           </section>
 
           <section>
-            <h2 className="font-heading text-xl font-semibold text-charcoal">14. Events outside reasonable control</h2>
-            <p className="mt-3">Zero Pack is not responsible for delay caused by events outside its reasonable control, including major carrier disruption, port closure, customs delay, industrial action, severe weather, natural disaster, government action or material supply interruption. We will communicate material delays where reasonably practicable.</p>
+            <h2 className="font-heading text-xl font-semibold text-charcoal">14. Force Majeure and International Logistics</h2>
+            <p className="mt-3">Zero Pack will use reasonable efforts to meet quoted production and delivery timeframes. However, Zero Pack will not be liable for delay or failure to perform an obligation to the extent that the delay or failure results from circumstances outside its reasonable control.</p>
+            <p className="mt-3">Such circumstances may include natural disasters, severe weather, fire, flood, epidemic or pandemic events, war, civil disturbance, industrial action, government action, changes in law or regulation, customs or biosecurity inspections or holds, port congestion or closure, shipping or aviation disruption, carrier delays, shortages of transport capacity, supplier or manufacturing disruption arising from such events, or other comparable events beyond Zero Pack&apos;s reasonable control.</p>
+            <p className="mt-3">Where freight, duties, tariffs, taxes, customs clearance, port, terminal, biosecurity or other logistics charges are included in an accepted quotation, those amounts are based on the rates and regulatory requirements known at the date of quotation. If a new or increased external charge is imposed after acceptance and is outside Zero Pack&apos;s reasonable control, Zero Pack may pass through the documented incremental cost reasonably attributable to the customer&apos;s order.</p>
+            <p className="mt-3">Zero Pack will notify the customer as soon as reasonably practicable of any material delay or additional cost and will take reasonable steps to minimise its impact.</p>
+            <p className="mt-3">A force majeure event does not relieve the customer of an obligation to pay for goods or services already supplied, manufactured, committed to production or otherwise incurred on the customer&apos;s behalf before the event occurred.</p>
           </section>
 
           <section>

@@ -37,6 +37,6 @@ test('Update and successful Copy show a three-second tick; failed Copy does not'
  await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async()=>{throw new Error('Denied')}}}));const copy=page.getByRole('button',{name:'Copy customer description',exact:true});await copy.click();await expect(page.getByRole('alert')).toContainText('Clipboard access is unavailable');await expect(copy.locator('.action-success')).toHaveCount(0);
 });
 test('new controls preserve responsive layout and footer boundary',async({page},testInfo)=>{
- await demo(page);await page.locator('.carton-fields').scrollIntoViewIfNeeded();await page.screenshot({path:`/workspace/scratch/57e322bb00d5/shipping-${testInfo.project.name}.png`});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ await demo(page);await page.locator('.carton-fields').scrollIntoViewIfNeeded();await page.screenshot({path:testInfo.outputPath(`shipping-${testInfo.project.name}.png`)});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await page.getByLabel('More Details',{exact:true}).scrollIntoViewIfNeeded();await expect(page.getByLabel('More Details',{exact:true})).toBeVisible();await page.locator('footer').scrollIntoViewIfNeeded();const edge=await page.evaluate(()=>{const panel=document.querySelector('.content>.panel')!,footer=document.querySelector('footer')!;return footer.getBoundingClientRect().top-panel.getBoundingClientRect().bottom});expect(edge).toBeLessThanOrEqual(16);
 });

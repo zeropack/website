@@ -2,6 +2,7 @@ import {BOARD,TEMPLATES,COMPANIES,CONTACTS,PROJECTS,C,T,SNAPSHOT,DRAFT_BODY,WRIT
 import {blockReason,decide,editDraft,generate,merge,stale,today,uniqueTemplate} from './model.ts';
 import type {Profile,Template,Project,Snapshot,Contact} from './model.ts';
 import {encodeSnapshot,decodeSnapshot} from './codec.ts';
+import {QA_ID,qaProfile} from './qa.ts';
 type CV={id:string;text?:string|null;value?:string|null;linked_item_ids?:string[]};
 type Item={id:string;name:string;updated_at:string;board?:{id:string};column_values:CV[]};
 type Result={data?:any;errors?:{message:string}[];error_message?:string};
@@ -25,13 +26,13 @@ export function createAdapter(transport:Transport){
    if(d.items.length!==new Set(list.slice(i,i+100)).size||d.items.some((x:Item)=>x.board?.id!==expectedBoard))throw new Error('A canonical linked record is inaccessible or points to the wrong board.');result.push(...d.items);}
   return result;
  }
- async function load(){
-  const [rows,tr,pr,me]=await Promise.all([board(BOARD,{[SNAPSHOT]:'text',[DRAFT_BODY]:'long_text',[C.draftState]:'status',[C.active]:'status',[C.review]:'status',[C.company]:'board_relation'}),board(TEMPLATES,{[T.key]:'text',[T.body]:'long_text',[T.component]:'status'}),board(PROJECTS,{project_status:'status',project_timeline:'timeline'}),api('query{me{id name}}')]);
+ async function load(qaMode=false){
+  const [rows,tr,pr,me]=await Promise.all([board(BOARD,{[SNAPSHOT]:'text',[DRAFT_BODY]:'long_text',[C.draftState]:'status',[C.active]:'status',[C.review]:'status',[C.company]:'board_relation'}),board(TEMPLATES,{[T.key]:'text',[T.body]:'long_text',[T.component]:'status'}),board(PROJECTS,{project_status:'status',project_timeline:'timeline'}),api('query{me{id name email}}')]);
   const companyIds=ids(rows.flatMap(r=>links(r,C.company))),companies=await itemBatch(companyIds,COMPANIES);
   const contactIds=ids(companies.flatMap(r=>links(r,'board_relation_mm4nz01g'))),contacts=await itemBatch(contactIds,CONTACTS);
   const projects:Project[]=pr.map(r=>({id:r.id,name:r.name,status:text(r,'project_status'),end:text(r,'project_timeline').match(/\d{4}-\d{2}-\d{2}/g)?.at(-1)||'',companyIds:links(r,'board_relation_mm6471v8')})).sort((a,b)=>a.id.localeCompare(b.id));
   const templates:Template[]=tr.map(r=>({id:r.id,name:r.name,key:text(r,T.key),subject:text(r,T.subject),body:text(r,T.body),footer:text(r,T.footer),active:text(r,T.active)==='Yes',version:text(r,T.version),process:text(r,T.process),component:text(r,T.component)}));
-  const profiles:Profile[]=rows.filter(r=>text(r,C.kind)!=='QA').map(r=>{
+  const profiles:Profile[]=rows.filter(r=>qaMode?r.id===QA_ID&&text(r,C.kind)==='QA':text(r,C.kind)!=='QA').map(r=>{
    const companyList=links(r,C.company),companyId=companyList.length===1?companyList[0]:'',company=companies.find(x=>x.id===companyId),primary=company?links(company,'board_relation_mm4nz01g'):[],contact=primary.length===1?contacts.find(x=>x.id===primary[0]):null;
    const email=contact?text(contact,'contact_email'):'',contactCompanies=contact?links(contact,'contact_account'):[];
    const contactIssue=primary.length!==1?(primary.length?'Multiple Primary Contacts are selected.':'No current Primary Contact is selected.'):!email||!/^\S+@\S+\.\S+$/.test(email)?'Current Primary Contact has no valid email.':contactCompanies.length&&!contactCompanies.includes(companyId)?'Primary Contact Company relation conflicts with this Company.':'';
@@ -40,7 +41,7 @@ export function createAdapter(transport:Transport){
    return {id:r.id,name:r.name,updatedAt:r.updated_at,companyId,companyName:company?.name||r.name,kind:text(r,C.kind),product:text(r,C.product),key:text(r,C.key),last:text(r,C.last),quantity:text(r,C.quantity),typical:Number(text(r,C.typical))||0,confidence:text(r,C.confidence),active:text(r,C.active)==='Yes',review:text(r,C.review),snooze:text(r,C.snooze),issues:text(r,C.issues),evidence:text(r,C.evidence),cycle:text(r,C.cycle),projectIds,previousIds,contact:resolved,contactIssue,projects:projects.filter(x=>x.companyIds.includes(companyId)||projectIds.includes(x.id)||previousIds.includes(x.id)),snapshot:decodeSnapshot(text(r,SNAPSHOT)),draftState:text(r,C.draftState)};
   });
   if(!me.me?.id)throw new Error('Current staff identity unavailable.');
-  return {profiles,templates,actor:String(me.me.id)};
+  return {profiles:qaMode?profiles.map(p=>qaProfile(p,me.me)):profiles,templates,actor:String(me.me.id)};
  }
  async function write(id:string,expectedUpdatedAt:string,values:Record<string,unknown>){
   if(Object.keys(values).some(x=>!WRITABLE.has(x)))throw new Error('Write outside Phase 2 allowlist.');
@@ -49,8 +50,8 @@ export function createAdapter(transport:Transport){
   const verified=(await itemBatch([id],BOARD))[0];
   for(const [key,value]of Object.entries(values)){const expected=typeof value==='string'?value:(value as any)?.text??(value as any)?.label??(value as any)?.date??'';if(text(verified,key)!==expected)throw new Error('Write readback differs. Refresh; do not repeat an approval blindly.');}
  }
- async function save(id:string,updatedAt:string,action:'Generate'|'Edit'|'Approve'|'Snooze'|'Skip'|'Pause',draft:Snapshot|null,options:{subject?:string;body?:string;date?:string}={}){
-  const data=await load(),p=data.profiles.find(x=>x.id===id);if(!p||p.updatedAt!==updatedAt)throw new Error('Profile changed. Refresh first.');
+ async function save(id:string,updatedAt:string,action:'Generate'|'Edit'|'Approve'|'Snooze'|'Skip'|'Pause',draft:Snapshot|null,options:{subject?:string;body?:string;date?:string;qaMode?:boolean}={}){
+  const data=await load(options.qaMode),p=data.profiles.find(x=>x.id===id);if(!p||p.updatedAt!==updatedAt)throw new Error('Profile changed. Refresh first.');
   let next=draft,state='Draft',review=p.review,active=p.active,snooze=p.snooze;
   if(action==='Generate'){if(p.review==='Approved'&&!await stale(p,data.templates))throw new Error('Use Edit to invalidate an approved preview before regenerating.');next=await generate(p,data.templates);review='Ready for Review';}
   else if(action==='Edit'||action==='Approve'){
@@ -62,7 +63,13 @@ export function createAdapter(transport:Transport){
   const serialized=next?encodeSnapshot(next):'';
   if(action==='Approve'&&p.review==='Approved')throw new Error('This draft is already approved; no duplicate approval was written.');
   const values:Record<string,unknown>={[SNAPSHOT]:serialized,[DRAFT_BODY]:next?{text:next.body}:null,[C.draftState]:{label:state},[C.review]:{label:review},[C.active]:{label:active?'Yes':'No'},[C.snooze]:snooze?{date:snooze}:null};
-  await write(id,updatedAt,values);return load();
+  await write(id,updatedAt,values);return load(options.qaMode);
  }
- return {load,save};
+ async function prepareQa(enabled:boolean){
+  const data=await load(true),p=data.profiles.find(x=>x.id===QA_ID);
+  if(!p)throw new Error('Excluded QA fixture is unavailable.');
+  await write(QA_ID,p.updatedAt,{[SNAPSHOT]:'',[DRAFT_BODY]:null,[C.draftState]:{label:'Empty'},[C.review]:{label:enabled?'Ready for Review':'Not Ready'},[C.active]:{label:enabled?'Yes':'No'},[C.snooze]:null});
+  return load(true);
+ }
+ return {load,save,prepareQa};
 }

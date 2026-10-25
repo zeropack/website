@@ -12,23 +12,24 @@ const adapter=createAdapter(async(query,variables)=>await monday.api(query,{vari
 const moneylessQty=(x:string)=>x?Number(x).toLocaleString('en-AU'):'Not recorded';
 const iframeHTML=(content:string)=>'<!doctype html><html><head><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'; base-uri \'none\'; form-action \'none\'"><style>body{font:15px/1.7 Arial,sans-serif;color:#263e3f;padding:20px;margin:0}p{margin:0 0 20px}hr{border:0;border-top:1px solid #e5ebea;margin:26px 0}a{color:#175a63}strong{font-weight:600}</style></head><body>'+content+'</body></html>';
 function App(){
+ const [qaMode,setQaMode]=useState(false);
  const [profiles,setProfiles]=useState<Profile[]>([]),[templates,setTemplates]=useState<Template[]>([]),[id,setId]=useState(''),[tab,setTab]=useState('Ready'),[search,setSearch]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[message,setMessage]=useState(''),[editing,setEditing]=useState(false),[subject,setSubject]=useState(''),[body,setBody]=useState(''),[snooze,setSnooze]=useState(addDays(today(),30)),[needsRefresh,setNeedsRefresh]=useState(false);
  const p=profiles.find(x=>x.id===id),draft=p?.snapshot||null;
  async function refresh(initial=false){
   try{if(initial)setBusy(true);setError('');
    if(live){if(initial){const ctx=await Promise.race([monday.get('context'),new Promise<never>((_,reject)=>setTimeout(()=>reject(new Error('Open the installed Reorder Review view in Monday.')),8000))]);if(String((ctx.data as {boardId?:number})?.boardId)!==BOARD)throw new Error('Open Reorder Review on Customer Reorder Profiles.');}
-    const data=await adapter.load();setProfiles(data.profiles);setTemplates(data.templates);if(initial)setId(data.profiles[0]?.id||'');
+    const data=await adapter.load(qaMode);setProfiles(data.profiles);setTemplates(data.templates);if(initial)setId(data.profiles[0]?.id||'');
    }else if(initial){setProfiles(structuredClone(demoProfiles));setTemplates(structuredClone(examples));setId(demoProfiles[0].id);}
   }catch(e){setError((e as Error).message);}finally{if(initial)setBusy(false);}
  }
- useEffect(()=>{void refresh(true);},[]);
+ useEffect(()=>{void refresh(true);},[qaMode]);
  useEffect(()=>{let active=true;if(!p){setNeedsRefresh(false);return;}stale(p,templates).then(v=>{if(active)setNeedsRefresh(v)}).catch(()=>{if(active)setNeedsRefresh(true)});return()=>{active=false};},[p,templates]);
- useEffect(()=>{const handler=()=>{if(!editing&&live)void refresh();};window.addEventListener('focus',handler);const timer=setInterval(handler,30000);return()=>{clearInterval(timer);window.removeEventListener('focus',handler)};},[editing]);
+ useEffect(()=>{const handler=()=>{if(!editing&&live)void refresh();};window.addEventListener('focus',handler);const timer=setInterval(handler,30000);return()=>{clearInterval(timer);window.removeEventListener('focus',handler)};},[editing,qaMode]);
  function select(next:string){if(editing&&!confirm('Discard unsaved edits?'))return;setId(next);setEditing(false);setError('');setMessage('');}
  async function action(kind:'Generate'|'Edit'|'Approve'|'Snooze'|'Skip'|'Pause'){
   if(!p||busy)return;setBusy(true);setError('');setMessage('');
   try{
-   if(live){const data=await adapter.save(p.id,p.updatedAt,kind,draft,{subject,body,date:snooze});setProfiles(data.profiles);setTemplates(data.templates);}
+   if(live){const data=await adapter.save(p.id,p.updatedAt,kind,draft,{subject,body,date:snooze,qaMode});setProfiles(data.profiles);setTemplates(data.templates);}
    else{
     let next=draft,review=p.review,active=p.active,snoozeUntil=p.snooze,state=p.draftState;
     if(kind==='Generate'){next=await generate(p,templates);state='Draft';review='Ready for Review';}
@@ -39,12 +40,16 @@ function App(){
    setEditing(false);setMessage(kind==='Approve'?'Approved for Phase 3. No email was sent.':kind==='Generate'?'Preview saved.':kind==='Edit'?'Your draft changes are saved.':kind==='Pause'?'Paused until manually reactivated.':kind==='Skip'?'Current cycle skipped. The profile remains active.':'Snooze saved.');
   }catch(e){setError((e as Error).message);}finally{setBusy(false);}
  }
+ async function prepareQa(enabled:boolean){
+  if(busy)return;setBusy(true);setError('');
+  try{const data=await adapter.prepareQa(enabled);setProfiles(data.profiles);setTemplates(data.templates);setId(data.profiles[0]?.id||'');setEditing(false);setMessage(enabled?'Excluded internal QA cycle started. No email can be sent.':'QA fixture reset and disabled.');}catch(e){setError((e as Error).message);}finally{setBusy(false);}
+ }
  const filtered=profiles.filter(x=>x.companyName.toLowerCase().includes(search.toLowerCase())&&(tab==='All'||tab==='Ready'&&!blockReason(x)&&x.review!=='Approved'||tab==='Approved'&&x.review==='Approved'||tab==='Held'&&Boolean(blockReason(x))));
  const reason=p?blockReason(p):'',time=p?timing(p):null,canGenerate=p&&!reason&&(p.review!=='Approved'||needsRefresh),canApprove=draft&&!reason&&!needsRefresh&&!editing&&p?.review!=='Approved';
- return <div className="app"><header><div className="brand">ZERO <b>PACK</b><span>REORDER REVIEW</span></div><div className="header-right"><span className="mode">{live?'MONDAY WORKSPACE':'SYNTHETIC DEMO'}</span><button onClick={()=>void refresh(true)} disabled={busy||editing}>Refresh</button></div></header>
+ return <div className="app"><header><div className="brand">ZERO <b>PACK</b><span>REORDER REVIEW</span></div><div className="header-right"><button disabled={busy||editing||!live} onClick={()=>{setQaMode(!qaMode);setMessage('');setEditing(false)}}>{qaMode?'Customer profiles':'Internal QA'}</button><span className="mode">{live?'MONDAY WORKSPACE':'SYNTHETIC DEMO'}</span><button onClick={()=>void refresh(true)} disabled={busy||editing}>Refresh</button></div></header>
  <div className="notice"><span className="dot"/>Preview and approval only. Emails are never sent from this interface.{!live&&<span> Demo decisions reset when this page reloads.</span>}</div>
  <main><aside><h1>Reorder reviews</h1><p className="muted">Review current customer and product details.</p><label className="sr-only" htmlFor="search">Search company</label><input id="search" placeholder="Search company…" value={search} onChange={e=>setSearch(e.target.value)}/><nav aria-label="Review filters">{['Ready','All','Approved','Held'].map(x=><button className={x===tab?'selected':''} key={x} onClick={()=>setTab(x)}>{x}</button>)}</nav><div className="record-list">{filtered.map(x=><button key={x.id} className={'record '+(id===x.id?'current':'')} onClick={()=>select(x.id)}><span>{x.companyName}</span><small>{timing(x).status} <i>·</i> {x.confidence} confidence</small><em>{x.product}</em></button>)}{!filtered.length&&<div className="empty-list">No {tab.toLowerCase()} reviews.<p>Use All to inspect profiles and their current controls.</p></div>}</div><a className="board-link" href={'https://zeropack.monday.com/boards/'+BOARD} target="_blank" rel="noreferrer">Open Reorder Management ↗</a></aside>
- <section className="workspace">{error&&<div className="alert error" role="alert">{error}</div>}{message&&<div className="alert success" role="status">✓ {message}</div>}{busy&&!p&&<p role="status">Loading the current CRM records…</p>}{p?<>
+ <section className="workspace">{qaMode&&<div className="alert held"><strong>EXCLUDED INTERNAL QA — no customer data or email transmission.</strong><p>The synthetic preview uses your current staff email and test packaging; it is separate from canonical customer resolution.</p><button disabled={busy||editing} onClick={()=>void prepareQa(true)}>Start QA cycle</button> <button disabled={busy||editing} onClick={()=>void prepareQa(false)}>Reset and disable QA</button></div>}{error&&<div className="alert error" role="alert">{error}</div>}{message&&<div className="alert success" role="status">✓ {message}</div>}{busy&&!p&&<p role="status">Loading the current CRM records…</p>}{p?<>
  <div className="title-row"><div><span className="eyebrow">CUSTOMER & PRODUCT</span><h2>{p.companyName}</h2></div><span className={'pill '+(needsRefresh?'warning':'')}>{needsRefresh?'Needs Refresh':p.snapshot?.decision||p.review}</span></div>
  <div className="context"><div><span>Primary Contact</span><strong>{p.contact?.name||'Needs review'}</strong><a href={p.contact?'mailto:'+p.contact.email:undefined}>{p.contact?.email||p.contactIssue||'No current primary contact'}</a></div><div className="product"><span>Product / Packaging</span><strong>{p.product||'Product specification needs review'}</strong></div></div>
  <div className="metrics">{[['Last quantity',moneylessQty(p.quantity)],['Last fulfilled',p.last||'Awaiting completion'],['Typical interval',p.typical?p.typical+' days':'Not established'],['Next review',time?.expected||'Not started'],['Reorder status',time?.status||'Not Ready'],['Confidence',p.confidence]].map(([label,value])=><div key={label}><span>{label}</span><strong>{value}</strong></div>)}</div>

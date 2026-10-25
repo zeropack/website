@@ -44,3 +44,14 @@ Optimistic `updated_at` checks before mutation and exact readback protect staff 
 The Monday app feature registration, upload and installed-context SDK acceptance are pending. Local browser QA and native connector snapshot storage tests are not proof of installed-app success. Do not report Phase 2 fully live before that gate.
 
 Phase 3 proposal only: a human-triggered send handler must re-resolve current recipient, compare exact approved fingerprint/snapshot, check newer orders/projects, reminder/snooze/skip/pause and contact eligibility/suppression, enforce idempotency and log provider message ID/result. No Phase 3 code or sending is included here.
+
+## 26 October — installed mutation QA preparation
+
+Phase 2 v1 is installed on Customer Reorder Profiles, view `57940141`.
+This change adds an explicit Internal QA mode, separate from customer lists. It accepts only the existing fixture `2889840324`, still labelled QA and unlinked to Company/Project records. QA previews use synthetic packaging/dates and the current signed-in staff email, restricted to `zeropack.co`. This is visibly disclosed and does not replace canonical customer contact resolution. Start/reset actions write only the six existing review-state fields on that fixture. Reset clears the draft and approval, turns Reminder Active off and restores Not Ready. Customer mode continues to exclude QA. There is no email/enrollment code.
+
+Validation: 45 unit/adapter/codec tests pass, including the complete QA prepare/generate/edit/approve/readback/snooze/skip/pause/reset lifecycle and refusal of other fixture IDs, linked customers/projects and external staff emails. TypeScript and Monday build pass. Local browser test launch is unavailable (default Chromium missing; historical binary not executable), so the six browser tests have not been rerun successfully for this change.
+
+Release: draft Monday v2 `19273688`, feature `127293484`, created but updated ZIP upload was rejected by automatic approval review. V1 remains live. No installed mutation was performed. Direct chat authorization is required to upload/promote this specific non-sending build and test only the excluded fixture; no new scopes are needed.
+
+Phase 3 remains gated. The inspected public Sequence type exposes metadata only; it has no live email content/recipient-column or per-recipient suppression/eligibility fields. Enrollment exists from API 2026-04, but metadata visibility is not proof of email eligibility or content parity. Do not implement or enable enrollment by assuming those checks pass. Investigate a supported native validation mechanism before any internal Send test. Edited instance text also needs an explicit native Sequence binding before the approved preview can be treated as operational sending content. No custom sender, signature or unsubscribe mechanism was created.

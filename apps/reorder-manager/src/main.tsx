@@ -1,0 +1,60 @@
+import React,{useEffect,useState} from 'react';
+import {createRoot} from 'react-dom/client';
+import mondaySdk from 'monday-sdk-js';
+import {createAdapter} from './adapter.ts';
+import {BOARD,TEMPLATES} from './schema.ts';
+import {addDays,blockReason,chooseKey,decide,editDraft,generate,stale,timing,today,uniqueTemplate} from './model.ts';
+import type {Profile,Snapshot,Template} from './model.ts';
+import {demoProfiles,templates as examples} from './mock.ts';
+import './style.css';
+const live=import.meta.env.VITE_APP_MODE==='monday',monday=mondaySdk();
+const adapter=createAdapter(async(query,variables)=>await monday.api(query,{variables,apiVersion:'2026-07'}));
+const moneylessQty=(x:string)=>x?Number(x).toLocaleString('en-AU'):'Not recorded';
+const iframeHTML=(content:string)=>'<!doctype html><html><head><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'; base-uri \'none\'; form-action \'none\'"><style>body{font:15px/1.7 Arial,sans-serif;color:#263e3f;padding:20px;margin:0}p{margin:0 0 20px}hr{border:0;border-top:1px solid #e5ebea;margin:26px 0}a{color:#175a63}strong{font-weight:600}</style></head><body>'+content+'</body></html>';
+function App(){
+ const [profiles,setProfiles]=useState<Profile[]>([]),[templates,setTemplates]=useState<Template[]>([]),[id,setId]=useState(''),[tab,setTab]=useState('Ready'),[search,setSearch]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[message,setMessage]=useState(''),[editing,setEditing]=useState(false),[subject,setSubject]=useState(''),[body,setBody]=useState(''),[snooze,setSnooze]=useState(addDays(today(),30)),[needsRefresh,setNeedsRefresh]=useState(false);
+ const p=profiles.find(x=>x.id===id),draft=p?.snapshot||null;
+ async function refresh(initial=false){
+  try{if(initial)setBusy(true);setError('');
+   if(live){if(initial){const ctx=await Promise.race([monday.get('context'),new Promise<never>((_,reject)=>setTimeout(()=>reject(new Error('Open the installed Reorder Review view in Monday.')),8000))]);if(String((ctx.data as {boardId?:number})?.boardId)!==BOARD)throw new Error('Open Reorder Review on Customer Reorder Profiles.');}
+    const data=await adapter.load();setProfiles(data.profiles);setTemplates(data.templates);if(initial)setId(data.profiles[0]?.id||'');
+   }else if(initial){setProfiles(structuredClone(demoProfiles));setTemplates(structuredClone(examples));setId(demoProfiles[0].id);}
+  }catch(e){setError((e as Error).message);}finally{if(initial)setBusy(false);}
+ }
+ useEffect(()=>{void refresh(true);},[]);
+ useEffect(()=>{let active=true;if(!p){setNeedsRefresh(false);return;}stale(p,templates).then(v=>{if(active)setNeedsRefresh(v)}).catch(()=>{if(active)setNeedsRefresh(true)});return()=>{active=false};},[p,templates]);
+ useEffect(()=>{const handler=()=>{if(!editing&&live)void refresh();};window.addEventListener('focus',handler);const timer=setInterval(handler,30000);return()=>{clearInterval(timer);window.removeEventListener('focus',handler)};},[editing]);
+ function select(next:string){if(editing&&!confirm('Discard unsaved edits?'))return;setId(next);setEditing(false);setError('');setMessage('');}
+ async function action(kind:'Generate'|'Edit'|'Approve'|'Snooze'|'Skip'|'Pause'){
+  if(!p||busy)return;setBusy(true);setError('');setMessage('');
+  try{
+   if(live){const data=await adapter.save(p.id,p.updatedAt,kind,draft,{subject,body,date:snooze});setProfiles(data.profiles);setTemplates(data.templates);}
+   else{
+    let next=draft,review=p.review,active=p.active,snoozeUntil=p.snooze,state=p.draftState;
+    if(kind==='Generate'){next=await generate(p,templates);state='Draft';review='Ready for Review';}
+    else if(kind==='Edit'){if(!draft||await stale(p,templates))throw new Error('Needs Refresh: regenerate the preview.');const f=uniqueTemplate(templates,draft.footerKey,'Signature');next=editDraft(draft,subject,body,f.body);state='Edited';review='Ready for Review';}
+    else{if(kind==='Approve'&&await stale(p,templates))throw new Error('Needs Refresh: regenerate first.');const r=decide(p,kind,draft,'demo-reviewer',snooze);next=r.draft;state=r.state;review=r.review;active=r.active;snoozeUntil=r.snooze;}
+    setProfiles(all=>all.map(x=>x.id===p.id?{...x,snapshot:next,review,active,snooze:snoozeUntil,draftState:state,updatedAt:new Date().toISOString()}:x));
+   }
+   setEditing(false);setMessage(kind==='Approve'?'Approved for Phase 3. No email was sent.':kind==='Generate'?'Preview saved.':kind==='Edit'?'Your draft changes are saved.':kind==='Pause'?'Paused until manually reactivated.':kind==='Skip'?'Current cycle skipped. The profile remains active.':'Snooze saved.');
+  }catch(e){setError((e as Error).message);}finally{setBusy(false);}
+ }
+ const filtered=profiles.filter(x=>x.companyName.toLowerCase().includes(search.toLowerCase())&&(tab==='All'||tab==='Ready'&&!blockReason(x)&&x.review!=='Approved'||tab==='Approved'&&x.review==='Approved'||tab==='Held'&&Boolean(blockReason(x))));
+ const reason=p?blockReason(p):'',time=p?timing(p):null,canGenerate=p&&!reason&&(p.review!=='Approved'||needsRefresh),canApprove=draft&&!reason&&!needsRefresh&&!editing&&p?.review!=='Approved';
+ return <div className="app"><header><div className="brand">ZERO <b>PACK</b><span>REORDER REVIEW</span></div><div className="header-right"><span className="mode">{live?'MONDAY WORKSPACE':'SYNTHETIC DEMO'}</span><button onClick={()=>void refresh(true)} disabled={busy||editing}>Refresh</button></div></header>
+ <div className="notice"><span className="dot"/>Preview and approval only. Emails are never sent from this interface.{!live&&<span> Demo decisions reset when this page reloads.</span>}</div>
+ <main><aside><h1>Reorder reviews</h1><p className="muted">Review current customer and product details.</p><label className="sr-only" htmlFor="search">Search company</label><input id="search" placeholder="Search company…" value={search} onChange={e=>setSearch(e.target.value)}/><nav aria-label="Review filters">{['Ready','All','Approved','Held'].map(x=><button className={x===tab?'selected':''} key={x} onClick={()=>setTab(x)}>{x}</button>)}</nav><div className="record-list">{filtered.map(x=><button key={x.id} className={'record '+(id===x.id?'current':'')} onClick={()=>select(x.id)}><span>{x.companyName}</span><small>{timing(x).status} <i>·</i> {x.confidence} confidence</small><em>{x.product}</em></button>)}{!filtered.length&&<div className="empty-list">No {tab.toLowerCase()} reviews.<p>Use All to inspect profiles and their current controls.</p></div>}</div><a className="board-link" href={'https://zeropack.monday.com/boards/'+BOARD} target="_blank" rel="noreferrer">Open Reorder Management ↗</a></aside>
+ <section className="workspace">{error&&<div className="alert error" role="alert">{error}</div>}{message&&<div className="alert success" role="status">✓ {message}</div>}{busy&&!p&&<p role="status">Loading the current CRM records…</p>}{p?<>
+ <div className="title-row"><div><span className="eyebrow">CUSTOMER & PRODUCT</span><h2>{p.companyName}</h2></div><span className={'pill '+(needsRefresh?'warning':'')}>{needsRefresh?'Needs Refresh':p.snapshot?.decision||p.review}</span></div>
+ <div className="context"><div><span>Primary Contact</span><strong>{p.contact?.name||'Needs review'}</strong><a href={p.contact?'mailto:'+p.contact.email:undefined}>{p.contact?.email||p.contactIssue||'No current primary contact'}</a></div><div className="product"><span>Product / Packaging</span><strong>{p.product||'Product specification needs review'}</strong></div></div>
+ <div className="metrics">{[['Last quantity',moneylessQty(p.quantity)],['Last fulfilled',p.last||'Awaiting completion'],['Typical interval',p.typical?p.typical+' days':'Not established'],['Next review',time?.expected||'Not started'],['Reorder status',time?.status||'Not Ready'],['Confidence',p.confidence]].map(([label,value])=><div key={label}><span>{label}</span><strong>{value}</strong></div>)}</div>
+ <details className="source"><summary>Source context <span>{time?.cap?'18-month stock-check cap':'Normal reorder cadence'}</span></summary><p>{p.projectIds.length?'Last Project: '+p.projects.filter(x=>p.projectIds.includes(x.id)).map(x=>x.name+' · '+x.status).join(', '):'Last Project: historical/manual evidence'}</p>{!!p.previousIds.length&&<p>Previous Project: {p.projects.filter(x=>p.previousIds.includes(x.id)).map(x=>x.name).join(', ')}</p>}<p>{p.issues||p.evidence||'No further source notes.'}</p></details>
+ {reason&&<div className="alert held">{reason}</div>}{needsRefresh&&<div className="alert error">This preview no longer matches the current source data. Generate a fresh preview before approval.</div>}
+ <section className="email-card"><div className="email-top"><h3>Email preview</h3><span>{draft?draft.templateKey+' · '+draft.templateVersion:'No preview generated'}</span><button disabled={busy||!canGenerate||editing} onClick={()=>void action('Generate')}>{draft?'Refresh preview':'Generate preview'}</button></div>
+ {draft?<><div className="mail-meta"><span>To</span><strong>{draft.recipient.name} &lt;{draft.recipient.email}&gt;</strong><span>Subject</span><strong>{draft.subject}</strong></div>{editing?<div className="editor"><label>Subject<input aria-label="Subject" value={subject} onChange={e=>setSubject(e.target.value)} maxLength={250}/></label><label>Email body<textarea aria-label="Email body" value={body} onChange={e=>setBody(e.target.value)} maxLength={2000}/></label><small>Paragraphs, **bold** and [links](https://…) are supported. The shared signature is appended automatically.</small><div><button onClick={()=>setEditing(false)}>Cancel edit</button><button className="primary" disabled={busy} onClick={()=>void action('Edit')}>Save draft changes</button></div></div>:<iframe title="Rendered customer email" sandbox="" srcDoc={iframeHTML(draft.html)}/>}<div className="draft-info">{draft.approvedAt?'Approved '+new Date(draft.approvedAt).toLocaleString('en-AU')+' · No email sent':(draft.edited?'Edited draft':'Generated draft')+' · '+new Date(draft.generatedAt).toLocaleString('en-AU')}</div></>:<div className="preview-empty"><div>✉</div><h3>A personal email, ready for your review</h3><p>{reason?'Resolve the hold above before generating a preview.':'Generate a preview to merge the current customer and packaging details.'}</p></div>}
+ </section>
+ <div className="actions"><div><button disabled={busy||!draft||needsRefresh||!!reason||editing} onClick={()=>{if(!draft)return;setSubject(draft.subject);setBody(draft.body);setEditing(true)}}>Edit</button><details className="snooze"><summary>Snooze</summary><label>Until<input aria-label="Snooze Until" type="date" value={snooze} min={addDays(today(),1)} onChange={e=>setSnooze(e.target.value)}/></label><div>{[30,60,90].map(n=><button key={n} onClick={()=>setSnooze(addDays(today(),n))}>{n} days</button>)}</div><button disabled={busy||editing||!p.active} onClick={()=>void action('Snooze')}>Apply snooze</button></details><button disabled={busy||editing||!p.active} onClick={()=>void action('Skip')}>Skip cycle</button><button className="pause" disabled={busy||editing||!p.active} onClick={()=>void action('Pause')}>Pause</button></div><button className="primary approve" disabled={busy||!canApprove} onClick={()=>void action('Approve')}>Approve for Phase 3 ✓</button></div>
+ <details className="template-details"><summary>Template configuration</summary><p>Customer-specific edits change only this draft. Shared copy is managed on the <a target="_blank" rel="noreferrer" href={'https://zeropack.monday.com/boards/'+TEMPLATES}>Email Automation Templates board ↗</a>.</p><p>Selected: {p.snapshot?.templateKey||chooseKey(p)||'None while held'}. Approval never transmits an email.</p></details>
+ </>:!busy&&<div className="blank"><h2>Select a reorder profile</h2><p>Current recipient and product details will appear here.</p></div>}</section></main><footer><span>ZERO PACK · CUSTOMER RELATIONSHIPS</span><span>Phase 2 · Human decisions. No email transmission.</span></footer></div>;
+}
+createRoot(document.getElementById('root')!).render(<App/>);

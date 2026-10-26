@@ -38,7 +38,7 @@ export async function sendOnce(s:Storage,id:string,expected:string,load:()=>Prom
  try{await cas(s,lock.ledger,lock.version);}catch{throw new Error('Send status requires review. Durable initial lock remains; do not retry.');}
  await log(lock.receipt);return lock.receipt;
 }
-export function nativePreview(p:Profile,templates:Template[]){const c=p.controlled!;const t=templates.find(x=>x.key==='reorder.stock_check');if(!t||t.body!==c.templateBody||t.subject!==c.templateSubject)throw new Error('Backup template changed since native content verification.');const values={first_name:p.contact!.firstName||'there',company_name:p.companyName,product_name:p.product,last_quantity:p.quantity,last_fulfilment_date:p.last,expected_reorder_date:''};return {subject:merge(c.templateSubject,values),body:merge(c.templateBody,values)+'\n\n'+c.nativeSignoff};}
+export function nativePreview(p:Profile,templates:Template[]){const c=p.controlled!;const t=templates.find(x=>x.key==='reorder.stock_check');if(!t||t.body!==c.templateBody||t.subject!==c.templateSubject)throw new Error('Backup template changed since native content verification.');if(!p.emailProduct.trim())throw new Error('Customer-facing product name required.');const values={first_name:p.contact!.firstName||'there',company_name:p.companyName,product_name:p.emailProduct.trim(),last_quantity:p.quantity,last_fulfilment_date:p.last,expected_reorder_date:''};return {subject:merge(c.templateSubject,values),body:merge(c.templateBody,values)+'\n\n'+c.nativeSignoff};}
 
 // Provisioning exists only in a bootstrap build which cannot enroll. The final
 // sending build has no initialization/reset path, so an old initializer cannot

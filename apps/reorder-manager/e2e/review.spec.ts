@@ -2,9 +2,10 @@ import {test,expect} from '@playwright/test';
 test('Rendered preview, customer edit and approval stop without sending',async({page})=>{
  const requests:string[]=[];page.on('request',r=>requests.push(r.url()));await page.goto('/');
  await expect(page.getByRole('heading',{name:'Harbour Supply',exact:true})).toBeVisible();
+ await expect(page.locator('.context')).toContainText('Email product');await expect(page.locator('.context')).toContainText('compostable mailers');await expect(page.locator('.context')).toContainText('Product / Packaging');await expect(page.locator('.context')).toContainText('150 × 220mm and 230 × 320mm');
  await page.getByRole('button',{name:'Generate preview',exact:true}).click();
  const email=page.frameLocator('iframe[title="Rendered customer email"]');
- await expect(email.locator('body')).toContainText('Hi Alex');await expect(email.locator('body')).toContainText('150 × 220mm and 230 × 320mm');await expect(email.locator('body')).toContainText('Patrick Kilbane');
+ await expect(email.locator('body')).toContainText('Hi Alex');await expect(email.locator('body')).toContainText('compostable mailers');await expect(email.locator('body')).not.toContainText('150 × 220mm and 230 × 320mm');await expect(email.locator('body')).toContainText('Patrick Kilbane');
  await page.screenshot({path:test.info().outputPath('reorder-review.png'),fullPage:true});
  await page.getByRole('button',{name:'Edit',exact:true}).click();await page.getByLabel('Subject',{exact:true}).fill('A personal stock check');await page.getByLabel('Email body',{exact:true}).fill('Hi Alex,\n\nA customer-specific adjustment.');await page.getByRole('button',{name:'Save draft changes'}).click();
  await expect(page.locator('.mail-meta')).toContainText('A personal stock check');await page.getByRole('button',{name:'Approve for Phase 3'}).click();await expect(page.getByRole('status')).toContainText('No email was sent');await expect(page.getByRole('button',{name:'Approve for Phase 3'})).toBeDisabled();

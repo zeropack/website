@@ -2,7 +2,7 @@ import type {Control} from './send.ts';
 import {nativePreview} from './send.ts';
 export type Contact={id:string;name:string;firstName:string;email:string};
 export type Project={id:string;name:string;status:string;end:string;companyIds:string[]};
-export type Profile={nativeObservation?:import('./send.ts').NativeObservation;controlled?:Control;sequenceEmail?:string;sequenceFirstName?:string;sequenceCompany?:string;isQa?:boolean;id:string;name:string;updatedAt:string;companyId:string;companyName:string;kind:string;product:string;key:string;last:string;quantity:string;typical:number;confidence:string;active:boolean;review:string;snooze:string;issues:string;evidence:string;cycle:string;projectIds:string[];previousIds:string[];contact:Contact|null;contactIssue:string;projects:Project[];snapshot:Snapshot|null;draftState:string};
+export type Profile={nativeObservation?:import('./send.ts').NativeObservation;controlled?:Control;sequenceEmail?:string;sequenceFirstName?:string;sequenceCompany?:string;isQa?:boolean;id:string;name:string;updatedAt:string;companyId:string;companyName:string;kind:string;product:string;emailProduct:string;key:string;last:string;quantity:string;typical:number;confidence:string;active:boolean;review:string;snooze:string;issues:string;evidence:string;cycle:string;projectIds:string[];previousIds:string[];contact:Contact|null;contactIssue:string;projects:Project[];snapshot:Snapshot|null;draftState:string};
 export type Template={id:string;name:string;key:string;process:string;subject:string;body:string;footer:string;active:boolean;version:string;component:string};
 export type Snapshot={schema:1;profileId:string;cycle:string;fingerprint:string;templateKey:string;templateVersion:string;footerKey:string;footerVersion:string;recipient:Contact;companyId:string;subject:string;body:string;html:string;generatedAt:string;edited:boolean;approvedAt:string|null;approvedBy:string|null;decision:string;decisionAt?:string};
 export function today(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Australia/Adelaide',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
@@ -17,6 +17,7 @@ export function timing(p:Profile,now=today()){
 }
 export function blockReason(p:Profile,now=today()):string{
  if(p.kind!=='Verified Profile')return 'This record is not a verified reorder profile.';
+ if(!p.emailProduct.trim())return 'Customer-facing product name required.';
  if(!p.active||p.review==='Paused')return 'Reminders are paused. Reactivate manually in Reorder Management.';
  if(!p.companyId||!p.key||!p.product)return 'Company or product identity needs review.';
  if(p.issues)return 'Resolve the source review issues before generating a preview.';
@@ -49,13 +50,13 @@ export function html(text:string){
  return text.split(/\n\s*\n/).map(paragraph=>'<p>'+escape(paragraph).replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+|mailto:[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>').replace(/\*\*([^*\n]+)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')+'</p>').join('');
 }
 export async function fingerprint(p:Profile,t:Template,f:Template){
- const source=JSON.stringify({company:[p.companyId,p.companyName],product:[p.key,p.product,p.quantity],history:[p.last,p.typical,p.projectIds,p.previousIds,p.cycle],controlled:p.controlled,confidence:p.confidence,active:p.active,snooze:p.snooze,issues:p.issues,contact:p.contact,contactIssue:p.contactIssue,projects:p.projects,template:t,footer:f});
+ const source=JSON.stringify({company:[p.companyId,p.companyName],product:[p.key,p.product,p.emailProduct,p.quantity],history:[p.last,p.typical,p.projectIds,p.previousIds,p.cycle],controlled:p.controlled,confidence:p.confidence,active:p.active,snooze:p.snooze,issues:p.issues,contact:p.contact,contactIssue:p.contactIssue,projects:p.projects,template:t,footer:f});
  const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(source));return Array.from(new Uint8Array(digest),x=>x.toString(16).padStart(2,'0')).join('');
 }
 export async function generate(p:Profile,templates:Template[],now=today()):Promise<Snapshot>{
  const key=chooseKey(p,now);if(!key)throw new Error(blockReason(p,now)||'No applicable template.');
  const t=uniqueTemplate(templates,key),f=uniqueTemplate(templates,t.footer,'Signature');
- const values={first_name:p.contact!.firstName||'there',company_name:p.companyName,product_name:p.product,last_quantity:p.quantity?Number(p.quantity).toLocaleString('en-AU'):'not recorded',last_fulfilment_date:p.last,expected_reorder_date:timing(p,now).expected};
+ const values={first_name:p.contact!.firstName||'there',company_name:p.companyName,product_name:p.emailProduct.trim(),last_quantity:p.quantity?Number(p.quantity).toLocaleString('en-AU'):'not recorded',last_fulfilment_date:p.last,expected_reorder_date:timing(p,now).expected};
  const native=p.controlled?nativePreview(p,templates):null;const subject=native?.subject??merge(t.subject,values),body=native?.body??merge(t.body,values),footer=merge(f.body,values);
  if(/[\r\n]/.test(subject))throw new Error('Subject must be one line.');
  return {schema:1,profileId:p.id,cycle:p.cycle||p.last,fingerprint:await fingerprint(p,t,f),templateKey:t.key,templateVersion:t.version,footerKey:f.key,footerVersion:f.version,recipient:{...p.contact!},companyId:p.companyId,subject,body,html:p.controlled?html(body):html(body)+'<hr>'+html(footer),generatedAt:new Date().toISOString(),edited:false,approvedAt:null,approvedBy:null,decision:'Draft'};

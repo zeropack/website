@@ -1,5 +1,5 @@
 import {BOARD} from './schema.ts';
-import {blockReason,stale,html,merge} from './model.ts';
+import {blockReason,stale,html,merge,primaryContacts} from './model.ts';
 import type {Profile,Template} from './model.ts';
 export const LEDGER='zp-reorder-send-ledger-v1',CONTROLLED_PROFILE='2889840971',CONTROLLED_COMPANY='2757796581',STOCK_SEQUENCE='ce965250-e06e-4427-9f48-f9d2258bc58b';
 export type Control={profileId:string;companyId:string;contactId:string;email:string;sequenceId:string;revision:string;cycle:string;templateBody:string;templateSubject:string;nativeSignoff:string;expires:string};
@@ -8,6 +8,7 @@ export type Ledger={schema:1;lockVerified:boolean;control:Control;attempts:Recor
 export type Storage={getItem:(key:string)=>Promise<any>;setItem:(key:string,value:string,options?:{previous_version?:string})=>Promise<any>};
 export function receiptKey(p:Profile,c:Control){return [p.id,p.cycle||p.last,c.sequenceId].join(':');}
 export function controlled(p:Profile,c:Control):Profile {
+ if(primaryContacts(p).length!==1)throw new Error('The controlled single-recipient test cannot enroll multiple Primary Contacts.');
  if(p.id!==CONTROLLED_PROFILE||p.id!==c.profileId||p.companyId!==CONTROLLED_COMPANY||p.companyId!==c.companyId||p.contact?.id!==c.contactId||p.contact?.email.toLowerCase()!==c.email.toLowerCase()||Date.now()>Date.parse(c.expires))throw new Error('Controlled test identity or time window changed.');
  if(p.contactIssue&&!p.contactIssue.startsWith('Primary Contact Company relation conflicts'))throw new Error(p.contactIssue);
  return {...p,controlled:c,contactIssue:'',cycle:c.cycle};
@@ -23,12 +24,13 @@ async function cas(s:Storage,value:Ledger,version:string){const r=await s.setIte
 export async function claim(s:Storage,p:Profile){const r=await ledgerRead(s),c=r.value.control;if(!r.value.lockVerified)throw new Error('Send lock has not passed installed QA.');const key=receiptKey(p,c);if(r.value.attempts[key])throw new Error('This reminder cycle already has a send attempt. No retry is allowed.');const receipt:Receipt={key,state:'Sending / Enrollment Pending',fingerprint:p.snapshot!.fingerprint,at:new Date().toISOString(),recipient:p.contact!.email};r.value.attempts[key]=receipt;const version=await cas(s,r.value,r.version);return {ledger:r.value,version,receipt};}
 export async function sendOnce(s:Storage,id:string,expected:string,load:()=>Promise<{profiles:Profile[];templates:Template[]}>,sequence:()=>Promise<any>,enroll:()=>Promise<any>,log:(r:Receipt)=>Promise<void>){
  let d=await load(),p=d.profiles.find(p=>p.id===id);if(!p||p.updatedAt!==expected)throw new Error('Profile changed. Refresh before Send.');
+ if(primaryContacts(p).length!==1)throw new Error('Multiple-recipient native sending requires its own verified recipient transport.');
  if(!p.controlled||!p.snapshot?.approvedAt||p.review!=='Approved'||p.snapshot.edited||blockReason(p)||await stale(p,d.templates))throw new Error('A current unedited approved native Sequence preview is required.');
  if(p.sequenceEmail?.toLowerCase()!==p.contact?.email.toLowerCase()||p.sequenceFirstName!==(p.contact?.firstName||'there')||p.sequenceCompany!==p.companyName)throw new Error('Sequence variables differ from current canonical CRM data.');
  const seq=await sequence();if(seq?.id!==p.controlled.sequenceId||seq.status!=='ACTIVE'||seq.context_id!==BOARD||seq.step_count!==1||seq.updated_at!==p.controlled.revision)throw new Error('Sequence state/configuration changed. Revalidate native unsubscribe controls and content.');
  const lock=await claim(s,p); // Durable claim precedes the only enrollment call.
  try{
-  d=await load();const current=d.profiles.find(x=>x.id===id);if(!current||current.updatedAt!==p.updatedAt||blockReason(current)||await stale(current,d.templates)||current.sequenceEmail?.toLowerCase()!==current.contact?.email.toLowerCase()||current.sequenceFirstName!==(current.contact?.firstName||'there')||current.sequenceCompany!==current.companyName)throw new Error('Final live CRM validation changed after locking.');
+  d=await load();const current=d.profiles.find(x=>x.id===id);if(!current||primaryContacts(current).length!==1||current.updatedAt!==p.updatedAt||blockReason(current)||await stale(current,d.templates)||current.sequenceEmail?.toLowerCase()!==current.contact?.email.toLowerCase()||current.sequenceFirstName!==(current.contact?.firstName||'there')||current.sequenceCompany!==current.companyName)throw new Error('Final live CRM validation changed after locking.');
   const again=await sequence();if(JSON.stringify(again)!==JSON.stringify(seq))throw new Error('Sequence changed after locking.');
   const result=await enroll();const ok=result?.succeeded_item_ids?.map(String)||[],bad=result?.failed_item_ids?.map(String)||[];
   lock.receipt.state=ok.length===1&&ok[0]===id&&bad.length===0?'Enrolled':'Send status requires review';

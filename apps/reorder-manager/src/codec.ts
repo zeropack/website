@@ -4,6 +4,7 @@ export function encodeSnapshot(value:Snapshot){const bytes=new TextEncoder().enc
 export function decodeSnapshot(raw:string):Snapshot|null{
  if(!raw)return null;
  try{if(!raw.startsWith(PREFIX)||raw.length>33000)throw 0;const s=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(raw.slice(PREFIX.length)),c=>c.charCodeAt(0))));
- if(s.schema!==1||typeof s.profileId!=='string'||typeof s.fingerprint!=='string'||typeof s.subject!=='string'||typeof s.body!=='string'||typeof s.html!=='string'||!s.recipient?.id)throw 0;return s;
+ if(s.schema!==1||typeof s.profileId!=='string'||typeof s.fingerprint!=='string'||typeof s.subject!=='string'||typeof s.body!=='string'||typeof s.html!=='string'||!s.recipient?.id)throw 0;
+ if(s.additionalRecipients!==undefined&&(!Array.isArray(s.additionalRecipients)||s.additionalRecipients.some((x:any)=>!x.recipient?.id||typeof x.recipient.email!=='string'||typeof x.subject!=='string'||typeof x.body!=='string'||typeof x.html!=='string')))throw 0;return s;
  }catch{throw new Error('Stored review snapshot is invalid. Restore/review it before continuing.');}
 }

@@ -21,3 +21,11 @@ test('Active/incomplete project blocked, responsive width and footer boundary',a
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  const main=await page.locator('main').boundingBox(),footer=await page.locator('footer').boundingBox();expect(Math.abs((main!.y+main!.height)-footer!.y)).toBeLessThan(1);
 });
+
+test('Multiple primary contacts have separate previews and edits revoke approval for all',async({page})=>{
+ await page.goto('/');await page.getByRole('button',{name:'All',exact:true}).click();await page.getByRole('button',{name:/Two contact example/}).click();await expect(page.locator('.context')).toContainText('Sam Lee');await page.getByRole('button',{name:'Generate preview',exact:true}).click();
+ const email=page.frameLocator('iframe[title="Rendered customer email"]');await expect(email.locator('body')).toContainText('Hi Alex');await page.getByLabel('Recipient preview').selectOption('demo-contact-2');await expect(email.locator('body')).toContainText('Hi Sam');
+ await page.getByRole('button',{name:'Approve all recipients'}).click();await expect(page.getByRole('status')).toContainText('No email was sent');await page.getByRole('button',{name:'Edit',exact:true}).click();await page.getByLabel('Email body',{exact:true}).fill('Hi Sam, revised personal message.');await page.getByRole('button',{name:'Save draft changes'}).click();await expect(email.locator('body')).toContainText('revised personal message');
+ await page.getByLabel('Recipient preview').selectOption('demo-contact');await expect(email.locator('body')).toContainText('Hi Alex');await expect(email.locator('body')).not.toContainText('revised personal message');await expect(page.getByRole('button',{name:'Approve all recipients'})).toBeEnabled();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:test.info().outputPath('multiple-primary-contacts.png'),fullPage:true});
+});

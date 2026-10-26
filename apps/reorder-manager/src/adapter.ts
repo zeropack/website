@@ -1,5 +1,5 @@
 import {BOARD,TEMPLATES,COMPANIES,CONTACTS,PROJECTS,C,T,SNAPSHOT,DRAFT_BODY,WRITABLE} from './schema.ts';
-import {blockReason,decide,editDraft,generate,merge,stale,today,uniqueTemplate} from './model.ts';
+import {blockReason,decide,editDraft,generate,merge,stale,today,uniqueTemplate,recipientPreviews} from './model.ts';
 import type {Profile,Template,Project,Snapshot,Contact} from './model.ts';
 import {encodeSnapshot,decodeSnapshot} from './codec.ts';
 import {QA_ID,qaProfile} from './qa.ts';
@@ -36,12 +36,17 @@ export function createAdapter(transport:Transport){
   const projects:Project[]=pr.map(r=>({id:r.id,name:r.name,status:text(r,'project_status'),end:text(r,'project_timeline').match(/\d{4}-\d{2}-\d{2}/g)?.at(-1)||'',companyIds:links(r,'board_relation_mm6471v8')})).sort((a,b)=>a.id.localeCompare(b.id));
   const templates:Template[]=tr.map(r=>({id:r.id,name:r.name,key:text(r,T.key),subject:text(r,T.subject),body:text(r,T.body),footer:text(r,T.footer),active:text(r,T.active)==='Yes',version:text(r,T.version),process:text(r,T.process),component:text(r,T.component)}));
   const profiles:Profile[]=rows.filter(r=>qaMode?r.id===QA_ID&&text(r,C.kind)==='QA':text(r,C.kind)!=='QA').map(r=>{
-   const companyList=links(r,C.company),companyId=companyList.length===1?companyList[0]:'',company=companies.find(x=>x.id===companyId),primary=company?links(company,'board_relation_mm4nz01g'):[],contact=primary.length===1?contacts.find(x=>x.id===primary[0]):null;
-   const email=contact?text(contact,'contact_email'):'',contactCompanies=contact?links(contact,'contact_account'):[];
-   const contactIssue=primary.length!==1?(primary.length?'Multiple Primary Contacts are selected.':'No current Primary Contact is selected.'):!email||!/^\S+@\S+\.\S+$/.test(email)?'Current Primary Contact has no valid email.':contactCompanies.length&&!contactCompanies.includes(companyId)?'Primary Contact Company relation conflicts with this Company.':'';
-   const resolved:Contact|null=contact&&(!contactIssue||(control&&contactIssue.startsWith('Primary Contact Company relation conflicts')))?{id:contact.id,name:[text(contact,'text_mm5n6d0w'),text(contact,'text_mm4pxvbs')].filter(Boolean).join(' ')||contact.name,firstName:text(contact,'text_mm5n6d0w'),email}:null;
+   const companyList=links(r,C.company),companyId=companyList.length===1?companyList[0]:'',company=companies.find(x=>x.id===companyId),primary=company?[...new Set(links(company,'board_relation_mm4nz01g'))].sort():[];
+   const resolvedContacts:Contact[]=[];const contactProblems:string[]=[];
+   for(const id of primary){const contact=contacts.find(x=>x.id===id);if(!contact){contactProblems.push('Current Primary Contact is unavailable.');continue;}
+    const email=text(contact,'contact_email').trim(),contactCompanies=links(contact,'contact_account');
+    const issue=!email||!/^\S+@\S+\.\S+$/.test(email)?'Current Primary Contact has no valid email.':contactCompanies.length&&!contactCompanies.includes(companyId)?'Primary Contact Company relation conflicts with this Company.':'';
+    if(issue)contactProblems.push(issue);
+    if(!issue||(control&&primary.length===1&&issue.startsWith('Primary Contact Company relation conflicts')))resolvedContacts.push({id:contact.id,name:[text(contact,'text_mm5n6d0w'),text(contact,'text_mm4pxvbs')].filter(Boolean).join(' ')||contact.name,firstName:text(contact,'text_mm5n6d0w'),email});
+   }
+   const contactIssue=!primary.length?'No current Primary Contact is selected.':contactProblems.join(' '),resolved=resolvedContacts[0]||null;
    const projectIds=links(r,C.lastProject),previousIds=links(r,C.previousProject);
-   return {nativeObservation:nativeObservation(r),sequenceEmail:text(r,'lookup_mm8fgngv'),sequenceFirstName:text(r,'text_mm8fvfzr'),sequenceCompany:text(r,'text_mm8fk7dv'),id:r.id,name:r.name,updatedAt:r.updated_at,companyId,companyName:company?.name||r.name,kind:text(r,C.kind),product:text(r,C.product),emailProduct:text(r,C.emailProduct),key:text(r,C.key),last:text(r,C.last),quantity:text(r,C.quantity),typical:Number(text(r,C.typical))||0,confidence:text(r,C.confidence),active:text(r,C.active)==='Yes',review:text(r,C.review),snooze:text(r,C.snooze),issues:text(r,C.issues),evidence:text(r,C.evidence),cycle:text(r,C.cycle),projectIds,previousIds,contact:resolved,contactIssue,projects:projects.filter(x=>x.companyIds.includes(companyId)||projectIds.includes(x.id)||previousIds.includes(x.id)),snapshot:decodeSnapshot(text(r,SNAPSHOT)),draftState:text(r,C.draftState)};
+   return {nativeObservation:nativeObservation(r),sequenceEmail:text(r,'lookup_mm8fgngv'),sequenceFirstName:text(r,'text_mm8fvfzr'),sequenceCompany:text(r,'text_mm8fk7dv'),id:r.id,name:r.name,updatedAt:r.updated_at,companyId,companyName:company?.name||r.name,kind:text(r,C.kind),product:text(r,C.product),emailProduct:text(r,C.emailProduct),key:text(r,C.key),last:text(r,C.last),quantity:text(r,C.quantity),typical:Number(text(r,C.typical))||0,confidence:text(r,C.confidence),active:text(r,C.active)==='Yes',review:text(r,C.review),snooze:text(r,C.snooze),issues:text(r,C.issues),evidence:text(r,C.evidence),cycle:text(r,C.cycle),projectIds,previousIds,contact:resolved,contacts:resolvedContacts,contactIssue,projects:projects.filter(x=>x.companyIds.includes(companyId)||projectIds.includes(x.id)||previousIds.includes(x.id)),snapshot:decodeSnapshot(text(r,SNAPSHOT)),draftState:text(r,C.draftState)};
   });
   if(!me.me?.id)throw new Error('Current staff identity unavailable.');
   return {profiles:qaMode?profiles.map(p=>qaProfile(p,me.me)):control?profiles.filter(p=>p.id===control.profileId).map(p=>controlled(p,control)):profiles,templates,actor:String(me.me.id)};
@@ -53,17 +58,17 @@ export function createAdapter(transport:Transport){
   const verified=(await itemBatch([id],BOARD))[0];
   for(const [key,value]of Object.entries(values)){const expected=typeof value==='string'?value:(value as any)?.text??(value as any)?.label??(value as any)?.date??'';if(text(verified,key)!==expected)throw new Error('Write readback differs. Refresh; do not repeat an approval blindly.');}
  }
- async function save(id:string,updatedAt:string,action:'Generate'|'Edit'|'Approve'|'Snooze'|'Skip'|'Pause',draft:Snapshot|null,options:{subject?:string;body?:string;date?:string;qaMode?:boolean;control?:Control}={}){
+ async function save(id:string,updatedAt:string,action:'Generate'|'Edit'|'Approve'|'Snooze'|'Skip'|'Pause',draft:Snapshot|null,options:{subject?:string;body?:string;date?:string;recipientId?:string;qaMode?:boolean;control?:Control}={}){
   const data=await load(options.qaMode,options.control),p=data.profiles.find(x=>x.id===id);if(!p||p.updatedAt!==updatedAt)throw new Error('Profile changed. Refresh first.');
   let next=draft,state='Draft',review=p.review,active=p.active,snooze=p.snooze;
   if(action==='Generate'){if(p.review==='Approved'&&!await stale(p,data.templates))throw new Error('Use Edit to invalidate an approved preview before regenerating.');next=await generate(p,data.templates);review='Ready for Review';}
   else if(action==='Edit'||action==='Approve'){
    if(action==='Edit'&&p.controlled)throw new Error('This native Sequence test uses its verified operational body; instance edits cannot be sent.');
    if(!draft||await stale(p,data.templates,draft))throw new Error('Needs Refresh: current Company, contact, product, project or template differs.');
-   if(action==='Edit'){const t=uniqueTemplate(data.templates,draft.templateKey),f=uniqueTemplate(data.templates,t.footer,'Signature');next=editDraft(draft,options.subject||'',options.body||'',merge(f.body,{first_name:p.contact!.firstName||'there',company_name:p.companyName,product_name:p.emailProduct.trim(),last_quantity:p.quantity,last_fulfilment_date:p.last,expected_reorder_date:''}));state='Edited';if(review==='Approved')review='Ready for Review';}
+   if(action==='Edit'){const selected=recipientPreviews(draft).find(x=>x.recipient.id===(options.recipientId||draft.recipient.id));if(!selected)throw new Error('Preview recipient changed.');const t=uniqueTemplate(data.templates,draft.templateKey),f=uniqueTemplate(data.templates,t.footer,'Signature');next=editDraft(draft,options.subject||'',options.body||'',merge(f.body,{first_name:selected.recipient.firstName||'there',company_name:p.companyName,product_name:p.emailProduct.trim(),last_quantity:p.quantity,last_fulfilment_date:p.last,expected_reorder_date:''}),selected.recipient.id);state='Edited';if(review==='Approved')review='Ready for Review';}
    else{const d=decide(p,'Approve',draft,data.actor);next=d.draft;state=d.state;review=d.review;}
   }else{const d=decide(p,action,draft,data.actor,options.date);next=d.draft;state=d.state;review=d.review;active=d.active;snooze=d.snooze;}
-  if(next&&next.body.length>2000)throw new Error('Body must be 2,000 characters or fewer.');
+  if(next&&recipientPreviews(next).some(x=>x.body.length>2000))throw new Error('Body must be 2,000 characters or fewer.');
   const serialized=next?encodeSnapshot(next):'';
   if(action==='Approve'&&p.review==='Approved')throw new Error('This draft is already approved; no duplicate approval was written.');
   const values:Record<string,unknown>={[SNAPSHOT]:serialized,[DRAFT_BODY]:next?{text:next.body}:null,[C.draftState]:{label:state},[C.review]:{label:review},[C.active]:{label:active?'Yes':'No'},[C.snooze]:snooze?{date:snooze}:null};

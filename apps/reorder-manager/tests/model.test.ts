@@ -26,3 +26,23 @@ test('Snooze holds until date and expires safely',()=>{const r=decide(fixture(),
 test('Skip suppresses current cycle, pause persists',()=>{const p=fixture(),s=decide(p,'Skip',null,'user'),pause=decide(p,'Pause',null,'user');assert.equal(s.active,true);assert.equal(s.review,'Skipped');assert.equal(pause.active,false);assert.equal(pause.review,'Paused');assert.equal(timing({...p,active:pause.active,review:pause.review}).status,'Paused')});
 test('Newer un-reconciled completed project blocks a new preview',()=>{const p=fixture({projects:[{id:'new',name:'Newer order',status:'Completed',end:day,companyIds:[fixture().companyId]}]});assert.equal(chooseKey(p),null)});
 test('A copied recipient or profile snapshot cannot remain authoritative',async()=>{const p=fixture(),d=await generate(p,templates);assert.equal(await stale(p,templates,{...d,profileId:'another-record'}),true);assert.equal(await stale(p,templates,{...d,recipient:{...d.recipient,email:'other@example.invalid'}}),true)});
+
+test('Multiple primary contacts receive individually personalised previews and one approval',async()=>{
+ const p=fixture({contacts:[{id:'2',name:'Sam Lee',firstName:'Sam',email:'sam@example.invalid'},{id:'1',name:'Alex Taylor',firstName:'Alex',email:'alex@example.invalid'}]});
+ const d=await generate(p,templates);assert.equal(d.recipient.firstName,'Alex');assert.match(d.body,/Hi Alex/);assert.equal(d.additionalRecipients?.length,1);assert.match(d.additionalRecipients![0].body,/Hi Sam/);assert.equal(await stale(p,templates,d),false);
+ const approved=decide(p,'Approve',d,'reviewer').draft!;assert.ok(approved.approvedAt);assert.equal(approved.additionalRecipients?.[0].recipient.email,'sam@example.invalid');
+ const edited=editDraft(approved,'For Sam','Hi Sam, revised','Footer','2');assert.equal(edited.body,d.body);assert.equal(edited.additionalRecipients![0].body,'Hi Sam, revised');assert.equal(edited.approvedAt,null);
+ for(const contacts of [p.contacts!.slice(0,1),[...p.contacts!,{id:'3',name:'Jo',firstName:'Jo',email:'jo@example.invalid'}],p.contacts!.map(c=>c.id==='2'?{...c,email:'new@example.invalid'}:c)])assert.equal(await stale({...p,contacts},templates,d),true);
+ assert.equal(await stale({...p,contacts:[...p.contacts!].reverse()},templates,d),false);
+});
+test('Shared mailboxes dedupe case-insensitively while every primary must be valid',async()=>{
+ const contacts=[{id:'1',name:'Alex',firstName:'Alex',email:'team@example.invalid'},{id:'2',name:'Sam',firstName:'Sam',email:'TEAM@example.invalid'}];
+ const d=await generate(fixture({contacts}),templates);assert.equal(d.additionalRecipients?.length,0);
+ await assert.rejects(generate(fixture({contacts:[...contacts,{id:'3',name:'Bad',firstName:'Bad',email:''}]}),templates),/Every current Primary/);
+});
+test('Current native monday variables render for each recipient and unknown variables fail closed',async()=>{
+ const p=fixture({contacts:[{id:'1',name:'Alex',firstName:'Alex',email:'alex@example.invalid'},{id:'2',name:'Sam',firstName:'Sam',email:'sam@example.invalid'}]});
+ const native=templates.map(t=>({...t,subject:t.subject.replaceAll('{{company_name}}','{pulse.text_mm8fk7dv}'),body:t.body.replaceAll('{{first_name}}','{pulse.text_mm8fvfzr}').replaceAll('{{product_name}}','{pulse.text_mm8gb0g7}')}));
+ const d=await generate(p,native);assert.match(d.body,/Hi Alex/);assert.match(d.additionalRecipients![0].body,/Hi Sam/);assert.doesNotMatch(d.body,/pulse\./);
+ await assert.rejects(generate(p,native.map(t=>({...t,body:t.body+' {pulse.unknown}'}))),/Unresolved/);
+});

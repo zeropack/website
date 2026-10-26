@@ -47,3 +47,14 @@ All seven current `Email - Product Name` values were read from the live board an
 The 56 non-sending tests cover the seven values, blank/changed wording, stale approval and Send gating, paired internal specifications and existing duplicate/suppression controls. The controlled test ledger and sole physical enrollment path were not reset or changed. The source is ready for CI and installed preview verification.
 
 The authorised controlled test is complete. No additional customer email or enrollment is authorised without explicit user approval.
+
+
+## Multiple Company Primary Contacts — 27 October 2026
+
+The review adapter now validates all current Company primaries and shows every resolved name/email. Multiplicity alone is valid. Any invalid or mismatched selected contact holds the complete cohort; a shared mailbox is deduplicated case-insensitively by email after validation. A single Company/product profile and purchase cycle remain intact.
+
+Generate stores one personalised subject/body/HTML per distinct recipient in the existing snapshot. The recipient selector displays each email; instance edits affect only that recipient and revoke the cohort approval. The fingerprint covers the complete sorted contact identity/name/email list. Added, removed, renamed or changed contacts invalidate approval; relation ordering does not. Existing single-recipient snapshots load but require regeneration because the fingerprint now covers the set. Native monday `pulse` variables in current backup templates are rendered through the same supported token mapping.
+
+Daily refresh accepts multiple primaries. The single Contact Email compatibility field holds only the first sorted Contact ID's email after ALL primaries pass, solely to keep existing queue formulas working; it is never a full recipient list or send authority. Company primaries and optional deprecated relation caches are not modified.
+
+Customer mode remains preview/approval only. The existing controlled single-recipient test transport explicitly rejects multiple contacts before claiming or enrolling. This release does not implement production per-recipient native enrollment. Before that transport is released, each unique recipient needs isolated native suppression, recipient-bound variables, a durable Profile+Cycle+Sequence+normalized-email attempt lock, independent outcome evidence and no retry after uncertain/blocked attempts; legacy profile-level attempts must still prevent replay. Never rotate a shared row's recipient variables between active native runs. No sequence activation or email is authorized by this change.

@@ -2,3 +2,5 @@
 @media(max-width:700px){header{height:auto;min-height:72px;flex-wrap:wrap;gap:14px;padding:16px 18px}.header-right{flex-wrap:wrap;gap:8px;min-width:0;width:100%}.header-right button{padding:8px 10px;font-size:12px}.send-button{width:100%;margin-top:10px}}
 
 .context .internal-product-label{margin-top:15px}
+
+.recipient-picker{display:grid;gap:8px;padding:16px 22px;border-bottom:1px solid #e5ebea}.recipient-picker select{width:100%;max-width:100%;padding:10px;font:inherit}.recipient-picker small{color:#607777}.context a{overflow-wrap:anywhere}

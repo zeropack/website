@@ -1,6 +1,6 @@
-# Zero Pack Reorder Review — Phase 2
+# Zero Pack Reorder Review — Phase 3 controlled test
 
-Staff-only standalone Monday board-view application. **No email transmission exists.** No Outlook/MailerLite/Mass Mail/Emails & Activities calls, mailbox drafts, send recipes or backend tokens. The public website and Quote Manager bundle are unchanged.
+Staff-only standalone Monday board-view application. Customer and synthetic QA views remain preview-only. The separately gated controlled Code Black test has one physical Send enrollment path. No Outlook/MailerLite/Mass Mail/Emails & Activities calls, mailbox drafts, send recipes or backend tokens. The public website and Quote Manager bundle are unchanged.
 
 ## Run and build
 
@@ -43,7 +43,7 @@ Optimistic `updated_at` checks before mutation and exact readback protect staff 
 
 The Monday app feature registration, upload and installed-context SDK acceptance are pending. Local browser QA and native connector snapshot storage tests are not proof of installed-app success. Do not report Phase 2 fully live before that gate.
 
-Phase 3 proposal only: a human-triggered send handler must re-resolve current recipient, compare exact approved fingerprint/snapshot, check newer orders/projects, reminder/snooze/skip/pause and contact eligibility/suppression, enforce idempotency and log provider message ID/result. No Phase 3 code or sending is included here.
+Phase 3 proposal only: a human-triggered send handler must re-resolve current recipient, compare exact approved fingerprint/snapshot, check newer orders/projects, reminder/snooze/skip/pause and contact eligibility/suppression, enforce idempotency and log provider message ID/result. Historical Phase 2 release note; superseded by the controlled Phase 3 implementation below.
 
 ## 26 October — installed mutation QA preparation
 
@@ -55,3 +55,16 @@ Validation: 45 unit/adapter/codec tests pass, including the complete QA prepare/
 Release: Monday v2 `19273688`, feature `127293484`, is live after direct user approval. The exact ZIP SHA-256 is `2bde66f315afa3f2d91f7e10cf399f21a61ac8ed36bc5e9dedbaa097c924f828`. Installed generate/edit/readback/approve/approval-after-page-refresh/Snooze/Skip/Pause/Reset checks passed using only the excluded fixture. Pause persisted through app refresh. The final fixture is QA, Reminder Active No, Review Status Not Ready, Draft State Empty, with blank body/snapshot/snooze. Seven real customer profiles and all shared templates exactly matched their captured baselines. No email or Sequence enrollment occurred. GitHub run 40242567107 passed unit/build, all six desktop/mobile browser flows and the Monday build; this supersedes the local browser-launch limitation for independent automated verification.
 
 Phase 3 remains gated. The inspected public Sequence type exposes metadata only; it has no live email content/recipient-column or per-recipient suppression/eligibility fields. Enrollment exists from API 2026-04, but metadata visibility is not proof of email eligibility or content parity. Do not implement or enable enrollment by assuming those checks pass. Investigate a supported native validation mechanism before any internal Send test. Edited instance text also needs an explicit native Sequence binding before the approved preview can be treated as operational sending content. No custom sender, signature or unsubscribe mechanism was created.
+
+
+## Phase 3 — authoritative controlled-send architecture (26 October 2026)
+
+Application pre-send validation + monday-native unsubscribe enforcement at Sequence execution + post-enrollment run-state verification. There is no supported app-level native global-unsubscribe eligibility precheck. Contact Subscribed is not authoritative. Both native unsubscribe controls remain enabled. Never override or retry a Stopped/suppressed run.
+
+Only the physical Send handler calls enrollment. No effects, polling, dates, statuses, approvals or activation initiate enrollment. Test identity is the Code Black profile, its current canonical Company Primary Contact, a pinned Sequence revision and the controlled review cycle. The Company-match exception only accepts this exact identity and expires after two hours. It also permits a controlled Stock Check preview while preserving the actual fulfilment date, cadence, confidence and 18-month next-review date. Instance edits are disabled for this native fixed-content test. Direct recipient/name/company variables must match canonical CRM immediately before enrollment.
+
+Durable idempotency uses app-global SDK storage and version-conditional writes, keyed by Profile ID + Review Cycle + Sequence ID with approved SHA-256 fingerprint. A non-sending bootstrap build proves concurrent/stale-version exclusion on installed storage before creating the ledger. A subsequent build removes provisioning UI and cannot reset the ledger. A durable Sending / Enrollment Pending claim precedes live revalidation and the sole enrollment call. Accepted enrollment remains Enrolled, never Sent. Ambiguous outcomes become Send status requires review and remain locked. All existing attempts, including blocked ones, prevent further enrollment across refresh/reopen.
+
+The native contact journey is inspected using monday's supported native/connector interface. An authorised operator records its run ID, status, reason and email/activity evidence on Last Reminder Result as nativeRun. On refresh the app reconciles that observation into the durable receipt; this path cannot enroll, clear a lock or retry. Unsubscribe/permission/suppression results become Blocked by monday. Unknown terminations require review. Sent requires explicit email-sent evidence. Review Status must never be set Sent solely on enrollment acceptance. No API for journey inspection or native eligibility is fabricated.
+
+52 unit/adapter/codec tests pass, including durable concurrent lock contention, duplicate prevention, ambiguous enrollment, stale variables, narrow exception expiry and a stubbed Stopped unsubscribe reconciliation which stays locked. TypeScript and the Monday production build pass. Live controlled-send evidence is maintained in the Phase 2/3 operational runbook. Bootstrap v3 installed CAS proof passed; no customer email was sent by provisioning.

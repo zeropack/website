@@ -1,0 +1,36 @@
+name: Reorder Manager
+on:
+  push:
+    branches: [feature/zero-pack-reorder-review]
+    paths: ['apps/reorder-manager/**', '.github/workflows/reorder-manager.yml']
+  pull_request:
+    paths: ['apps/reorder-manager/**', '.github/workflows/reorder-manager.yml']
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/reorder-manager
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: apps/reorder-manager/package-lock.json
+      - run: npm ci
+      - run: npm run check
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - run: npm run build:monday
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reorder-review-monday-preview-only
+          path: apps/reorder-manager/dist
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reorder-review-qa
+          path: apps/reorder-manager/test-results

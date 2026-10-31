@@ -89,6 +89,15 @@ exists at `/api/integrations/mailerlite/reconcile`: production GET uses the
 existing cron bearer secret; POST uses the existing internal secret. Both return
 counts only. HTTP failures do not expose upstream bodies or recipient details.
 
+Health persistence is coalesced: a changed aggregate result is written immediately;
+an identical result is written at least every six hours on the next completed run.
+`checkedAt` is the time of the persisted observation, not necessarily the last poll.
+Missing, corrupt, unreadable or future-dated health is replaced by the current
+result. This only reduces diagnostic writes: snapshot polling, pending-inbox
+listing, processing, retries, receipts and contact locks keep their existing cadence.
+Concurrent runs can still perform redundant health writes; this diagnostic record
+is not a processing lock or a source of suppression authority.
+
 ## Acceptance and operation
 
 1. Run `npm run test:mailerlite`, TypeScript checks and the production build.

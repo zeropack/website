@@ -76,5 +76,24 @@ export async function pendingIds(limit = 40): Promise<string[]> {
 }
 export async function saveHealth(summary: Record<string, unknown>): Promise<void> {
   // This record contains aggregate counts/configuration flags only, never PII.
-  await put(`${root()}health.json`, JSON.stringify({ ...summary, checkedAt: new Date().toISOString() }), { access: "public", addRandomSuffix: false, allowOverwrite: true, contentType: "application/json", cacheControlMaxAge: 0 });
+  const pathname = `${root()}health.json`;
+  const now = Date.now();
+  try {
+    const result = await get(pathname, { access: "public", useCache: false });
+    if (result?.statusCode === 200) {
+      const previous: unknown = await new Response(result.stream).json();
+      if (previous && typeof previous === "object" && !Array.isArray(previous)) {
+        const { checkedAt, ...lastSummary } = previous as Record<string, unknown>;
+        const age = now - Date.parse(String(checkedAt));
+        const stable = (value: Record<string, unknown>) => JSON.stringify(Object.entries(value).sort(([a], [b]) => a.localeCompare(b)));
+        // Persist every changed result immediately, plus a six-hour heartbeat.
+        // Polling, durable events, retries and suppression writes still run every time.
+        if (age >= 0 && age < 6 * 60 * 60 * 1000 && stable(lastSummary) === stable(summary)) return;
+      }
+    }
+  } catch {
+    // Missing, unreadable or corrupt health must not suppress the current result.
+    // Fall back to the original write path; do not log record contents or secrets.
+  }
+  await put(pathname, JSON.stringify({ ...summary, checkedAt: new Date(now).toISOString() }), { access: "public", addRandomSuffix: false, allowOverwrite: true, contentType: "application/json", cacheControlMaxAge: 0 });
 }

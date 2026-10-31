@@ -1,5 +1,4 @@
-import { after, NextResponse } from "next/server";
-import { safeReconcileMailerLite } from "@/lib/integrations/mailerlite/reconcile";
+import { NextResponse } from "next/server";
 
 import {
   type ReconcileMode,
@@ -61,9 +60,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
 
-  // Reuse the commissioned Cloudflare cadence and daily Vercel fallback, even
-  // if the independent Klaviyo reconciliation fails during this invocation.
-  after(safeReconcileMailerLite);
   try {
     const result = await run("apply");
     return NextResponse.json(result, {

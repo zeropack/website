@@ -64,6 +64,11 @@ were unchanged. No Klaviyo profile, subscription, suppression or send was change
 No MailerLite subscriber/campaign was deleted, reactivated or resubscribed.
 Personal details, subscriber links and secrets must not be committed to this repository.
 
+The former runtime remained in `internal` mode, and the real campaign records did
+not carry its required `zp_permission_scope`. Its narrow commissioning guard therefore
+did not mirror those real campaign unsubscribes. This task reconciled them manually
+under explicit user authority; it did not broaden the old unattended integration.
+
 ## Blob retention and recovery
 
 The manual script `scripts/audit-retired-mailerlite.mjs --audit` can enumerate both
@@ -72,7 +77,16 @@ historical pending/receipt records in memory, and verify existing Monday suppres
 state. It reports aggregate counts only. It cannot write/delete Blob or change CRM.
 It is not a cron, API route, build step or recurring job in the final implementation.
 Pending, quarantined, unreadable, unknown or unreflected records block readiness.
-The exact one-off ledger audit result is recorded in the PR once available.
+The one-off preview audit on 31 October 2026, deployment
+`dpl_FFLwVPCUhY5GsQCcKfZCizoEhPWe`, scanned both namespaces and returned:
+
+```json
+{"pending":0,"receipts":1,"quarantined":0,"locks":0,"health":1,"unknown":0,"unreadable":0,"unreflected":0,"verified":1,"ready":true}
+```
+
+It verified the retained receipt against Monday without replaying it. Two bounded
+namespace listings plus a direct receipt read were performed; no Blob/CRM writes
+were made by the audit. Its temporary preview-build invocation was then removed.
 
 Retain every historical encrypted queue/receipt/lock/health object and its encryption
 key, as well as Monday audit notes, source subscriber statuses and sent-campaign

@@ -1,3 +1,5 @@
+> Historical implementation reference, retired by the pending MailerLite retirement PR. Do not recommission this runtime or remove retained keys/records from these old instructions. See ../mailerlite-retirement.md.
+
 # MailerLite suppression integration
 
 MailerLite is an additional delivery platform for the approved New Home series,

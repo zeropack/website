@@ -23,6 +23,7 @@ export type ArticleSection = {
   paragraphs?: string[];
   bullets?: string[];
   numberedList?: string[];
+  afterListParagraphs?: string[];
   table?: SectionTable;
   table2?: SectionTable;
   note?: string;

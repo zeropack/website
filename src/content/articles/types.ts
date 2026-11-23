@@ -10,6 +10,7 @@ export type GuideSubsection = {
   paragraphs?: string[];
   bullets?: string[];
   numberedList?: string[];
+  afterListParagraphs?: string[];
   table?: SectionTable;
   table2?: SectionTable;
   note?: string;
@@ -48,6 +49,8 @@ export type Article = {
   topics?: string[];
   heroImage?: string;
   heroAlt?: string;
+  heroWidth?: number;
+  heroHeight?: number;
   projectAttribution?: string;
   hideGuidePromo?: boolean;
   primaryKeyword?: string;

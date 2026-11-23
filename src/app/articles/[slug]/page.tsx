@@ -42,6 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     canonicalUrl: getArticleCanonicalUrl(article),
     locale: MARKET_ROUTES[canonicalMarket].locale,
     openGraphType: "article",
+    ogImagePath: article.heroImage,
   });
 }
 
@@ -61,6 +62,7 @@ export default async function Page({ params }: Props) {
   return (
     <>
       <Breadcrumbs
+        canonicalOrigin={new URL(getArticleCanonicalUrl(article)).origin}
         items={[
           { name: homeName, href: "/" },
           { name: "Articles", href: "/articles/" },

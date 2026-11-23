@@ -78,7 +78,7 @@ export function ArticleTemplate({ article }: { article: Article }) {
       url: absoluteUrl("/"),
     },
     mainEntityOfPage: articleUrl,
-    image: article.heroImage ? absoluteUrl(article.heroImage) : undefined,
+    image: article.heroImage ? new URL(article.heroImage, articleUrl).toString() : undefined,
     keywords: [article.primaryKeyword, ...(article.secondaryKeywords ?? []), ...(article.topics ?? [])]
       .filter(Boolean)
       .join(", "),
@@ -110,8 +110,8 @@ export function ArticleTemplate({ article }: { article: Article }) {
             <Image
               src={article.heroImage}
               alt={article.heroAlt}
-              width={1600}
-              height={900}
+              width={article.heroWidth ?? 1600}
+              height={article.heroHeight ?? 900}
               className="h-auto w-full"
               priority
             />
@@ -197,6 +197,9 @@ export function ArticleTemplate({ article }: { article: Article }) {
                   ))}
                 </ol>
               ) : null}
+              {s.afterListParagraphs?.map((p, i) => (
+                <p key={`after-${i}`} className="mt-4 text-charcoal/75">{renderParagraph(p)}</p>
+              ))}
               {s.table ? (
                 <>
                   <div className="mt-6 overflow-x-auto rounded-xl border border-black/8">

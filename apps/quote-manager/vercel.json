@@ -1,0 +1,1 @@
+{"$schema":"https://openapi.vercel.sh/vercel.json","headers":[{"source":"/(.*)","headers":[{"key":"X-Robots-Tag","value":"noindex, nofollow, noarchive"},{"key":"Cache-Control","value":"private, no-store"},{"key":"Referrer-Policy","value":"no-referrer"},{"key":"X-Content-Type-Options","value":"nosniff"}]}],"git":{"deploymentEnabled":{"master":false}}}

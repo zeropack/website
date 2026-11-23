@@ -4,7 +4,7 @@ import { JsonLd } from "./JsonLd";
 
 export type Crumb = { name: string; href: string };
 
-export function Breadcrumbs({ items }: { items: Crumb[] }) {
+export function Breadcrumbs({ items, canonicalOrigin }: { items: Crumb[]; canonicalOrigin?: string }) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -12,7 +12,7 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
       "@type": "ListItem",
       position: idx + 1,
       name: c.name,
-      item: absoluteUrl(c.href),
+      item: canonicalOrigin ? new URL(c.href, canonicalOrigin).toString() : absoluteUrl(c.href),
     })),
   };
 

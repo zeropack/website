@@ -38,7 +38,7 @@ export const singleVsDoubleAdhesiveMailersReturns: Article = {
   "keyTakeaways": [
     "A second adhesive strip helps only if the opened mailer can be repacked and securely resealed for returns.",
     "Test both the outbound and return journey using realistic packed samples before approving production.",
-    "Zero Pack adhesive protective release strips are not compostable: remove both before composting a suitable confirmed mailer.",
+    "Zero Pack adhesive protective release strips are not compostable. Remove them and any other unsuitable attachments before composting an eligible mailer.",
     "Certification of the mailer material does not guarantee local collection acceptance."
   ],
   "cta": {
@@ -62,13 +62,6 @@ export const singleVsDoubleAdhesiveMailersReturns: Article = {
       ]
     },
     {
-      "id": "short-answer",
-      "heading": "Short answer",
-      "paragraphs": [
-        "A single-adhesive mailer has one closure for the outbound shipment. A double-adhesive mailer has an additional strip that can be used to close the package again after it has been opened, provided the construction, size and opening method support it. For brands planning to use the same outer bag for returns, trial the complete two-way journey before approving a custom production specification."
-      ]
-    },
-    {
       "id": "difference",
       "heading": "What is the difference between single and double adhesive?",
       "paragraphs": [
@@ -81,20 +74,25 @@ export const singleVsDoubleAdhesiveMailersReturns: Article = {
       "id": "remove-protective-strips",
       "heading": "Important: remove the adhesive protective strips before composting",
       "paragraphs": [
-        "The peel-off protective release strips covering the adhesive on Zero Pack mailers are not compostable. With a double-adhesive mailer, the recipient may encounter an additional release strip when closing the package for a return. Both protective strips must be removed from the packaging and kept out of compost before the remaining mailer is composted under the conditions applicable to its confirmed specification. Do not assume that the protective strips are certified simply because the mailer material is compostable.",
-        "For brands using a double-adhesive mailer, this should be clearly explained to the end recipient in the packaging or customer disposal instructions. The first protective strip may already have been removed during fulfilment, but the recipient still needs to know to remove the second strip when using the return closure and to keep any loose protective liners out of compost. The customer should also check the correct composting route for the mailer itself; compostability certification does not guarantee acceptance by a local collection service."
+        "The peel-off protective release strips covering the adhesive on Zero Pack mailers are not compostable. Remove them and keep them out of compost. On a double-adhesive mailer, the first protective strip is normally removed during fulfilment while the second may stay in place until the return closure is used. If the second closure is never used, its protective strip must still be removed before composting.",
+        "Before composting the mailer itself, also remove shipping labels, tape or other attachments that are not confirmed suitable for the same composting pathway. Follow the confirmed material and certification instructions for the actual supplied mailer and check whether the intended home-compost or organics service accepts that product. Certification alone does not guarantee acceptance by a local collection service.",
+        "Suggested recipient instruction (adapt to the exact mailer specification and destination): “Before composting this mailer, remove the adhesive protective backing strips, any non-compostable shipping labels and tape, and other unsuitable attachments. Only compost the remaining mailer using a pathway confirmed for this product. Check local collection acceptance. Do not put the mailer in conventional recycling unless a verified local programme accepts it. If no appropriate composting service or home-composting route is available, follow your local residual-waste guidance.”"
       ]
     },
     {
       "id": "when-to-choose-double-adhesive",
       "heading": "When is a second strip worth considering?",
       "paragraphs": [
-        "Consider double adhesive when all of these statements are broadly true:",
-        "• Customers are instructed or encouraged to return eligible items in the original outer mailer.",
-        "• The product is suitable for flexible packaging in both directions.",
-        "• The opened bag retains enough space and strength for the product to be repacked and closed.",
-        "• A return label or courier instruction can be applied without interfering with the second closure.",
-        "• Your warehouse team and customer service process can clearly explain how the return-ready design works.",
+        "Consider double adhesive when all of these statements are broadly true:"
+      ],
+      "bullets": [
+        "Customers are instructed or encouraged to return eligible items in the original outer mailer.",
+        "The product is suitable for flexible packaging in both directions.",
+        "The opened bag retains enough space and strength for the product to be repacked and closed.",
+        "A return label or courier instruction can be applied without interfering with the second closure.",
+        "Your warehouse team and customer service process can clearly explain how the return-ready design works."
+      ],
+      "afterListParagraphs": [
         "If most returns are handled using a box, a different prepaid bag, an in-store handoff or no repackaging at all, adding a second strip may not improve the actual customer process. First document what happens today, then decide what the mailer needs to support."
       ]
     },
@@ -102,14 +100,18 @@ export const singleVsDoubleAdhesiveMailersReturns: Article = {
       "id": "seven-step-test",
       "heading": "The seven-step returns-ready mailer test",
       "paragraphs": [
-        "Before placing a custom order, test a physical sample with an ordinary packed order and at least one awkward but realistic variation.",
-        "1. Pack the normal order. Use the tissue, inserts, labels or other protective materials that customers actually receive. The contents should fit without pulling the closure area out of alignment.",
-        "2. Seal it for dispatch. Check the first adhesive area is accessible to the packing team, the opening method is clear and the finished package has enough space for the carrier label.",
-        "3. Open it as a customer would. Do not carefully dismantle the pack in a way a normal recipient would not. Check how the tear, cut or peel affects the available return flap.",
-        "4. Repack the product. Try putting the item back into the bag, including any retained protective elements. A garment folded differently after being tried on can change the packed profile.",
-        "5. Use the second strip. Confirm the return flap reaches its intended adhesive without excessive tension, folds or contamination. The second seal should be simple to identify and use.",
-        "6. Apply the return label and instructions. Check that the new label does not cover the opening/closure instructions, barcodes that still need to be read or the second adhesive feature. Confirm how the old shipping label should be handled within the approved returns process.",
-        "7. Test the actual workflow. Ask the fulfilment and customer-service teams to pack, explain and process the return using the sample. Include a check that adhesive protective release strips are removed and that end-recipient instructions state those strips are not compostable. Record defects and resolve them in the final specification before production approval.",
+        "Before placing a custom order, test a physical sample with an ordinary packed order and at least one awkward but realistic variation."
+      ],
+      "numberedList": [
+        "Pack the normal order. Use the tissue, inserts, labels or other protective materials that customers actually receive. The contents should fit without pulling the closure area out of alignment.",
+        "Seal it for dispatch. Check the first adhesive area is accessible to the packing team, the opening method is clear and the finished package has enough space for the carrier label.",
+        "Open it as a customer would. Do not carefully dismantle the pack in a way a normal recipient would not. Check how the tear, cut or peel affects the available return flap.",
+        "Repack the product. Try putting the item back into the bag, including any retained protective elements. A garment folded differently after being tried on can change the packed profile.",
+        "Use the second strip. Confirm the return flap reaches its intended adhesive without excessive tension, folds or contamination. The second seal should be simple to identify and use.",
+        "Apply the return label and instructions. Check that the new label does not cover the opening/closure instructions, barcodes that still need to be read or the second adhesive feature. Confirm how the old shipping label should be handled within the approved returns process.",
+        "Test the actual workflow. Ask the fulfilment and customer-service teams to pack, explain and process the return using the sample. Include a check that adhesive protective release strips are removed and that end-recipient instructions state those strips are not compostable. Record defects and resolve them in the final specification before production approval."
+      ],
+      "afterListParagraphs": [
         "These are recommended operational checks, not a universal product test standard. Additional protection and carrier-specific testing may be needed for particular items or shipping conditions."
       ]
     },
@@ -128,17 +130,21 @@ export const singleVsDoubleAdhesiveMailersReturns: Article = {
       "id": "custom-mailer-brief",
       "heading": "What to include in a custom mailer brief",
       "paragraphs": [
-        "Give your packaging supplier the information needed to assess both the outward and return journeys:",
-        "• Representative packed product dimensions, weight and any awkward combinations.",
-        "• Typical packing materials and product protection needs.",
-        "• Estimated quantity by mailer size.",
-        "• Whether a second adhesive closure is required for returns.",
-        "• How recipients should open and reuse the mailer.",
-        "• Preferred carrier-label area and any return-label process.",
-        "• Artwork direction and whether opening instructions need printing.",
-        "• Delivery market and intended production timetable for confirmation in the quote.",
-        "• Any required material, certification or disposal wording to verify for the exact selected specification. Include instructions to remove the non-compostable adhesive protective strips before composting and to confirm an appropriate local disposal route.",
-        "For Zero Pack custom compostable mailers, single- and double-adhesive options are available. Final size, print, material and certification are considered for the actual order rather than assumed from a generic illustration. More detail on the broader process is in How Custom Compostable Mailers Work: Enquiry to Delivery."
+        "Give your packaging supplier the information needed to assess both the outward and return journeys:"
+      ],
+      "bullets": [
+        "Representative packed product dimensions, weight and any awkward combinations.",
+        "Typical packing materials and product protection needs.",
+        "Estimated quantity by mailer size.",
+        "Whether a second adhesive closure is required for returns.",
+        "How recipients should open and reuse the mailer.",
+        "Preferred carrier-label area and any return-label process.",
+        "Artwork direction and whether opening instructions need printing.",
+        "Delivery market and intended production timetable for confirmation in the quote.",
+        "Any required material, certification or disposal wording to verify for the exact selected specification. Include instructions to remove the non-compostable adhesive protective strips before composting and to confirm an appropriate local disposal route."
+      ],
+      "afterListParagraphs": [
+        "For Zero Pack custom compostable mailers, single- and double-adhesive options are available. Final size, print, material and certification are considered for the actual order rather than assumed from a generic illustration. Read [Custom Compostable Mailers: An Ecommerce Guide](/articles/custom-compostable-mailers-guide/) for the broader enquiry-to-order process."
       ]
     },
     {
@@ -153,8 +159,14 @@ export const singleVsDoubleAdhesiveMailersReturns: Article = {
       "id": "next-step",
       "heading": "Next step",
       "paragraphs": [
-        "If you are planning a custom mailer, share a representative packed product, your typical order sizes and the way returns are handled. Zero Pack can help assess whether a single- or double-adhesive compostable mailer is suitable, then work through sizing and branding for the approved specification.",
-        "Explore custom compostable mailers: https://www.zeropack.co/custom-compostable-mailers/"
+        "If you are planning a custom mailer, share a representative packed product, your typical order sizes and the way returns are handled. Zero Pack can help assess whether a single- or double-adhesive compostable mailer is suitable, then work through sizing and branding for the approved specification."
+      ]
+    },
+    {
+      "id": "sources-and-further-reading",
+      "heading": "Sources and further reading",
+      "paragraphs": [
+        "For general information on certification scope, consult the [Australasian Bioplastics Association certification overview](https://bioplastics.org.au/certification/). For practical differences between home and commercial composting, see the [US Environmental Protection Agency's recycling and composting FAQ](https://www.epa.gov/trash-free-waters/frequently-asked-questions-about-plastic-recycling-and-composting). Requirements and collection acceptance vary by market and service; these resources do not certify any particular Zero Pack mailer."
       ]
     }
   ],
@@ -181,7 +193,10 @@ export const singleVsDoubleAdhesiveMailersReturns: Article = {
     },
     {
       "question": "What should customers do with the peel-off adhesive strips?",
-      "answer": "Remove them and keep them out of home or commercial compost. Give recipients a clear instruction to remove the protective strips before composting the mailer, including the second strip used for a return. Check local disposal rules for the removed strips and for the mailer itself."
+      "answer": "Remove them and keep them out of home or commercial compost, including the second strip over the return closure. Also remove labels, tape and other attachments unless confirmed suitable for the same composting pathway. Follow the exact mailer specification and check your local service's acceptance rules."
     }
-  ]
+  ],
+  "dateModified": "2026-11-23",
+  "heroWidth": 1536,
+  "heroHeight": 1024
 };

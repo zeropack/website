@@ -1,3 +1,5 @@
 import type { Article } from "../../types";
 
-export const generatedUkArticles: Article[] = [];
+import { homeCompostableMailersUkCertification } from "./home-compostable-mailers-uk-certification";
+
+export const generatedUkArticles: Article[] = [homeCompostableMailersUkCertification];
